@@ -1,7 +1,7 @@
 <?php
 function validate_required(array $data, array $fields): void {
     foreach ($fields as $field) {
-        if (empty($data[$field])) {
+        if (!isset($data[$field]) || trim((string)$data[$field]) === '') {
             json_error("Champ requis : $field", 422);
         }
     }
