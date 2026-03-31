@@ -1,0 +1,62 @@
+<?php
+require_once __DIR__ . '/config/env.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/helpers/Response.php';
+require_once __DIR__ . '/helpers/Validator.php';
+
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+$uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$uri    = preg_replace('#^/api#', '', $uri);
+$method = $_SERVER['REQUEST_METHOD'];
+$body   = json_decode(file_get_contents('php://input'), true) ?? [];
+
+// Routes publiques
+if ($uri === '/settings' && $method === 'GET') {
+    require __DIR__ . '/routes/settings.php';
+}
+elseif (preg_match('#^/categories$#', $uri) && $method === 'GET') {
+    require __DIR__ . '/routes/menu.php';
+}
+elseif (preg_match('#^/products$#', $uri) && $method === 'GET') {
+    require __DIR__ . '/routes/menu.php';
+}
+elseif (preg_match('#^/auth/(register|login)$#', $uri, $m) && $method === 'POST') {
+    require __DIR__ . '/routes/auth.php';
+}
+elseif ($uri === '/orders' && $method === 'POST') {
+    require __DIR__ . '/routes/orders.php';
+}
+elseif (preg_match('#^/orders/([a-f0-9\-]{36})$#', $uri, $m) && $method === 'GET') {
+    // Suivi par tracking_token
+    require __DIR__ . '/routes/orders.php';
+}
+// Routes admin (préfixe /admin)
+elseif (str_starts_with($uri, '/admin')) {
+    require_once __DIR__ . '/middleware/Auth.php';
+    auth_require_role(['admin']);
+    $admin_uri = preg_replace('#^/admin#', '', $uri);
+    if (str_starts_with($admin_uri, '/orders'))    require __DIR__ . '/routes/admin/orders.php';
+    elseif (str_starts_with($admin_uri, '/products'))  require __DIR__ . '/routes/admin/products.php';
+    elseif (str_starts_with($admin_uri, '/categories')) require __DIR__ . '/routes/admin/categories.php';
+    elseif (str_starts_with($admin_uri, '/delivery-fees')) require __DIR__ . '/routes/admin/delivery.php';
+    elseif (str_starts_with($admin_uri, '/options'))   require __DIR__ . '/routes/admin/options.php';
+    elseif ($admin_uri === '/settings') require __DIR__ . '/routes/admin/settings.php';
+    else json_error('Route admin non trouvée', 404);
+}
+// Routes cuisine
+elseif (str_starts_with($uri, '/kitchen')) {
+    require_once __DIR__ . '/middleware/Auth.php';
+    auth_require_role(['admin', 'kitchen']);
+    require __DIR__ . '/routes/admin/orders.php';
+}
+else {
+    json_error('Route non trouvée', 404);
+}
