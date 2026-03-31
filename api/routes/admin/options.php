@@ -1,0 +1,37 @@
+<?php
+// /api/admin/options?product_id=X  — GET toutes les options d'un plat
+// /api/admin/options                — POST créer une option
+// /api/admin/options/{id}           — DELETE supprimer une option
+
+preg_match('#/options(?:/(\d+))?$#', $uri, $m);
+$opt_id = isset($m[1]) ? (int) $m[1] : null;
+
+if ($method === 'GET') {
+    $product_id = isset($_GET['product_id']) ? (int) $_GET['product_id'] : null;
+    if (!$product_id) json_error('product_id requis', 422);
+    $stmt = db()->prepare('SELECT * FROM product_options WHERE product_id = ? ORDER BY group_name, id');
+    $stmt->execute([$product_id]);
+    json_success($stmt->fetchAll());
+}
+
+if ($method === 'POST') {
+    validate_required($body, ['product_id', 'group_name', 'option_name']);
+    $stmt = db()->prepare(
+        'INSERT INTO product_options (product_id, group_name, option_name, extra_price, is_default) VALUES (?,?,?,?,?)'
+    );
+    $stmt->execute([
+        (int) $body['product_id'],
+        $body['group_name'],
+        $body['option_name'],
+        (float) ($body['extra_price'] ?? 0),
+        (int) ($body['is_default'] ?? 0),
+    ]);
+    json_success(['id' => (int) db()->lastInsertId()], 201);
+}
+
+if ($method === 'DELETE' && $opt_id) {
+    db()->prepare('DELETE FROM product_options WHERE id = ?')->execute([$opt_id]);
+    json_success(['deleted' => true]);
+}
+
+json_error('Route options invalide', 405);
