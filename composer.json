@@ -9,10 +9,5 @@
     "psr-4": {
       "App\\": "api/"
     }
-  },
-  "config": {
-    "audit": {
-      "block-insecure": false
-    }
   }
 }
