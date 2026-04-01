@@ -16,7 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri    = preg_replace('#^/api#', '', $uri);
 $method = $_SERVER['REQUEST_METHOD'];
-$body   = json_decode(file_get_contents('php://input'), true) ?? [];
+$raw_input = $GLOBALS['_test_override_input'] ?? file_get_contents('php://input');
+$body      = json_decode($raw_input, true) ?? [];
 
 // Routes publiques
 if ($uri === '/settings' && $method === 'GET') {
@@ -34,9 +35,18 @@ elseif (preg_match('#^/auth/(register|login)$#', $uri, $m) && $method === 'POST'
 elseif ($uri === '/orders' && $method === 'POST') {
     require __DIR__ . '/routes/orders.php';
 }
-elseif (preg_match('#^/orders/([a-f0-9\-]{36})$#', $uri, $m) && $method === 'GET') {
+elseif (preg_match('#^/orders/([a-f0-9\-]{36,64})$#', $uri, $m) && $method === 'GET') {
     // Suivi par tracking_token
     require __DIR__ . '/routes/orders.php';
+}
+elseif (preg_match('#^/orders/([a-f0-9\-]{36,64})/(confirm|name)$#', $uri) && $method === 'PATCH') {
+    require __DIR__ . '/routes/orders.php';
+}
+elseif ($uri === '/orders/mine' && $method === 'GET') {
+    require __DIR__ . '/routes/orders.php';
+}
+elseif ($uri === '/payment/create-intent' && $method === 'POST') {
+    require __DIR__ . '/routes/payment.php';
 }
 // Routes admin (préfixe /admin)
 elseif (str_starts_with($uri, '/admin')) {
