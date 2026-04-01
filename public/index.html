@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#CC0000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,34 +14,42 @@
 </head>
 <body x-data="appData()" x-init="init()" x-cloak>
 
-  <!-- ===== HEADER ===== -->
-  <div style="padding:16px 16px 8px; display:flex; align-items:center; justify-content:space-between;"
-       :style="'background:' + settings.color_primary">
-    <img :src="settings.logo_url || '/assets/img/logo.png'" alt="Logo"
-         style="height:44px; object-fit:contain;"
-         onerror="this.src='/assets/img/logo.png'">
-    <div style="font-size:18px; font-weight:800; color:white; letter-spacing:1px;"
-         x-text="settings.restaurant_name || 'P.R.T'"></div>
-    <a href="/account.html" style="color:white; text-decoration:none; font-size:13px; font-weight:600;">
-      <span x-text="authUser ? '👤 ' + (authUser.name || 'Compte') : 'Connexion'"></span>
-    </a>
-  </div>
+  <!-- ===== ZONE STICKY (header + bandes + promo + catégories) ===== -->
+  <div class="sticky-top-bar">
 
-  <!-- Toggle Pick & Collect / Livraison -->
-  <div :style="'background:' + settings.color_primary + '; padding-bottom:12px;'">
-    <div class="mode-toggle">
-      <button :class="mode==='pickup' ? 'active' : ''"
-              @click="mode='pickup'">🛍 Pick &amp; Collect</button>
-      <button :class="mode==='delivery' ? 'active' : ''"
-              @click="mode='delivery'">🛵 Livraison</button>
+  <!-- ===== HEADER ===== -->
+  <div class="app-header" :style="'background:' + settings.color_primary">
+    <!-- Marque : logo + nom -->
+    <div class="app-header-brand">
+      <img :src="settings.logo_url || '/assets/img/logo.png'"
+           class="app-header-logo"
+           alt=""
+           onerror="this.style.display='none'">
+      <span class="app-header-name" x-text="settings.restaurant_name || 'P.R.T'"></span>
+    </div>
+    <!-- Centre vide -->
+    <div class="app-header-center"></div>
+    <!-- Compte -->
+    <div class="app-header-action">
+      <a href="/account.html" class="app-header-account" aria-label="Mon compte">
+        <!-- Icône user SVG -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+        <span x-text="authUser ? (authUser.name || 'Compte') : 'Connexion'"
+              style="font-size:12px;"></span>
+      </a>
     </div>
   </div>
+
 
   <!-- 4 bandes signature -->
   <div class="signature-bands">
     <span :style="'background:' + settings.color_band_1"></span>
     <span :style="'background:' + settings.color_band_2"></span>
-    <span :style="'background:' + settings.color_band_3 + ';border:none;'"></span>
+    <span :style="'background:' + settings.color_band_3"></span>
     <span :style="'background:' + settings.color_band_4"></span>
   </div>
 
@@ -61,6 +69,8 @@
       </button>
     </template>
   </div>
+
+  </div><!-- /sticky-top-bar -->
 
   <!-- ===== LISTE PLATS ===== -->
   <div class="products-grid" style="padding-bottom:90px;">
@@ -107,7 +117,14 @@
          x-transition:enter-start="translate-y-full"
          x-transition:enter-end="translate-y-0">
       <div class="cart-drawer-handle"></div>
-      <div class="cart-drawer-header">🛒 Votre panier</div>
+      <div class="cart-drawer-header">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.61L23 6H6"/>
+        </svg>
+        Votre panier
+      </div>
 
       <template x-for="item in $store.cart.items" :key="item.key">
         <div class="cart-item">
@@ -198,9 +215,9 @@
       <div class="checkout-modal-header" :style="'background:' + settings.color_primary">
         <button class="checkout-modal-back"
                 @click="checkoutStep > 1 ? checkoutStep-- : checkoutOpen=false">←</button>
-        <h2 x-text="mode==='pickup' ? 'Pick &amp; Collect' : 'Livraison'"></h2>
+        <h2 x-text="checkoutStep === 1 ? 'Votre commande' : (mode==='pickup' ? 'Récupérer sur place' : 'Livraison à domicile')"></h2>
         <div class="step-indicator">
-          <template x-for="n in (mode==='pickup' ? 2 : 3)" :key="n">
+          <template x-for="n in (mode==='pickup' ? 3 : 4)" :key="n">
             <div class="step-dot"
                  :class="n === checkoutStep ? 'active' : (n < checkoutStep ? 'done' : '')"></div>
           </template>
@@ -209,23 +226,68 @@
 
       <div class="checkout-steps">
 
-        <!-- Étape 1 : Téléphone -->
+        <!-- Étape 1 : Choix du mode -->
         <div x-show="checkoutStep === 1">
+          <p style="font-size:14px;color:#555;margin-bottom:16px;line-height:1.5;">
+            Comment souhaitez-vous recevoir votre commande ?
+          </p>
+
+          <!-- Récupérer sur place -->
+          <div class="mode-choice-card" @click="mode='pickup'; checkoutStep=2">
+            <div class="mode-choice-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 01-8 0"/>
+              </svg>
+            </div>
+            <div class="mode-choice-text">
+              <div class="mode-choice-title">Récupérer sur place</div>
+              <div class="mode-choice-sub">Venez chercher votre commande au restaurant</div>
+            </div>
+            <span class="mode-choice-badge free">Gratuit</span>
+          </div>
+
+          <!-- Livraison -->
+          <div class="mode-choice-card" @click="mode='delivery'; checkoutStep=2">
+            <div class="mode-choice-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="6" cy="17" r="2"/><circle cx="18" cy="17" r="2"/>
+                <path d="M5 17H3v-5l2-2 4-4h6l2 3 3 3v5h-2"/>
+                <path d="M9 6l1 5H5"/>
+              </svg>
+            </div>
+            <div class="mode-choice-text">
+              <div class="mode-choice-title">Livraison à domicile</div>
+              <div class="mode-choice-sub"
+                   x-text="settings.delivery_free_above > 0 ? 'Offerte dès ' + settings.delivery_free_above + ' €' : 'Frais calculés à la commande'"></div>
+            </div>
+            <svg class="mode-choice-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                 stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Étape 2 : Téléphone -->
+        <div x-show="checkoutStep === 2">
           <label class="checkout-label">Votre numéro de téléphone</label>
-          <input class="checkout-input" type="tel" placeholder="+33 6 00 00 00 00"
-                 x-model="checkoutPhone" @keyup.enter="checkoutPhone.length >= 8 && (checkoutStep=2)">
-          <p style="font-size:12px; color:#888; margin-bottom:16px;">
+          <input class="checkout-input" type="tel" placeholder="+594 6 94 00 00 00"
+                 x-model="checkoutPhone" @keyup.enter="checkoutPhone.length >= 8 && (checkoutStep=3, mode==='pickup' && initStripe())">
+          <p style="font-size:12px; color:var(--color-sub); margin-bottom:16px;">
             Vous recevrez un SMS de confirmation à ce numéro.
           </p>
           <button class="checkout-next-btn"
                   :disabled="checkoutPhone.length < 8"
-                  @click="checkoutStep=2">
+                  @click="checkoutStep=3; mode==='pickup' && initStripe()">
             Continuer →
           </button>
         </div>
 
-        <!-- Étape 2 : Adresse (livraison uniquement) -->
-        <div x-show="checkoutStep === 2 && mode === 'delivery'">
+        <!-- Étape 3 : Adresse (livraison uniquement) -->
+        <div x-show="checkoutStep === 3 && mode === 'delivery'">
           <label class="checkout-label">Adresse de livraison</label>
           <input class="checkout-input" type="text" placeholder="Numéro et nom de rue"
                  x-model="checkoutAddress">
@@ -233,13 +295,13 @@
                  x-model="checkoutCity">
           <button class="checkout-next-btn"
                   :disabled="!checkoutAddress.trim() || !checkoutCity.trim()"
-                  @click="checkoutStep=3; initStripe()">
+                  @click="checkoutStep=4; initStripe()">
             Continuer →
           </button>
         </div>
 
-        <!-- Étape paiement (étape 2 pour pickup, 3 pour livraison) -->
-        <div x-show="checkoutStep === (mode==='pickup' ? 2 : 3)" x-init="checkoutStep === (mode==='pickup' ? 2 : 3) && initStripe()">
+        <!-- Étape paiement (étape 3 pour pickup, 4 pour livraison) -->
+        <div x-show="checkoutStep === (mode==='pickup' ? 3 : 4)">
           <!-- Récapitulatif -->
           <div style="background:white; border-radius:14px; padding:14px; margin-bottom:16px;">
             <div style="font-weight:800; font-size:15px; margin-bottom:10px;">Récapitulatif</div>

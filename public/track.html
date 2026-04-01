@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Suivi commande — P.R.T</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#CC0000">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/assets/css/prt.css">
+  <style>
+    body { background: #f5f5f5; font-family: 'Segoe UI', sans-serif; }
+    .order-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    .order-card h2 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+    .item-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
+    .item-row:last-child { border-bottom: none; }
+    .item-name { flex: 1; }
+    .item-price { font-weight: 600; white-space: nowrap; margin-left: 12px; }
+    .item-options { font-size: 12px; color: #888; margin-top: 2px; }
+    .order-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 16px; padding: 12px 0 0; margin-top: 8px; border-top: 2px solid #f0f0f0; }
+    .delivery-fee-row { display: flex; justify-content: space-between; font-size: 13px; color: #666; padding: 4px 0; }
+    .search-box { background: white; border-radius: 16px; padding: 20px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .search-box input { border-radius: 12px; border: 2px solid #eee; padding: 12px 16px; font-size: 15px; }
+    .search-box input:focus { border-color: var(--color-primary); outline: none; box-shadow: none; }
+    .btn-track { background: var(--color-primary); color: white; border: none; border-radius: 12px; padding: 12px 24px; font-weight: 700; font-size: 15px; width: 100%; }
+    .badge-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .badge-pending        { background: #fff3cd; color: #856404; }
+    .badge-received       { background: #cfe2ff; color: #0c63e4; }
+    .badge-in_preparation { background: #fff3cd; color: #856404; }
+    .badge-ready          { background: #d1e7dd; color: #0f5132; }
+    .badge-en_route       { background: #d1e7dd; color: #0f5132; }
+    .badge-delivered      { background: #d1e7dd; color: #0f5132; }
+    .badge-cancelled      { background: #f8d7da; color: #842029; }
+    .type-badge { display: inline-block; background: #f0f0f0; padding: 2px 10px; border-radius: 20px; font-size: 12px; margin-left: 8px; }
+    .error-msg { color: #dc3545; font-size: 14px; margin-top: 8px; }
+    .spinner-border-sm { width: 1rem; height: 1rem; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; color: white; opacity: .9; font-size: 14px; text-decoration: none; margin-bottom: 8px; }
+    .back-link:hover { opacity: 1; color: white; }
+  </style>
+</head>
+<body x-data="trackApp()" x-init="init()">
+
+  <!-- Header -->
+  <div class="track-header">
+    <a href="/" class="back-link">← Retour au menu</a>
+    <h1>Suivi de commande</h1>
+    <div class="track-order-num" x-show="order" x-text="'#' + (order?.id || '')"></div>
+  </div>
+
+  <div class="track-page">
+
+    <!-- Formulaire de recherche (si pas de token dans l'URL) -->
+    <div x-show="!tokenFromUrl" class="search-box">
+      <p style="font-size:14px;color:#555;margin-bottom:12px;">Entrez votre token de suivi reçu après la commande.</p>
+      <input
+        type="text"
+        class="form-control mb-3"
+        placeholder="Token de commande..."
+        x-model="searchToken"
+        @keyup.enter="loadOrder(searchToken)"
+      >
+      <button class="btn-track" @click="loadOrder(searchToken)" :disabled="loading">
+        <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
+        Rechercher
+      </button>
+      <div x-show="errorMsg" class="error-msg" x-text="errorMsg"></div>
+    </div>
+
+    <!-- Loader initial -->
+    <div x-show="tokenFromUrl && loading" class="text-center py-5">
+      <div class="spinner-border" style="color:var(--color-primary)"></div>
+      <p class="mt-3 text-muted">Chargement…</p>
+    </div>
+
+    <!-- Erreur -->
+    <div x-show="tokenFromUrl && !loading && errorMsg" class="order-card text-center">
+      <p style="font-size:32px">😕</p>
+      <p class="fw-bold" x-text="errorMsg"></p>
+      <a href="/" class="btn-track d-inline-block mt-2" style="width:auto;padding:10px 24px;text-decoration:none;">Retour au menu</a>
+    </div>
+
+    <!-- Détails commande -->
+    <template x-if="order">
+      <div>
+
+        <!-- Statut + type -->
+        <div class="order-card d-flex align-items-center justify-content-between">
+          <div>
+            <span :class="'badge-status badge-' + order.status" x-text="statusLabel(order.status)"></span>
+            <span class="type-badge" x-text="order.type === 'pickup' ? '🛍 À emporter' : '🚴 Livraison'"></span>
+          </div>
+          <div style="font-size:12px;color:#999" x-text="formatDate(order.created_at)"></div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="order-card">
+          <h2>Progression</h2>
+          <div class="timeline">
+            <template x-for="(step, i) in steps" :key="step.key">
+              <div>
+                <div class="timeline-step">
+                  <div :class="'timeline-dot ' + stepClass(step.key)">
+                    <span x-text="stepIcon(step.key, i)"></span>
+                  </div>
+                  <div>
+                    <div class="timeline-label" x-text="step.label"></div>
+                    <div class="timeline-sub" x-text="stepSub(step.key)"></div>
+                  </div>
+                </div>
+                <div x-show="i < steps.length - 1" :class="'timeline-line ' + (isDone(step.key) ? 'done' : '')"></div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- Récapitulatif items -->
+        <div class="order-card">
+          <h2>Détail de la commande</h2>
+          <template x-for="item in order.items" :key="item.product_name + item.unit_price">
+            <div class="item-row">
+              <div class="item-name">
+                <div x-text="item.quantity + ' × ' + item.product_name"></div>
+                <div class="item-options" x-show="item.options && item.options.length > 0"
+                     x-text="item.options.map(o => o.option_name || o).join(', ')"></div>
+              </div>
+              <div class="item-price" x-text="(item.unit_price * item.quantity).toFixed(2) + ' €'"></div>
+            </div>
+          </template>
+          <template x-if="order.delivery_fee > 0">
+            <div class="delivery-fee-row">
+              <span>Frais de livraison</span>
+              <span x-text="order.delivery_fee.toFixed(2) + ' €'"></span>
+            </div>
+          </template>
+          <div class="order-total">
+            <span>Total</span>
+            <span x-text="order.total.toFixed(2) + ' €'"></span>
+          </div>
+        </div>
+
+        <!-- Bouton confirmer réception (si pickup + ready) -->
+        <template x-if="order.type === 'pickup' && order.status === 'ready'">
+          <div class="order-card text-center">
+            <p style="font-size:14px;color:#555;margin-bottom:12px;">Votre commande est prête ! Confirmez la récupération :</p>
+            <button class="btn-track" @click="confirmReceived()" :disabled="confirming">
+              <span x-show="confirming" class="spinner-border spinner-border-sm me-2"></span>
+              ✅ J'ai récupéré ma commande
+            </button>
+          </div>
+        </template>
+
+        <!-- Message livraison en route -->
+        <template x-if="order.type === 'delivery' && order.status === 'en_route'">
+          <div class="order-card text-center" style="background:var(--color-primary);color:white;">
+            <p style="font-size:32px;margin:0">🚴</p>
+            <p style="font-weight:700;margin:8px 0 0">Votre commande est en route !</p>
+          </div>
+        </template>
+
+        <!-- Message commande livrée -->
+        <template x-if="order.status === 'delivered'">
+          <div class="order-card text-center">
+            <p style="font-size:40px;margin:0">🎉</p>
+            <p style="font-weight:700;margin:8px 0 4px">Commande livrée !</p>
+            <p style="font-size:13px;color:#666">Merci pour votre confiance. Bonne dégustation !</p>
+            <a href="/" class="btn-track d-inline-block mt-2" style="width:auto;padding:10px 24px;text-decoration:none;">Commander à nouveau</a>
+          </div>
+        </template>
+
+        <!-- Message annulée -->
+        <template x-if="order.status === 'cancelled'">
+          <div class="order-card text-center">
+            <p style="font-size:40px;margin:0">❌</p>
+            <p style="font-weight:700;margin:8px 0 4px">Commande annulée</p>
+            <p style="font-size:13px;color:#666">Veuillez nous contacter si vous avez des questions.</p>
+          </div>
+        </template>
+
+        <!-- Rafraîchissement auto -->
+        <div class="text-center mt-2 mb-4" style="font-size:12px;color:#aaa">
+          Actualisation automatique toutes les 30 secondes
+          <br><a href="#" @click.prevent="loadOrder(currentToken)" style="color:var(--color-primary)">Actualiser maintenant</a>
+        </div>
+
+      </div>
+    </template>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+  <script src="/assets/js/api.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+  </script>
+  <script>
+  function trackApp() {
+    return {
+      order:        null,
+      loading:      false,
+      errorMsg:     '',
+      searchToken:  '',
+      tokenFromUrl: false,
+      currentToken: '',
+      confirming:   false,
+      refreshTimer: null,
+
+      steps: [
+        { key: 'received',       label: 'Commande reçue',       sub: 'Votre commande a été enregistrée' },
+        { key: 'in_preparation', label: 'En préparation',        sub: 'Notre équipe prépare votre commande' },
+        { key: 'ready',          label: 'Prête',                 sub: 'Votre commande est prête' },
+        { key: 'en_route',       label: 'En route',              sub: 'Le livreur est en chemin' },
+        { key: 'delivered',      label: 'Livrée / Récupérée',   sub: 'Commande complétée' },
+      ],
+
+      statusOrder: ['pending','received','in_preparation','ready','en_route','delivered'],
+
+      async init() {
+        // Appliquer le thème
+        try {
+          const s = await api.getSettings();
+          if (s.primary_color)   document.documentElement.style.setProperty('--color-primary',   s.primary_color);
+          if (s.secondary_color) document.documentElement.style.setProperty('--color-secondary', s.secondary_color);
+          if (s.confirm_color)   document.documentElement.style.setProperty('--color-confirm',   s.confirm_color);
+        } catch {}
+
+        // Lire le token depuis l'URL (?token=xxx ou /track?token=xxx)
+        const params = new URLSearchParams(window.location.search);
+        const urlToken = params.get('token');
+        if (urlToken) {
+          this.tokenFromUrl = true;
+          await this.loadOrder(urlToken);
+          this.startAutoRefresh(urlToken);
+        }
+      },
+
+      async loadOrder(token) {
+        if (!token || !token.trim()) {
+          this.errorMsg = 'Veuillez entrer un token de commande.';
+          return;
+        }
+        token = token.trim();
+        this.loading  = true;
+        this.errorMsg = '';
+        this.currentToken = token;
+        try {
+          this.order = await api.getOrder(token);
+        } catch (e) {
+          this.errorMsg = e.message || 'Commande introuvable.';
+          this.order = null;
+        } finally {
+          this.loading = false;
+        }
+      },
+
+      startAutoRefresh(token) {
+        if (this.refreshTimer) clearInterval(this.refreshTimer);
+        this.refreshTimer = setInterval(() => {
+          if (this.order && !['delivered','cancelled'].includes(this.order.status)) {
+            this.loadOrder(token);
+          } else {
+            clearInterval(this.refreshTimer);
+          }
+        }, 30000);
+      },
+
+      async confirmReceived() {
+        this.confirming = true;
+        try {
+          await fetch('/api/orders/' + this.currentToken + '/confirm', { method: 'PATCH' });
+          await this.loadOrder(this.currentToken);
+        } catch {}
+        this.confirming = false;
+      },
+
+      statusLabel(status) {
+        const labels = {
+          pending:        'En attente de paiement',
+          received:       'Commande reçue',
+          in_preparation: 'En préparation',
+          ready:          'Prête',
+          en_route:       'En route',
+          delivered:      'Livrée',
+          cancelled:      'Annulée',
+        };
+        return labels[status] || status;
+      },
+
+      stepClass(key) {
+        const orderStatus = this.order?.status;
+        const stepIdx     = this.statusOrder.indexOf(key);
+        const currentIdx  = this.statusOrder.indexOf(orderStatus);
+        if (orderStatus === 'cancelled') return '';
+        if (stepIdx < currentIdx)  return 'done';
+        if (stepIdx === currentIdx) return 'active';
+        return '';
+      },
+
+      stepIcon(key, i) {
+        const cls = this.stepClass(key);
+        if (cls === 'done')   return '✓';
+        if (cls === 'active') return ['📋','🍳','✅','🚴','🎉'][i] || '●';
+        return '';
+      },
+
+      stepSub(key) {
+        return this.steps.find(s => s.key === key)?.sub || '';
+      },
+
+      isDone(key) {
+        const stepIdx    = this.statusOrder.indexOf(key);
+        const currentIdx = this.statusOrder.indexOf(this.order?.status);
+        return stepIdx < currentIdx;
+      },
+
+      // Filtrer les étapes selon le type de commande
+      get steps() {
+        if (this.order?.type === 'pickup') {
+          return [
+            { key: 'received',       label: 'Commande reçue',      sub: 'Votre commande a été enregistrée' },
+            { key: 'in_preparation', label: 'En préparation',       sub: 'Notre équipe prépare votre commande' },
+            { key: 'ready',          label: 'Prête à récupérer',    sub: 'Venez chercher votre commande !' },
+            { key: 'delivered',      label: 'Récupérée',            sub: 'Commande complétée' },
+          ];
+        }
+        return [
+          { key: 'received',       label: 'Commande reçue',      sub: 'Votre commande a été enregistrée' },
+          { key: 'in_preparation', label: 'En préparation',       sub: 'Notre équipe prépare votre commande' },
+          { key: 'ready',          label: 'Prête pour livraison', sub: 'En attente du livreur' },
+          { key: 'en_route',       label: 'En route',             sub: 'Le livreur est en chemin' },
+          { key: 'delivered',      label: 'Livrée',               sub: 'Bonne dégustation !' },
+        ];
+      },
+
+      formatDate(dt) {
+        if (!dt) return '';
+        const d = new Date(dt);
+        return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' })
+             + ' ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+      },
+    };
+  }
+  </script>
+</body>
+</html>

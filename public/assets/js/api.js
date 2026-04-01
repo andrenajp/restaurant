@@ -15,6 +15,7 @@ const api = {
   getCategories: () => apiFetch('/categories'),
   getProducts:   () => apiFetch('/products'),
   getOrder:      (token) => apiFetch('/orders/' + token),
+  getMyOrders:   () => apiFetch('/orders/mine'),
   register:      (body) => apiFetch('/auth/register', { method: 'POST', body: JSON.stringify(body) }),
   login:         (body) => apiFetch('/auth/login',    { method: 'POST', body: JSON.stringify(body) }),
   createOrder:   (body) => apiFetch('/orders',        { method: 'POST', body: JSON.stringify(body) }),

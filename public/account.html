@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mon compte — P.R.T</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#CC0000">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/assets/css/prt.css">
+  <style>
+    body { background: #f5f5f5; font-family: 'Segoe UI', sans-serif; }
+    .account-header {
+      background: var(--color-primary);
+      color: white;
+      padding: 20px 16px;
+      text-align: center;
+    }
+    .account-header h1 { margin: 0; font-size: 20px; }
+    .account-header p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; color: white; opacity: .9; font-size: 14px; text-decoration: none; margin-bottom: 8px; }
+    .back-link:hover { opacity: 1; color: white; }
+    .card-section { background: white; border-radius: 16px; padding: 20px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .card-section h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+    .form-label { font-size: 13px; font-weight: 600; color: #555; }
+    .form-control { border-radius: 12px; border: 2px solid #eee; padding: 12px 14px; font-size: 15px; }
+    .form-control:focus { border-color: var(--color-primary); box-shadow: none; }
+    .btn-primary-prt { background: var(--color-primary); color: white; border: none; border-radius: 12px; padding: 13px; font-weight: 700; font-size: 15px; width: 100%; }
+    .btn-primary-prt:disabled { opacity: .6; }
+    .btn-outline-prt { background: transparent; color: var(--color-primary); border: 2px solid var(--color-primary); border-radius: 12px; padding: 11px; font-weight: 700; font-size: 15px; width: 100%; }
+    .alert-success { background: #d1e7dd; color: #0f5132; border-radius: 12px; padding: 12px 16px; font-size: 14px; }
+    .alert-danger  { background: #f8d7da; color: #842029; border-radius: 12px; padding: 12px 16px; font-size: 14px; }
+    .order-row { border-bottom: 1px solid #f0f0f0; padding: 12px 0; }
+    .order-row:last-child { border-bottom: none; }
+    .order-row-top { display: flex; justify-content: space-between; align-items: center; }
+    .order-row-id { font-weight: 700; font-size: 14px; }
+    .order-row-date { font-size: 12px; color: #999; }
+    .order-row-bottom { display: flex; justify-content: space-between; margin-top: 4px; }
+    .order-row-status { font-size: 12px; }
+    .order-row-total { font-size: 14px; font-weight: 600; }
+    .badge-status { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .badge-pending        { background: #fff3cd; color: #856404; }
+    .badge-received       { background: #cfe2ff; color: #0c63e4; }
+    .badge-in_preparation { background: #fff3cd; color: #856404; }
+    .badge-ready          { background: #d1e7dd; color: #0f5132; }
+    .badge-en_route       { background: #d1e7dd; color: #0f5132; }
+    .badge-delivered      { background: #d1e7dd; color: #0f5132; }
+    .badge-cancelled      { background: #f8d7da; color: #842029; }
+    .tab-nav { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-btn { flex: 1; padding: 10px; border: 2px solid #eee; border-radius: 12px; background: white; font-size: 14px; font-weight: 600; color: #666; cursor: pointer; }
+    .tab-btn.active { border-color: var(--color-primary); color: var(--color-primary); background: #fff5f5; }
+    .logout-btn { background: none; border: none; color: #dc3545; font-size: 14px; font-weight: 600; padding: 0; }
+    .empty-state { text-align: center; padding: 32px 0; color: #aaa; }
+    .spinner-border-sm { width: 1rem; height: 1rem; }
+  </style>
+</head>
+<body x-data="accountApp()" x-init="init()">
+
+  <!-- Header -->
+  <div class="account-header">
+    <a href="/" class="back-link">← Retour au menu</a>
+    <h1>Mon compte</h1>
+    <p x-show="user" x-text="user?.name || user?.phone"></p>
+  </div>
+
+  <div class="account-page">
+
+    <!-- État non connecté -->
+    <div x-show="!user" x-cloak>
+
+      <!-- Onglets Connexion / Inscription -->
+      <div class="tab-nav mt-2">
+        <button class="tab-btn" :class="{active: tab==='login'}"    @click="tab='login'">Connexion</button>
+        <button class="tab-btn" :class="{active: tab==='register'}" @click="tab='register'">Inscription</button>
+      </div>
+
+      <!-- Connexion -->
+      <div x-show="tab==='login'" class="card-section">
+        <h2>Se connecter</h2>
+        <div class="mb-3">
+          <label class="form-label">Téléphone</label>
+          <input type="tel" class="form-control" x-model="loginForm.phone" placeholder="+594694000000" @keyup.enter="doLogin()">
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Mot de passe</label>
+          <input type="password" class="form-control" x-model="loginForm.password" placeholder="••••••••" @keyup.enter="doLogin()">
+        </div>
+        <div x-show="loginError" class="alert-danger mb-3" x-text="loginError"></div>
+        <button class="btn-primary-prt" @click="doLogin()" :disabled="loginLoading">
+          <span x-show="loginLoading" class="spinner-border spinner-border-sm me-2"></span>
+          Se connecter
+        </button>
+      </div>
+
+      <!-- Inscription -->
+      <div x-show="tab==='register'" class="card-section">
+        <h2>Créer un compte</h2>
+        <div class="mb-3">
+          <label class="form-label">Prénom (optionnel)</label>
+          <input type="text" class="form-control" x-model="registerForm.name" placeholder="Jean">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Téléphone</label>
+          <input type="tel" class="form-control" x-model="registerForm.phone" placeholder="+594694000000">
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Mot de passe</label>
+          <input type="password" class="form-control" x-model="registerForm.password" placeholder="••••••••">
+        </div>
+        <div x-show="registerError" class="alert-danger mb-3" x-text="registerError"></div>
+        <div x-show="registerSuccess" class="alert-success mb-3">Compte créé ! Vous êtes connecté.</div>
+        <button class="btn-primary-prt" @click="doRegister()" :disabled="registerLoading">
+          <span x-show="registerLoading" class="spinner-border spinner-border-sm me-2"></span>
+          Créer mon compte
+        </button>
+      </div>
+
+    </div>
+
+    <!-- État connecté -->
+    <div x-show="user" x-cloak>
+
+      <!-- Historique commandes -->
+      <div class="card-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 style="margin:0">Mes commandes</h2>
+          <button class="logout-btn" @click="doLogout()">Déconnexion</button>
+        </div>
+
+        <div x-show="ordersLoading" class="empty-state">
+          <div class="spinner-border" style="color:var(--color-primary)"></div>
+        </div>
+
+        <div x-show="!ordersLoading && orders.length === 0" class="empty-state">
+          <p style="font-size:32px">🛒</p>
+          <p>Aucune commande pour l'instant.</p>
+          <a href="/" style="color:var(--color-primary);font-weight:700;">Commander maintenant</a>
+        </div>
+
+        <template x-if="!ordersLoading && orders.length > 0">
+          <div>
+            <template x-for="order in orders" :key="order.id">
+              <div class="order-row">
+                <div class="order-row-top">
+                  <span class="order-row-id" x-text="'Commande #' + order.id"></span>
+                  <span class="order-row-date" x-text="formatDate(order.created_at)"></span>
+                </div>
+                <div class="order-row-bottom">
+                  <span :class="'badge-status badge-' + order.status" x-text="statusLabel(order.status)"></span>
+                  <span class="order-row-total" x-text="parseFloat(order.total).toFixed(2) + ' €'"></span>
+                </div>
+                <div class="mt-2" x-show="order.tracking_token">
+                  <a :href="'/track?token=' + order.tracking_token"
+                     style="font-size:13px;color:var(--color-primary);font-weight:600;text-decoration:none;">
+                    Suivre cette commande →
+                  </a>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+  <script src="/assets/js/api.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+
+  function accountApp() {
+    return {
+      user:            null,
+      tab:             'login',
+      orders:          [],
+      ordersLoading:   false,
+
+      loginForm:    { phone: '', password: '' },
+      loginError:   '',
+      loginLoading: false,
+
+      registerForm:    { name: '', phone: '', password: '' },
+      registerError:   '',
+      registerSuccess: false,
+      registerLoading: false,
+
+      async init() {
+        try {
+          const s = await api.getSettings();
+          if (s.primary_color)   document.documentElement.style.setProperty('--color-primary',   s.primary_color);
+          if (s.secondary_color) document.documentElement.style.setProperty('--color-secondary', s.secondary_color);
+          if (s.confirm_color)   document.documentElement.style.setProperty('--color-confirm',   s.confirm_color);
+        } catch {}
+
+        // Vérifier si déjà connecté
+        const token    = localStorage.getItem('auth_token');
+        const userData = localStorage.getItem('auth_user');
+        if (token && userData) {
+          this.user = JSON.parse(userData);
+          await this.loadOrders();
+        }
+      },
+
+      async doLogin() {
+        this.loginError   = '';
+        this.loginLoading = true;
+        try {
+          const res = await api.login({ phone: this.loginForm.phone, password: this.loginForm.password });
+          localStorage.setItem('auth_token', res.token);
+          localStorage.setItem('auth_user',  JSON.stringify(res.user)); // contient {id, phone, role}
+          this.user = res.user;
+          await this.loadOrders();
+        } catch (e) {
+          this.loginError = e.message || 'Numéro ou mot de passe incorrect.';
+        } finally {
+          this.loginLoading = false;
+        }
+      },
+
+      async doRegister() {
+        this.registerError   = '';
+        this.registerSuccess = false;
+        this.registerLoading = true;
+        try {
+          const res = await api.register({
+            name:     this.registerForm.name  || null,
+            phone:    this.registerForm.phone,
+            password: this.registerForm.password,
+          });
+          localStorage.setItem('auth_token', res.token);
+          localStorage.setItem('auth_user',  JSON.stringify(res.user)); // contient {id, phone, role}
+          this.user = res.user;
+          this.registerSuccess = true;
+          await this.loadOrders();
+        } catch (e) {
+          this.registerError = e.message || 'Erreur lors de l\'inscription.';
+        } finally {
+          this.registerLoading = false;
+        }
+      },
+
+      doLogout() {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_user');
+        this.user   = null;
+        this.orders = [];
+      },
+
+      async loadOrders() {
+        this.ordersLoading = true;
+        try {
+          this.orders = await api.getMyOrders();
+        } catch {
+          this.orders = [];
+        } finally {
+          this.ordersLoading = false;
+        }
+      },
+
+      statusLabel(status) {
+        const labels = {
+          pending:        'En attente',
+          received:       'Reçue',
+          in_preparation: 'En préparation',
+          ready:          'Prête',
+          en_route:       'En route',
+          delivered:      'Livrée',
+          cancelled:      'Annulée',
+        };
+        return labels[status] || status;
+      },
+
+      formatDate(dt) {
+        if (!dt) return '';
+        const d = new Date(dt);
+        return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
+      },
+    };
+  }
+  </script>
+</body>
+</html>

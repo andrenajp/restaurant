@@ -35,11 +35,11 @@ elseif (preg_match('#^/auth/(register|login)$#', $uri, $m) && $method === 'POST'
 elseif ($uri === '/orders' && $method === 'POST') {
     require __DIR__ . '/routes/orders.php';
 }
-elseif (preg_match('#^/orders/([a-f0-9\-]{36,64})$#', $uri, $m) && $method === 'GET') {
+elseif (preg_match('#^/orders/([a-f0-9\-]{32,64})$#', $uri, $m) && $method === 'GET') {
     // Suivi par tracking_token
     require __DIR__ . '/routes/orders.php';
 }
-elseif (preg_match('#^/orders/([a-f0-9\-]{36,64})/(confirm|name)$#', $uri) && $method === 'PATCH') {
+elseif (preg_match('#^/orders/([a-f0-9\-]{32,64})/(confirm|name)$#', $uri) && $method === 'PATCH') {
     require __DIR__ . '/routes/orders.php';
 }
 elseif ($uri === '/orders/mine' && $method === 'GET') {

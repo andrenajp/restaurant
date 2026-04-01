@@ -105,7 +105,8 @@ foreach ($line_items as $li) {
 
 // Créer le PaymentIntent Stripe via cURL
 $stripe_sk = env('STRIPE_SK');
-if (!$stripe_sk) {
+// Mock si clé absente ou placeholder (contient '...')
+if (!$stripe_sk || str_contains($stripe_sk, '...')) {
     // Pas de clé Stripe → retourner un mock pour développement
     json_success([
         'client_secret' => 'test_secret_no_stripe_configured',
