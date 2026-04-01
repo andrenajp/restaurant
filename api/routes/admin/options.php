@@ -30,7 +30,9 @@ if ($method === 'POST') {
 }
 
 if ($method === 'DELETE' && $opt_id) {
-    db()->prepare('DELETE FROM product_options WHERE id = ?')->execute([$opt_id]);
+    $stmt = db()->prepare('DELETE FROM product_options WHERE id = ?');
+    $stmt->execute([$opt_id]);
+    if ($stmt->rowCount() === 0) json_error('Option introuvable', 404);
     json_success(['deleted' => true]);
 }
 

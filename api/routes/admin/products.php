@@ -44,7 +44,9 @@ if ($method === 'PUT' && $product_id) {
 }
 
 if ($method === 'DELETE' && $product_id) {
-    db()->prepare('DELETE FROM products WHERE id = ?')->execute([$product_id]);
+    $stmt = db()->prepare('DELETE FROM products WHERE id = ?');
+    $stmt->execute([$product_id]);
+    if ($stmt->rowCount() === 0) json_error('Produit introuvable', 404);
     json_success(['deleted' => true]);
 }
 

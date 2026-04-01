@@ -18,7 +18,9 @@ if ($method === 'PUT' && $fee_id) {
     json_success(['updated' => true]);
 }
 if ($method === 'DELETE' && $fee_id) {
-    db()->prepare('DELETE FROM delivery_fees WHERE id = ?')->execute([$fee_id]);
+    $stmt = db()->prepare('DELETE FROM delivery_fees WHERE id = ?');
+    $stmt->execute([$fee_id]);
+    if ($stmt->rowCount() === 0) json_error('Zone de livraison introuvable', 404);
     json_success(['deleted' => true]);
 }
 
