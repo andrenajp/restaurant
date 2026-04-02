@@ -373,6 +373,28 @@
                   📍 <span x-text="order.delivery_address"></span>
                 </span>
               </div>
+
+              <!-- Dispatch livreur (livraisons uniquement) -->
+              <div x-show="order.type === 'delivery'" style="margin-bottom:10px;">
+                <div x-show="order.driver_name" style="font-size:12px;color:#4ade80;margin-bottom:6px;">
+                  🛵 Livreur : <strong x-text="order.driver_name"></strong>
+                </div>
+                <div x-show="order.status !== 'delivered' && order.status !== 'cancelled'"
+                     style="display:flex;gap:6px;align-items:center;">
+                  <select x-model="order._driverId"
+                          style="flex:1;background:#242424;border:1px solid #333;border-radius:6px;padding:6px 8px;color:#f0f0f0;font-size:13px;outline:none;">
+                    <option value="">— Assigner un livreur —</option>
+                    <template x-for="d in drivers" :key="d.id">
+                      <option :value="d.id" x-text="d.name || d.phone"></option>
+                    </template>
+                  </select>
+                  <button @click="assignDriver(order)"
+                          style="background:#3b82f6;color:white;border:none;border-radius:6px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">
+                    Dispatcher
+                  </button>
+                </div>
+              </div>
+
               <div class="order-actions">
                 <template x-for="next in nextStatuses(order.status)" :key="next">
                   <button :class="'status-btn btn-' + next"
@@ -942,6 +964,7 @@ function adminApp() {
 
     stats: null,
     users: [],
+    drivers: [],
 
     refreshTimer: null,
 
@@ -977,6 +1000,7 @@ function adminApp() {
         this.loadCategories(),
         this.loadDeliveryFees(),
         this.loadSettings(),
+        this.loadDrivers(),
       ]);
     },
 
@@ -1028,6 +1052,23 @@ function adminApp() {
         const o = this.orders.find(o => o.id == id);
         if (o) o.status = status;
       } catch (e) { alert('Erreur : ' + e.message); }
+    },
+
+    async loadDrivers() {
+      try { this.drivers = await apiFetch('/admin/orders/drivers'); } catch { this.drivers = []; }
+    },
+
+    async assignDriver(order) {
+      const driverId = order._driverId;
+      try {
+        await apiFetch('/admin/orders/' + order.id + '/assign', {
+          method: 'PATCH',
+          body: JSON.stringify({ driver_id: driverId || null }),
+        });
+        const d = this.drivers.find(d => d.id == driverId);
+        order.driver_name   = d ? (d.name || d.phone) : null;
+        order.delivery_driver_id = driverId || null;
+      } catch (e) { alert('Erreur dispatch : ' + e.message); }
     },
 
     nextStatuses(current) {

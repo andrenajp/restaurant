@@ -56,7 +56,8 @@ elseif (str_starts_with($uri, '/admin')) {
     require_once __DIR__ . '/middleware/Auth.php';
     auth_require_role(['admin']);
     $admin_uri = preg_replace('#^/admin#', '', $uri);
-    if (str_starts_with($admin_uri, '/orders'))    require __DIR__ . '/routes/admin/orders.php';
+    if ($admin_uri === '/orders/drivers' && $method === 'GET') require __DIR__ . '/routes/admin/orders.php';
+    elseif (str_starts_with($admin_uri, '/orders'))    require __DIR__ . '/routes/admin/orders.php';
     elseif (str_starts_with($admin_uri, '/products'))  require __DIR__ . '/routes/admin/products.php';
     elseif (str_starts_with($admin_uri, '/categories')) require __DIR__ . '/routes/admin/categories.php';
     elseif (str_starts_with($admin_uri, '/delivery-fees')) require __DIR__ . '/routes/admin/delivery.php';
@@ -66,6 +67,10 @@ elseif (str_starts_with($uri, '/admin')) {
     elseif ($admin_uri === '/stats') require __DIR__ . '/routes/admin/stats.php';
     elseif (str_starts_with($admin_uri, '/users')) require __DIR__ . '/routes/admin/users.php';
     else json_error('Route admin non trouvée', 404);
+}
+// Routes livreur
+elseif (str_starts_with($uri, '/delivery/orders')) {
+    require __DIR__ . '/routes/delivery.php';
 }
 // Routes cuisine
 elseif (str_starts_with($uri, '/kitchen')) {
