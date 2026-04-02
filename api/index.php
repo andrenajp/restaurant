@@ -29,7 +29,7 @@ elseif (preg_match('#^/categories$#', $uri) && $method === 'GET') {
 elseif (preg_match('#^/products$#', $uri) && $method === 'GET') {
     require __DIR__ . '/routes/menu.php';
 }
-elseif (preg_match('#^/auth/(register|login)$#', $uri, $m) && $method === 'POST') {
+elseif (preg_match('#^/auth/(register|login|forgot|reset)$#', $uri, $m) && $method === 'POST') {
     require __DIR__ . '/routes/auth.php';
 }
 elseif ($uri === '/orders' && $method === 'POST') {
@@ -48,6 +48,9 @@ elseif ($uri === '/orders/mine' && $method === 'GET') {
 elseif ($uri === '/payment/create-intent' && $method === 'POST') {
     require __DIR__ . '/routes/payment.php';
 }
+elseif ($uri === '/webhook/stripe' && $method === 'POST') {
+    require __DIR__ . '/routes/webhook.php';
+}
 // Routes admin (préfixe /admin)
 elseif (str_starts_with($uri, '/admin')) {
     require_once __DIR__ . '/middleware/Auth.php';
@@ -59,6 +62,8 @@ elseif (str_starts_with($uri, '/admin')) {
     elseif (str_starts_with($admin_uri, '/delivery-fees')) require __DIR__ . '/routes/admin/delivery.php';
     elseif (str_starts_with($admin_uri, '/options'))   require __DIR__ . '/routes/admin/options.php';
     elseif ($admin_uri === '/settings') require __DIR__ . '/routes/admin/settings.php';
+    elseif ($admin_uri === '/stats') require __DIR__ . '/routes/admin/stats.php';
+    elseif (str_starts_with($admin_uri, '/users')) require __DIR__ . '/routes/admin/users.php';
     else json_error('Route admin non trouvée', 404);
 }
 // Routes cuisine

@@ -278,6 +278,18 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         <span>Réglages</span>
       </div>
+      <div class="nav-item" :class="tab==='options' ? 'active' : ''" @click="tab='options'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+        <span>Options plats</span>
+      </div>
+      <div class="nav-item" :class="tab==='stats' ? 'active' : ''" @click="tab='stats'; loadStats()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Statistiques</span>
+      </div>
+      <div class="nav-item" :class="tab==='users' ? 'active' : ''" @click="tab='users'; loadUsers()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        <span>Utilisateurs</span>
+      </div>
     </nav>
 
     <div class="sidebar-footer">
@@ -594,6 +606,189 @@
       </button>
     </div>
 
+    <!-- ══ OPTIONS PRODUITS ══ -->
+    <div x-show="tab === 'options'">
+      <div class="section-title">Options par plat</div>
+
+      <div class="card-dark" style="max-width:520px;">
+        <div class="f-group">
+          <label class="f-label">Choisir un plat</label>
+          <select class="f-select" x-model="optionsProductId" @change="loadOptions()">
+            <option value="">— Sélectionner un plat —</option>
+            <template x-for="p in products" :key="p.id">
+              <option :value="p.id" x-text="p.name"></option>
+            </template>
+          </select>
+        </div>
+      </div>
+
+      <div x-show="optionsProductId">
+        <div class="section-title" style="font-size:18px;margin-top:4px;">
+          Options du plat
+          <button class="btn-red btn-sm" style="margin-left:auto;" @click="openOptionForm()">+ Ajouter</button>
+        </div>
+
+        <div class="card-dark" style="max-width:520px;" x-show="optionFormOpen">
+          <div class="f-row col2">
+            <div class="f-group">
+              <label class="f-label">Groupe *</label>
+              <input class="f-input" type="text" x-model="newOption.group_name" placeholder="Ex: Riz, Sauce">
+            </div>
+            <div class="f-group">
+              <label class="f-label">Option *</label>
+              <input class="f-input" type="text" x-model="newOption.option_name" placeholder="Ex: Riz basmati">
+            </div>
+            <div class="f-group">
+              <label class="f-label">Prix extra (€)</label>
+              <input class="f-input" type="number" step="0.01" x-model="newOption.extra_price" placeholder="0">
+            </div>
+            <div class="f-group" style="display:flex;align-items:center;gap:10px;padding-top:18px;">
+              <label class="toggle">
+                <input type="checkbox" :checked="newOption.is_default==1"
+                       @change="newOption.is_default = $event.target.checked ? 1 : 0">
+                <span class="toggle-slider"></span>
+              </label>
+              <span style="font-size:13px;">Par défaut</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:4px;">
+            <button class="btn-red" @click="saveOption()">Ajouter</button>
+            <button class="btn-outline" @click="optionFormOpen=false">Annuler</button>
+          </div>
+        </div>
+
+        <div x-show="!optionsLoading">
+          <template x-for="group in groupedOptions" :key="group.name">
+            <div class="card-dark" style="margin-bottom:10px;">
+              <div style="font-weight:700;font-size:14px;margin-bottom:10px;color:var(--red);" x-text="group.name"></div>
+              <table class="data-table">
+                <thead><tr><th>Option</th><th>Prix extra</th><th>Défaut</th><th></th></tr></thead>
+                <tbody>
+                  <template x-for="opt in group.items" :key="opt.id">
+                    <tr>
+                      <td x-text="opt.option_name"></td>
+                      <td x-text="parseFloat(opt.extra_price) > 0 ? '+' + parseFloat(opt.extra_price).toFixed(2) + ' €' : 'Inclus'"></td>
+                      <td><span x-show="opt.is_default == 1" style="color:var(--green);font-size:12px;font-weight:700;">✓ Défaut</span></td>
+                      <td><button class="btn-danger" @click="deleteOption(opt)">Suppr.</button></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </template>
+          <div x-show="productOptions.length === 0" class="empty-state">Aucune option pour ce plat.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ STATISTIQUES ══ -->
+    <div x-show="tab === 'stats'">
+      <div class="section-title">Statistiques</div>
+
+      <div x-show="!stats" class="empty-state">Chargement...</div>
+
+      <template x-if="stats">
+        <div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
+            <div class="card-dark" style="text-align:center;">
+              <div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Aujourd'hui</div>
+              <div style="font-size:30px;font-weight:800;color:var(--red);" x-text="'€' + stats.revenue.today.revenue.toFixed(2)"></div>
+              <div style="font-size:13px;color:var(--sub);margin-top:4px;" x-text="stats.revenue.today.orders + ' commandes livrées'"></div>
+            </div>
+            <div class="card-dark" style="text-align:center;">
+              <div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">7 derniers jours</div>
+              <div style="font-size:30px;font-weight:800;color:var(--gold);" x-text="'€' + stats.revenue.week.revenue.toFixed(2)"></div>
+              <div style="font-size:13px;color:var(--sub);margin-top:4px;" x-text="stats.revenue.week.orders + ' commandes livrées'"></div>
+            </div>
+            <div class="card-dark" style="text-align:center;">
+              <div style="font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">30 derniers jours</div>
+              <div style="font-size:30px;font-weight:800;color:var(--green);" x-text="'€' + stats.revenue.month.revenue.toFixed(2)"></div>
+              <div style="font-size:13px;color:var(--sub);margin-top:4px;" x-text="stats.revenue.month.orders + ' commandes livrées'"></div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="card-dark">
+              <div style="font-weight:700;margin-bottom:14px;">Top 5 plats</div>
+              <template x-for="(p, i) in stats.top_products" :key="p.name">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-weight:800;font-size:14px;color:var(--sub);min-width:20px;" x-text="(i+1) + '.'"></span>
+                    <span style="font-size:14px;" x-text="p.name"></span>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="font-weight:700;font-size:14px;" x-text="p.qty_sold + ' vendus'"></div>
+                    <div style="font-size:12px;color:var(--sub);" x-text="'€' + parseFloat(p.revenue).toFixed(2)"></div>
+                  </div>
+                </div>
+              </template>
+              <div x-show="stats.top_products.length === 0" class="empty-state" style="padding:20px;">Aucune donnée</div>
+            </div>
+
+            <div class="card-dark">
+              <div style="font-weight:700;margin-bottom:14px;">Pickup vs Livraison (30j)</div>
+              <template x-for="s in stats.type_split" :key="s.type">
+                <div style="margin-bottom:12px;">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                    <span style="font-size:14px;" x-text="s.type === 'pickup' ? '🏠 Récupérer sur place' : '🛵 Livraison'"></span>
+                    <span style="font-weight:700;" x-text="s.count + ' cmd'"></span>
+                  </div>
+                  <div style="background:var(--border);border-radius:4px;height:8px;">
+                    <div style="height:8px;border-radius:4px;transition:width .3s;"
+                         :style="'width:' + Math.round(s.count / stats.type_split.reduce((a,x)=>a+parseInt(x.count),0) * 100) + '%;background:' + (s.type==='pickup' ? 'var(--red)' : 'var(--green)')">
+                    </div>
+                  </div>
+                </div>
+              </template>
+              <div x-show="stats.type_split.length === 0" class="empty-state" style="padding:20px;">Aucune donnée</div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- ══ UTILISATEURS ══ -->
+    <div x-show="tab === 'users'">
+      <div class="section-title">Utilisateurs</div>
+
+      <div class="card-dark" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead>
+            <tr><th>Nom / Téléphone</th><th>Rôle</th><th>Inscrit le</th><th>Changer rôle</th><th></th></tr>
+          </thead>
+          <tbody>
+            <template x-for="u in users" :key="u.id">
+              <tr>
+                <td>
+                  <div style="font-weight:600;" x-text="u.name || '—'"></div>
+                  <div style="font-size:12px;color:var(--sub);" x-text="u.phone"></div>
+                </td>
+                <td>
+                  <span style="padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;"
+                        :style="u.role==='admin' ? 'background:#3b0000;color:#f87171' : u.role==='kitchen' ? 'background:#1a2e00;color:#86efac' : 'background:#1a1a1a;color:#aaa'"
+                        x-text="u.role"></span>
+                </td>
+                <td style="color:var(--sub);font-size:13px;" x-text="formatDate(u.created_at)"></td>
+                <td>
+                  <select class="f-select" style="padding:6px 10px;font-size:13px;width:auto;"
+                          :value="u.role"
+                          @change="changeUserRole(u, $event.target.value)">
+                    <option value="client">client</option>
+                    <option value="kitchen">kitchen</option>
+                    <option value="admin">admin</option>
+                  </select>
+                </td>
+                <td><button class="btn-danger" @click="deleteUser(u)">Suppr.</button></td>
+              </tr>
+            </template>
+            <tr x-show="users.length === 0">
+              <td colspan="5" style="text-align:center;color:var(--sub);padding:32px;">Aucun utilisateur</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -715,11 +910,29 @@ function adminApp() {
     catModal: false,     editCat: {},
     feeModal: false,     editFee: {},
 
+    optionsProductId: '',
+    productOptions: [],
+    optionsLoading: false,
+    optionFormOpen: false,
+    newOption: { group_name:'', option_name:'', extra_price:0, is_default:0 },
+
+    stats: null,
+    users: [],
+
     refreshTimer: null,
 
     // ── Computed ──
     get pendingCount() {
       return this.orders.filter(o => o.status === 'pending' || o.status === 'received').length;
+    },
+
+    get groupedOptions() {
+      const groups = {};
+      for (const opt of this.productOptions) {
+        if (!groups[opt.group_name]) groups[opt.group_name] = { name: opt.group_name, items: [] };
+        groups[opt.group_name].items.push(opt);
+      }
+      return Object.values(groups);
     },
 
     // ── Init ──
@@ -990,6 +1203,74 @@ function adminApp() {
       } catch (e) {
         this.settingsError = e.message;
       }
+    },
+
+    // ── Options produits ──
+    async loadOptions() {
+      if (!this.optionsProductId) return;
+      this.optionsLoading = true;
+      try {
+        this.productOptions = await apiFetch('/admin/options?product_id=' + this.optionsProductId);
+      } catch { this.productOptions = []; }
+      finally { this.optionsLoading = false; }
+    },
+
+    openOptionForm() {
+      this.newOption = { group_name:'', option_name:'', extra_price:0, is_default:0 };
+      this.optionFormOpen = true;
+    },
+
+    async saveOption() {
+      try {
+        await apiFetch('/admin/options', {
+          method: 'POST',
+          body: JSON.stringify({
+            product_id:  parseInt(this.optionsProductId),
+            group_name:  this.newOption.group_name,
+            option_name: this.newOption.option_name,
+            extra_price: parseFloat(this.newOption.extra_price || 0),
+            is_default:  parseInt(this.newOption.is_default || 0),
+          }),
+        });
+        this.optionFormOpen = false;
+        await this.loadOptions();
+      } catch (e) { alert('Erreur : ' + e.message); }
+    },
+
+    async deleteOption(opt) {
+      if (!confirm('Supprimer l\'option "' + opt.option_name + '" ?')) return;
+      try {
+        await apiFetch('/admin/options/' + opt.id, { method: 'DELETE' });
+        this.productOptions = this.productOptions.filter(x => x.id !== opt.id);
+      } catch (e) { alert(e.message); }
+    },
+
+    // ── Stats ──
+    async loadStats() {
+      try {
+        this.stats = await apiFetch('/admin/stats');
+      } catch { this.stats = null; }
+    },
+
+    // ── Utilisateurs ──
+    async loadUsers() {
+      try { this.users = await apiFetch('/admin/users'); } catch { this.users = []; }
+    },
+
+    async changeUserRole(u, role) {
+      if (role === u.role) return;
+      try {
+        await apiFetch('/admin/users/' + u.id, { method: 'PATCH', body: JSON.stringify({ role }) });
+        u.role = role;
+      } catch (e) { alert(e.message); }
+    },
+
+    async deleteUser(u) {
+      if (!confirm('Supprimer ' + (u.name || u.phone) + ' ?')) return;
+      try {
+        await apiFetch('/admin/users/' + u.id, { method: 'DELETE' });
+        this.users = this.users.filter(x => x.id !== u.id);
+      } catch (e) { alert(e.message); }
     },
   };
 }

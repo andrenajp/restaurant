@@ -90,6 +90,53 @@
           <span x-show="loginLoading" class="spinner-border spinner-border-sm me-2"></span>
           Se connecter
         </button>
+
+        <!-- Lien mot de passe oublié -->
+        <div style="text-align:center;margin-top:12px;">
+          <button style="background:none;border:none;color:var(--color-primary);font-size:13px;cursor:pointer;font-weight:600;"
+                  @click="forgotStep=1; forgotPhone=loginForm.phone">
+            Mot de passe oublié ?
+          </button>
+        </div>
+
+        <!-- Formulaire récupération -->
+        <div x-show="forgotStep > 0" class="card-section" style="margin-top:12px;">
+          <h2 x-text="forgotStep===1 ? 'Réinitialiser le mot de passe' : 'Entrer le code reçu'"></h2>
+
+          <div x-show="forgotError" class="alert-danger mb-3" x-text="forgotError"></div>
+          <div x-show="forgotSuccess" class="alert-success mb-3">Mot de passe modifié ! Vous pouvez vous connecter.</div>
+
+          <!-- Étape 1 : téléphone -->
+          <div x-show="forgotStep === 1">
+            <div class="mb-3">
+              <label class="form-label">Votre numéro de téléphone</label>
+              <input type="tel" class="form-control" x-model="forgotPhone" placeholder="+594694000000">
+            </div>
+            <button class="btn-primary-prt" @click="doForgot()" :disabled="forgotLoading">
+              Envoyer le code SMS
+            </button>
+            <button class="btn-outline-prt" style="margin-top:8px;" @click="forgotStep=0">Annuler</button>
+          </div>
+
+          <!-- Étape 2 : code + nouveau mot de passe -->
+          <div x-show="forgotStep === 2">
+            <p style="font-size:13px;color:#666;margin-bottom:16px;">
+              Un code à 6 chiffres a été envoyé au <strong x-text="forgotPhone"></strong>.
+            </p>
+            <div class="mb-3">
+              <label class="form-label">Code reçu par SMS</label>
+              <input type="text" class="form-control" x-model="forgotCode" placeholder="123456" maxlength="6">
+            </div>
+            <div class="mb-4">
+              <label class="form-label">Nouveau mot de passe</label>
+              <input type="password" class="form-control" x-model="forgotPassword" placeholder="••••••••">
+            </div>
+            <button class="btn-primary-prt" @click="doReset()" :disabled="forgotLoading">
+              Changer le mot de passe
+            </button>
+            <button class="btn-outline-prt" style="margin-top:8px;" @click="forgotStep=1">Retour</button>
+          </div>
+        </div>
       </div>
 
       <!-- Inscription -->
@@ -182,6 +229,14 @@
       loginForm:    { phone: '', password: '' },
       loginError:   '',
       loginLoading: false,
+
+      forgotStep:     0,
+      forgotPhone:    '',
+      forgotCode:     '',
+      forgotPassword: '',
+      forgotLoading:  false,
+      forgotError:    '',
+      forgotSuccess:  false,
 
       registerForm:    { name: '', phone: '', password: '' },
       registerError:   '',
@@ -278,6 +333,44 @@
         if (!dt) return '';
         const d = new Date(dt);
         return d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
+      },
+
+      async doForgot() {
+        this.forgotError = '';
+        this.forgotLoading = true;
+        try {
+          await fetch('/api/auth/forgot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: this.forgotPhone }),
+          });
+          this.forgotStep = 2;
+        } catch (e) {
+          this.forgotError = 'Erreur lors de l\'envoi.';
+        } finally {
+          this.forgotLoading = false;
+        }
+      },
+
+      async doReset() {
+        this.forgotError = '';
+        this.forgotLoading = true;
+        try {
+          const res = await fetch('/api/auth/reset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: this.forgotPhone, code: this.forgotCode, password: this.forgotPassword }),
+          });
+          const data = await res.json();
+          if (!data.success) throw new Error(data.error || 'Erreur');
+          this.forgotSuccess = true;
+          this.forgotStep = 0;
+          this.tab = 'login';
+        } catch (e) {
+          this.forgotError = e.message || 'Code invalide ou expiré.';
+        } finally {
+          this.forgotLoading = false;
+        }
       },
     };
   }

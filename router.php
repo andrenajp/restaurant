@@ -58,6 +58,11 @@ if ($uri === '/admin' || str_starts_with($uri, '/admin?')) {
     if (file_exists($f)) { readfile($f); return true; }
 }
 
+if ($uri === '/kitchen' || str_starts_with($uri, '/kitchen?')) {
+    $f = __DIR__ . '/public/kitchen.html';
+    if (file_exists($f)) { readfile($f); return true; }
+}
+
 // Fallback SPA → index.html
 readfile(__DIR__ . '/public/index.html');
 return true;

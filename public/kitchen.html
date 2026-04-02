@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cuisine — P.R.T</title>
+  <style>
+    :root { --red:#CC0000; --gold:#D4A017; --green:#22c55e; --orange:#f97316; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:'Segoe UI',system-ui,sans-serif; background:#111; color:#f0f0f0; }
+
+    /* Login */
+    .login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; }
+    .login-box { background:#1a1a1a; border:1px solid #2e2e2e; border-radius:16px; padding:36px 28px; width:340px; }
+    .login-title { font-size:22px; font-weight:800; color:var(--red); text-align:center; margin-bottom:24px; }
+    .f-label { font-size:12px; color:#888; font-weight:600; text-transform:uppercase; display:block; margin-bottom:5px; }
+    .f-input { width:100%; background:#242424; border:1px solid #333; border-radius:8px; padding:11px 13px; color:#f0f0f0; font-size:15px; outline:none; margin-bottom:14px; }
+    .f-input:focus { border-color:var(--red); }
+    .btn-red { background:var(--red); color:white; border:none; border-radius:8px; padding:13px; width:100%; font-size:15px; font-weight:700; cursor:pointer; }
+    .alert-err { background:#2e0a0a; border:1px solid #991b1b; color:#f87171; border-radius:8px; padding:10px 14px; font-size:13px; margin-bottom:14px; }
+
+    /* Header */
+    .kitchen-header {
+      background:#0a0a0a; border-bottom:1px solid #2e2e2e;
+      padding:12px 20px; display:flex; align-items:center; justify-content:space-between;
+    }
+    .kitchen-brand { font-weight:900; font-size:18px; color:var(--red); letter-spacing:2px; }
+    .kitchen-brand span { font-weight:400; font-size:12px; color:#888; margin-left:8px; }
+    .header-right { display:flex; align-items:center; gap:14px; }
+    .refresh-info { font-size:12px; color:#555; }
+    .logout-btn { background:transparent; border:1px solid #333; color:#888; border-radius:7px; padding:6px 12px; font-size:13px; cursor:pointer; }
+    .logout-btn:hover { border-color:#e55; color:#e55; }
+
+    /* Kanban */
+    .kanban { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; padding:16px; height:calc(100vh - 57px); overflow:hidden; }
+    .column { background:#1a1a1a; border-radius:12px; border:1px solid #2e2e2e; display:flex; flex-direction:column; overflow:hidden; }
+    .col-header { padding:14px 16px; border-bottom:1px solid #2e2e2e; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+    .col-title { font-weight:800; font-size:15px; }
+    .col-count { background:rgba(255,255,255,.08); border-radius:12px; padding:2px 9px; font-size:12px; font-weight:700; }
+    .col-body { flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:8px; }
+
+    /* Cards */
+    .order-card { background:#242424; border:1px solid #333; border-radius:10px; padding:12px 14px; }
+    .card-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+    .card-id { font-weight:800; font-size:16px; }
+    .card-time { font-size:11px; color:#666; }
+    .card-type { font-size:11px; font-weight:700; padding:2px 8px; border-radius:12px; background:rgba(255,255,255,.07); }
+    .card-phone { font-size:12px; color:#777; margin-bottom:8px; }
+    .card-items { border-top:1px solid #2e2e2e; padding-top:8px; }
+    .card-item { font-size:13px; padding:2px 0; color:#ccc; }
+    .card-item-qty { font-weight:700; color:white; }
+    .card-actions { display:flex; gap:6px; margin-top:10px; }
+    .btn-action {
+      flex:1; border:none; border-radius:7px; padding:9px; font-size:13px;
+      font-weight:700; cursor:pointer; transition:opacity .15s;
+    }
+    .btn-action:active { opacity:.75; }
+    .btn-start    { background:#b45309; color:white; }
+    .btn-ready    { background:var(--green); color:#111; }
+    .btn-delivered { background:#166534; color:white; }
+
+    /* Empty */
+    .col-empty { text-align:center; padding:32px 16px; color:#444; font-size:13px; }
+
+    /* Badge alerte nouvelle commande */
+    .col-header.has-new .col-title::after {
+      content: ' ●'; color:var(--red); animation:blink 1s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    [x-cloak] { display:none !important; }
+  </style>
+</head>
+<body x-data="kitchenApp()" x-init="init()">
+
+<!-- LOGIN -->
+<div class="login-wrap" x-show="!authed" x-cloak>
+  <div class="login-box">
+    <div class="login-title">🍽 Vue Cuisine</div>
+    <div x-show="loginError" class="alert-err" x-text="loginError"></div>
+    <label class="f-label">Téléphone</label>
+    <input class="f-input" type="tel" x-model="phone" placeholder="+594..." @keyup.enter="doLogin()">
+    <label class="f-label">Mot de passe</label>
+    <input class="f-input" type="password" x-model="password" @keyup.enter="doLogin()">
+    <button class="btn-red" @click="doLogin()" :disabled="loading">
+      <span x-text="loading ? 'Connexion...' : 'Se connecter'"></span>
+    </button>
+  </div>
+</div>
+
+<!-- KITCHEN -->
+<div x-show="authed" x-cloak>
+  <div class="kitchen-header">
+    <div class="kitchen-brand">P.R.T <span>— Vue Cuisine</span></div>
+    <div class="header-right">
+      <div class="refresh-info">↻ 15s
+        <span x-show="lastRefresh" x-text="'· ' + lastRefresh"></span>
+      </div>
+      <button class="logout-btn" @click="doLogout()">Déconnexion</button>
+    </div>
+  </div>
+
+  <div class="kanban">
+
+    <!-- Colonne 1 : En attente -->
+    <div class="column">
+      <div class="col-header" :class="waiting.length > 0 ? 'has-new' : ''">
+        <span class="col-title" :style="'color:#fbbf24'">En attente</span>
+        <span class="col-count" x-text="waiting.length"></span>
+      </div>
+      <div class="col-body">
+        <div x-show="waiting.length === 0" class="col-empty">Aucune commande</div>
+        <template x-for="o in waiting" :key="o.id">
+          <div class="order-card">
+            <div class="card-top">
+              <span class="card-id">#<span x-text="o.id"></span></span>
+              <span class="card-time" x-text="timeAgo(o.created_at)"></span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+              <span class="card-type" x-text="o.type==='pickup' ? '🏠 Récupérer' : '🛵 Livraison'"></span>
+              <span class="card-phone" style="margin-bottom:0;" x-text="o.phone"></span>
+            </div>
+            <div class="card-items">
+              <template x-for="item in o.items" :key="item.product_name">
+                <div class="card-item">
+                  <span class="card-item-qty" x-text="item.quantity + '×'"></span>
+                  <span x-text="' ' + item.product_name"></span>
+                </div>
+              </template>
+            </div>
+            <div class="card-actions">
+              <button class="btn-action btn-start" @click="setStatus(o.id, 'in_preparation')">
+                Commencer →
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Colonne 2 : En préparation -->
+    <div class="column">
+      <div class="col-header">
+        <span class="col-title" :style="'color:#fb923c'">En préparation</span>
+        <span class="col-count" x-text="inPrep.length"></span>
+      </div>
+      <div class="col-body">
+        <div x-show="inPrep.length === 0" class="col-empty">Aucune en cours</div>
+        <template x-for="o in inPrep" :key="o.id">
+          <div class="order-card">
+            <div class="card-top">
+              <span class="card-id">#<span x-text="o.id"></span></span>
+              <span class="card-time" x-text="timeAgo(o.created_at)"></span>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+              <span class="card-type" x-text="o.type==='pickup' ? '🏠 Récupérer' : '🛵 Livraison'"></span>
+            </div>
+            <div class="card-items">
+              <template x-for="item in o.items" :key="item.product_name">
+                <div class="card-item">
+                  <span class="card-item-qty" x-text="item.quantity + '×'"></span>
+                  <span x-text="' ' + item.product_name"></span>
+                </div>
+              </template>
+            </div>
+            <div class="card-actions">
+              <button class="btn-action btn-ready" @click="setStatus(o.id, 'ready')">
+                ✓ Prête
+              </button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Colonne 3 : Prêtes -->
+    <div class="column">
+      <div class="col-header">
+        <span class="col-title" :style="'color:#4ade80'">Prêtes</span>
+        <span class="col-count" x-text="ready.length"></span>
+      </div>
+      <div class="col-body">
+        <div x-show="ready.length === 0" class="col-empty">Aucune prête</div>
+        <template x-for="o in ready" :key="o.id">
+          <div class="order-card" style="border-color:#166534;">
+            <div class="card-top">
+              <span class="card-id">#<span x-text="o.id"></span></span>
+              <span class="card-type" x-text="o.type==='pickup' ? '🏠 Récupérer' : '🛵 Livraison'"></span>
+            </div>
+            <div class="card-items">
+              <template x-for="item in o.items" :key="item.product_name">
+                <div class="card-item">
+                  <span class="card-item-qty" x-text="item.quantity + '×'"></span>
+                  <span x-text="' ' + item.product_name"></span>
+                </div>
+              </template>
+            </div>
+            <div class="card-actions">
+              <button class="btn-action btn-delivered"
+                      x-show="o.type==='delivery'"
+                      @click="setStatus(o.id, 'en_route')">En route →</button>
+              <button class="btn-action btn-delivered"
+                      @click="setStatus(o.id, 'delivered')">✓ Livrée</button>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/assets/js/api.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+<script>
+function kitchenApp() {
+  return {
+    authed: false,
+    phone: '', password: '', loginError: '', loading: false,
+    orders: [],
+    lastRefresh: '',
+    timer: null,
+
+    get waiting() {
+      return this.orders.filter(o => o.status === 'received' || o.status === 'pending');
+    },
+    get inPrep() {
+      return this.orders.filter(o => o.status === 'in_preparation');
+    },
+    get ready() {
+      return this.orders.filter(o => o.status === 'ready');
+    },
+
+    async init() {
+      const token = localStorage.getItem('auth_token');
+      const user  = JSON.parse(localStorage.getItem('auth_user') || 'null');
+      if (token && (user?.role === 'admin' || user?.role === 'kitchen')) {
+        this.authed = true;
+        await this.loadOrders();
+        this.startPolling();
+      }
+    },
+
+    async doLogin() {
+      this.loginError = '';
+      this.loading = true;
+      try {
+        const res = await api.login({ phone: this.phone, password: this.password });
+        if (res.user.role !== 'admin' && res.user.role !== 'kitchen') {
+          throw new Error('Accès réservé à la cuisine et aux administrateurs.');
+        }
+        localStorage.setItem('auth_token', res.token);
+        localStorage.setItem('auth_user', JSON.stringify(res.user));
+        this.authed = true;
+        await this.loadOrders();
+        this.startPolling();
+      } catch (e) {
+        this.loginError = e.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    doLogout() {
+      clearInterval(this.timer);
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user');
+      this.authed = false;
+    },
+
+    startPolling() {
+      this.timer = setInterval(() => this.loadOrders(), 15000);
+    },
+
+    async loadOrders() {
+      try {
+        // Récupérer les commandes actives (pas delivered ni cancelled)
+        const all = await apiFetch('/admin/orders');
+        const active = all.filter(o =>
+          !['delivered','cancelled'].includes(o.status)
+        );
+        // Charger les items pour chaque commande
+        const withItems = await Promise.all(active.map(async o => {
+          try {
+            const detail = await apiFetch('/orders/' + o.tracking_token);
+            return { ...o, items: detail.items || [] };
+          } catch {
+            return { ...o, items: [] };
+          }
+        }));
+        this.orders = withItems;
+        this.lastRefresh = new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+      } catch (e) {
+        console.error('Erreur chargement commandes:', e);
+      }
+    },
+
+    async setStatus(id, status) {
+      try {
+        await apiFetch('/admin/orders/' + id, {
+          method: 'PATCH',
+          body: JSON.stringify({ status }),
+        });
+        // Mise à jour locale immédiate sans attendre le polling
+        const o = this.orders.find(x => x.id == id);
+        if (o) o.status = status;
+      } catch (e) {
+        alert('Erreur : ' + e.message);
+      }
+    },
+
+    timeAgo(dt) {
+      if (!dt) return '';
+      const diff = Math.floor((Date.now() - new Date(dt)) / 60000);
+      if (diff < 1) return 'à l\'instant';
+      if (diff < 60) return diff + ' min';
+      return Math.floor(diff / 60) + 'h' + (diff % 60).toString().padStart(2,'0');
+    },
+  };
+}
+</script>
+</body>
+</html>

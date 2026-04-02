@@ -38,10 +38,36 @@ if ($method === 'PATCH') {
         json_error('Statut invalide', 422);
     }
 
+    // Récupérer la commande pour le SMS
+    $order = db()->prepare('SELECT id, phone, type, tracking_token FROM orders WHERE id=?');
+    $order->execute([$order_id]);
+    $row = $order->fetch();
+    if (!$row) json_error('Commande introuvable', 404);
+
     $stmt = db()->prepare('UPDATE orders SET status = ? WHERE id = ?');
     $stmt->execute([$body['status'], $order_id]);
 
-    if ($stmt->rowCount() === 0) json_error('Commande introuvable', 404);
+    // Envoyer un SMS selon le nouveau statut
+    require_once __DIR__ . '/../../helpers/Sms.php';
+    $url = env('APP_URL', 'http://localhost') . '/track?token=' . $row['tracking_token'];
+
+    if ($body['status'] === 'ready') {
+        if ($row['type'] === 'pickup') {
+            send_sms($row['phone'],
+                "Votre commande #{$row['id']} est prête ! Venez la récupérer au restaurant. Suivi : $url"
+            );
+        } else {
+            send_sms($row['phone'],
+                "Votre commande #{$row['id']} est prête et sera bientôt prise en charge par notre livreur. Suivi : $url"
+            );
+        }
+    }
+
+    if ($body['status'] === 'en_route') {
+        send_sms($row['phone'],
+            "Votre commande #{$row['id']} est en route ! Elle arrive bientôt. Suivi : $url"
+        );
+    }
 
     json_success(['updated' => true, 'status' => $body['status']]);
 }
