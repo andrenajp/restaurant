@@ -43,6 +43,10 @@ $filename = bin2hex(random_bytes(12)) . '.' . $ext;
 $dest_dir = __DIR__ . '/../../../public/assets/img/products/';
 $dest     = $dest_dir . $filename;
 
+if (!is_dir($dest_dir)) {
+    mkdir($dest_dir, 0755, true);
+}
+
 if (!move_uploaded_file($file['tmp_name'], $dest)) {
     json_error('Erreur lors de l\'enregistrement du fichier', 500);
 }

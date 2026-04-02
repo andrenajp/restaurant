@@ -21,4 +21,5 @@ logo.png
 docs/superpowers/
 
 # Images produits uploadées (stocker sur le serveur, pas dans git)
-public/assets/img/products/
+public/assets/img/products/*
+!public/assets/img/products/.gitkeep
