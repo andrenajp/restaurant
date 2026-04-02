@@ -12,7 +12,7 @@ if ($method === 'GET' && !$user_id) {
 
 // PATCH /api/admin/users/{id} — modifier le rôle
 if ($method === 'PATCH' && $user_id) {
-    $allowed_roles = ['client', 'kitchen', 'admin'];
+    $allowed_roles = ['client', 'kitchen', 'delivery', 'admin'];
     if (!isset($body['role']) || !in_array($body['role'], $allowed_roles)) {
         json_error('Rôle invalide', 422);
     }

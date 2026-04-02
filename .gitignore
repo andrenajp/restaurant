@@ -1,3 +1,24 @@
 .env
 vendor/
 .DS_Store
+.claude
+.superpowers
+specs
+delivo-food-delivery-pwa-mobile-html-template-2026-03-03-17-18-07-utc
+
+# Cache / outils dev
+.phpunit.result.cache
+*.zip
+
+# Fichiers perso
+carte du restaurent
+logo.png
+*.jpg
+*.jpeg
+*.png
+
+# Plans superpowers
+docs/superpowers/
+
+# Images produits uploadées (stocker sur le serveur, pas dans git)
+public/assets/img/products/

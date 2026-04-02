@@ -71,7 +71,7 @@ $order_token = bin2hex(random_bytes(16));
 $user_id = null;
 require_once __DIR__ . '/../middleware/Auth.php';
 $payload = auth_get_payload();
-if ($payload) $user_id = $payload['uid'];
+if ($payload) $user_id = $payload['sub'];
 
 $stmt = db()->prepare(
     'INSERT INTO orders (user_id, phone, type, delivery_address, status, total, delivery_fee, tracking_token, created_at)

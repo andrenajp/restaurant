@@ -9,7 +9,7 @@ if ($method === 'GET' && $uri === '/orders/mine') {
         'SELECT id, type, status, total, tracking_token, created_at
          FROM orders WHERE user_id=? ORDER BY created_at DESC LIMIT 20'
     );
-    $stmt->execute([$payload['uid']]);
+    $stmt->execute([$payload['sub']]);
     json_success($stmt->fetchAll());
 }
 
@@ -129,7 +129,7 @@ if ($method === 'POST' && $uri === '/orders') {
     $tracking_token = bin2hex(random_bytes(16));
     $user_id = null;
     $payload = auth_get_payload();
-    if ($payload) $user_id = $payload['uid'];
+    if ($payload) $user_id = $payload['sub'];
 
     db()->beginTransaction();
     try {
