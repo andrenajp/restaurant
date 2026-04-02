@@ -62,6 +62,7 @@ elseif (str_starts_with($uri, '/admin')) {
     elseif (str_starts_with($admin_uri, '/delivery-fees')) require __DIR__ . '/routes/admin/delivery.php';
     elseif (str_starts_with($admin_uri, '/options'))   require __DIR__ . '/routes/admin/options.php';
     elseif ($admin_uri === '/settings') require __DIR__ . '/routes/admin/settings.php';
+    elseif ($admin_uri === '/upload') require __DIR__ . '/routes/admin/upload.php';
     elseif ($admin_uri === '/stats') require __DIR__ . '/routes/admin/stats.php';
     elseif (str_starts_with($admin_uri, '/users')) require __DIR__ . '/routes/admin/users.php';
     else json_error('Route admin non trouvée', 404);

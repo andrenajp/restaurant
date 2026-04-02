@@ -819,8 +819,31 @@
         <textarea class="f-textarea" x-model="editProduct.description"></textarea>
       </div>
       <div class="f-group" style="grid-column:1/-1">
-        <label class="f-label">URL image</label>
-        <input class="f-input" type="text" x-model="editProduct.image_url" placeholder="https://...">
+        <label class="f-label">Image du plat</label>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <!-- Prévisualisation -->
+          <div x-show="editProduct.image_url" style="width:80px;height:80px;border-radius:10px;overflow:hidden;border:1px solid var(--border);flex-shrink:0;">
+            <img :src="editProduct.image_url" style="width:100%;height:100%;object-fit:cover;" @error="editProduct.image_url=''">
+          </div>
+          <div x-show="!editProduct.image_url" style="width:80px;height:80px;border-radius:10px;border:2px dashed var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          </div>
+          <!-- Boutons -->
+          <div style="flex:1;min-width:200px;">
+            <label style="display:inline-block;cursor:pointer;">
+              <span class="btn-outline" style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;font-size:13px;"
+                    :style="uploadingImage ? 'opacity:.6;pointer-events:none' : ''">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                <span x-text="uploadingImage ? 'Upload...' : 'Choisir un fichier'"></span>
+              </span>
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/gif"
+                     style="display:none"
+                     @change="uploadProductImage($event)">
+            </label>
+            <div style="font-size:11px;color:#555;margin-top:6px;">JPG, PNG, WebP, GIF — max 5 Mo</div>
+            <div x-show="uploadError" style="font-size:12px;color:#f87171;margin-top:4px;" x-text="uploadError"></div>
+          </div>
+        </div>
       </div>
       <div class="f-group">
         <label class="f-label">Ordre d'affichage</label>
@@ -907,6 +930,7 @@ function adminApp() {
     settingsSaved: false, settingsError: '',
 
     productModal: false, editProduct: {},
+    uploadingImage: false, uploadError: '',
     catModal: false,     editCat: {},
     feeModal: false,     editFee: {},
 
@@ -1202,6 +1226,32 @@ function adminApp() {
         setTimeout(() => this.settingsSaved = false, 3000);
       } catch (e) {
         this.settingsError = e.message;
+      }
+    },
+
+    // ── Upload image produit ──
+    async uploadProductImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      this.uploadError = '';
+      this.uploadingImage = true;
+      try {
+        const token = localStorage.getItem('auth_token');
+        const fd = new FormData();
+        fd.append('image', file);
+        const res = await fetch('/api/admin/upload', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + token },
+          body: fd,
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Erreur upload');
+        this.editProduct.image_url = data.data.url;
+      } catch (e) {
+        this.uploadError = e.message;
+      } finally {
+        this.uploadingImage = false;
+        event.target.value = '';
       }
     },
 
