@@ -59,7 +59,12 @@ if ($method === 'GET' && preg_match('#^/orders/([a-f0-9\-]{32,64})$#', $uri, $m)
     // Résoudre les IDs d'options en noms
     $items_out = [];
     foreach ($items as $r) {
-        $opt_ids = json_decode($r['options_json'] ?? '[]', true);
+        $raw_opts = json_decode($r['options_json'] ?? '[]', true) ?? [];
+        // Normaliser : accepte soit des IDs entiers, soit des objets {id:...}
+        $opt_ids = array_values(array_filter(array_map(
+            fn($o) => is_array($o) ? (int)($o['id'] ?? 0) : (int)$o,
+            $raw_opts
+        )));
         $opt_labels = [];
         if (!empty($opt_ids)) {
             $placeholders = implode(',', array_fill(0, count($opt_ids), '?'));
