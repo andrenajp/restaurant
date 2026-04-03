@@ -47,8 +47,11 @@
     .card-type { font-size:11px; font-weight:700; padding:2px 8px; border-radius:12px; background:rgba(255,255,255,.07); }
     .card-phone { font-size:12px; color:#777; margin-bottom:8px; }
     .card-items { border-top:1px solid #2e2e2e; padding-top:8px; }
-    .card-item { font-size:13px; padding:2px 0; color:#ccc; }
+    .card-item { font-size:13px; padding:3px 0; color:#ccc; }
     .card-item-qty { font-weight:700; color:white; }
+    .card-item-options { padding-left:18px; margin-top:2px; }
+    .card-item-opt { font-size:11px; color:#888; padding:1px 0; }
+    .card-item-opt::before { content:'↳ '; color:#555; }
     .card-actions { display:flex; gap:6px; margin-top:10px; }
     .btn-action {
       flex:1; border:none; border-radius:7px; padding:9px; font-size:13px;
@@ -122,9 +125,16 @@
             </div>
             <div class="card-items">
               <template x-for="item in o.items" :key="item.product_name">
-                <div class="card-item">
-                  <span class="card-item-qty" x-text="item.quantity + '×'"></span>
-                  <span x-text="' ' + item.product_name"></span>
+                <div>
+                  <div class="card-item">
+                    <span class="card-item-qty" x-text="item.quantity + '×'"></span>
+                    <span x-text="' ' + item.product_name"></span>
+                  </div>
+                  <div class="card-item-options" x-show="item.options && item.options.length > 0">
+                    <template x-for="opt in item.options" :key="opt.option_name">
+                      <div class="card-item-opt" x-text="opt.group_name + ' : ' + opt.option_name"></div>
+                    </template>
+                  </div>
                 </div>
               </template>
             </div>
@@ -157,9 +167,16 @@
             </div>
             <div class="card-items">
               <template x-for="item in o.items" :key="item.product_name">
-                <div class="card-item">
-                  <span class="card-item-qty" x-text="item.quantity + '×'"></span>
-                  <span x-text="' ' + item.product_name"></span>
+                <div>
+                  <div class="card-item">
+                    <span class="card-item-qty" x-text="item.quantity + '×'"></span>
+                    <span x-text="' ' + item.product_name"></span>
+                  </div>
+                  <div class="card-item-options" x-show="item.options && item.options.length > 0">
+                    <template x-for="opt in item.options" :key="opt.option_name">
+                      <div class="card-item-opt" x-text="opt.group_name + ' : ' + opt.option_name"></div>
+                    </template>
+                  </div>
                 </div>
               </template>
             </div>
@@ -189,9 +206,16 @@
             </div>
             <div class="card-items">
               <template x-for="item in o.items" :key="item.product_name">
-                <div class="card-item">
-                  <span class="card-item-qty" x-text="item.quantity + '×'"></span>
-                  <span x-text="' ' + item.product_name"></span>
+                <div>
+                  <div class="card-item">
+                    <span class="card-item-qty" x-text="item.quantity + '×'"></span>
+                    <span x-text="' ' + item.product_name"></span>
+                  </div>
+                  <div class="card-item-options" x-show="item.options && item.options.length > 0">
+                    <template x-for="opt in item.options" :key="opt.option_name">
+                      <div class="card-item-opt" x-text="opt.group_name + ' : ' + opt.option_name"></div>
+                    </template>
+                  </div>
                 </div>
               </template>
             </div>

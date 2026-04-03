@@ -48,13 +48,34 @@ if ($method === 'GET' && preg_match('#^/orders/([a-f0-9\-]{32,64})$#', $uri, $m)
     if (!$order) json_error('Commande introuvable', 404);
 
     $stmt2 = db()->prepare(
-        'SELECT oi.quantity, oi.unit_price, oi.options_json, p.name as product_name
+        'SELECT oi.id as item_id, oi.quantity, oi.unit_price, oi.options_json, p.name as product_name
          FROM order_items oi
          JOIN products p ON p.id = oi.product_id
          WHERE oi.order_id = ?'
     );
     $stmt2->execute([$order['id']]);
     $items = $stmt2->fetchAll();
+
+    // Résoudre les IDs d'options en noms
+    $items_out = [];
+    foreach ($items as $r) {
+        $opt_ids = json_decode($r['options_json'] ?? '[]', true);
+        $opt_labels = [];
+        if (!empty($opt_ids)) {
+            $placeholders = implode(',', array_fill(0, count($opt_ids), '?'));
+            $opt_stmt = db()->prepare(
+                "SELECT option_name, group_name FROM product_options WHERE id IN ($placeholders)"
+            );
+            $opt_stmt->execute($opt_ids);
+            $opt_labels = $opt_stmt->fetchAll();
+        }
+        $items_out[] = [
+            'product_name' => $r['product_name'],
+            'quantity'     => (int) $r['quantity'],
+            'unit_price'   => (float) $r['unit_price'],
+            'options'      => $opt_labels,
+        ];
+    }
 
     json_success([
         'id'            => (int) $order['id'],
@@ -64,12 +85,7 @@ if ($method === 'GET' && preg_match('#^/orders/([a-f0-9\-]{32,64})$#', $uri, $m)
         'delivery_fee'  => (float) $order['delivery_fee'],
         'customer_name' => $order['customer_name'],
         'created_at'    => $order['created_at'],
-        'items'         => array_map(fn($r) => [
-            'product_name' => $r['product_name'],
-            'quantity'     => (int) $r['quantity'],
-            'unit_price'   => (float) $r['unit_price'],
-            'options'      => json_decode($r['options_json'] ?? '[]', true),
-        ], $items),
+        'items'         => $items_out,
     ]);
 }
 
