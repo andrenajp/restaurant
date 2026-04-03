@@ -10,6 +10,37 @@ if ($method === 'GET' && !$user_id) {
     json_success($stmt->fetchAll());
 }
 
+// POST /api/admin/users — créer un utilisateur
+if ($method === 'POST') {
+    validate_required($body, ['phone', 'password']);
+
+    if (!validate_phone($body['phone'])) json_error('Numéro de téléphone invalide', 422);
+    if (strlen($body['password']) < 6)   json_error('Mot de passe trop court (min 6 caractères)', 422);
+
+    $allowed_roles = ['client', 'kitchen', 'delivery', 'admin'];
+    $role = $body['role'] ?? 'client';
+    if (!in_array($role, $allowed_roles)) json_error('Rôle invalide', 422);
+
+    $check = db()->prepare('SELECT id FROM users WHERE phone=?');
+    $check->execute([$body['phone']]);
+    if ($check->fetch()) json_error('Ce numéro est déjà utilisé', 409);
+
+    $hash = password_hash($body['password'], PASSWORD_BCRYPT);
+    $stmt = db()->prepare(
+        'INSERT INTO users (name, phone, password_hash, role) VALUES (?,?,?,?)'
+    );
+    $stmt->execute([$body['name'] ?? null, $body['phone'], $hash, $role]);
+    $id = (int) db()->lastInsertId();
+
+    json_success([
+        'id'         => $id,
+        'name'       => $body['name'] ?? null,
+        'phone'      => $body['phone'],
+        'role'       => $role,
+        'created_at' => date('Y-m-d H:i:s'),
+    ], 201);
+}
+
 // PATCH /api/admin/users/{id} — modifier le rôle
 if ($method === 'PATCH' && $user_id) {
     $allowed_roles = ['client', 'kitchen', 'delivery', 'admin'];

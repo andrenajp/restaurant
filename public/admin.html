@@ -773,6 +773,40 @@
     <div x-show="tab === 'users'">
       <div class="section-title">Utilisateurs</div>
 
+      <!-- Formulaire nouvel utilisateur -->
+      <div class="card-dark" style="margin-bottom:16px;">
+        <div style="font-weight:700;font-size:14px;margin-bottom:14px;">Ajouter un utilisateur</div>
+        <div x-show="newUserError" class="alert-err" x-text="newUserError"></div>
+        <div x-show="newUserSuccess" style="background:#0a2e00;border:1px solid #166534;color:#86efac;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;" x-text="newUserSuccess"></div>
+        <div class="f-row col2">
+          <div class="f-group">
+            <label class="f-label">Prénom</label>
+            <input class="f-input" type="text" x-model="newUser.name" placeholder="Jean">
+          </div>
+          <div class="f-group">
+            <label class="f-label">Téléphone *</label>
+            <input class="f-input" type="tel" x-model="newUser.phone" placeholder="+594694000000">
+          </div>
+          <div class="f-group">
+            <label class="f-label">Mot de passe *</label>
+            <input class="f-input" type="password" x-model="newUser.password" placeholder="••••••••">
+          </div>
+          <div class="f-group">
+            <label class="f-label">Rôle *</label>
+            <select class="f-input" x-model="newUser.role">
+              <option value="client">client</option>
+              <option value="kitchen">kitchen</option>
+              <option value="delivery">delivery</option>
+              <option value="admin">admin</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-red" style="width:auto;padding:10px 24px;"
+                @click="createUser()" :disabled="newUserLoading">
+          <span x-text="newUserLoading ? 'Création...' : '+ Créer l\'utilisateur'"></span>
+        </button>
+      </div>
+
       <div class="card-dark" style="padding:0;overflow:hidden;">
         <table class="data-table">
           <thead>
@@ -797,6 +831,7 @@
                           @change="changeUserRole(u, $event.target.value)">
                     <option value="client">client</option>
                     <option value="kitchen">kitchen</option>
+                    <option value="delivery">delivery</option>
                     <option value="admin">admin</option>
                   </select>
                 </td>
@@ -965,6 +1000,8 @@ function adminApp() {
     stats: null,
     users: [],
     drivers: [],
+    newUser: { name:'', phone:'', password:'', role:'client' },
+    newUserLoading: false, newUserError: '', newUserSuccess: '',
 
     refreshTimer: null,
 
@@ -1362,6 +1399,36 @@ function adminApp() {
         await apiFetch('/admin/users/' + u.id, { method: 'DELETE' });
         this.users = this.users.filter(x => x.id !== u.id);
       } catch (e) { alert(e.message); }
+    },
+
+    async createUser() {
+      this.newUserError   = '';
+      this.newUserSuccess = '';
+      if (!this.newUser.phone.trim() || !this.newUser.password.trim()) {
+        this.newUserError = 'Téléphone et mot de passe requis.'; return;
+      }
+      this.newUserLoading = true;
+      try {
+        const created = await apiFetch('/admin/users', {
+          method: 'POST',
+          body: JSON.stringify({
+            name:     this.newUser.name.trim()     || null,
+            phone:    this.newUser.phone.trim(),
+            password: this.newUser.password.trim(),
+            role:     this.newUser.role,
+          }),
+        });
+        this.users.unshift(created);
+        this.newUser = { name:'', phone:'', password:'', role:'client' };
+        this.newUserSuccess = 'Utilisateur créé avec succès.';
+        setTimeout(() => this.newUserSuccess = '', 4000);
+        // Rafraîchir la liste des livreurs si besoin
+        if (created.role === 'delivery') this.loadDrivers();
+      } catch (e) {
+        this.newUserError = e.message;
+      } finally {
+        this.newUserLoading = false;
+      }
     },
   };
 }
