@@ -35,6 +35,9 @@ elseif (preg_match('#^/auth/(register|login|forgot|reset)$#', $uri, $m) && $meth
 elseif ($uri === '/auth/profile' && $method === 'PATCH') {
     require __DIR__ . '/routes/auth_profile.php';
 }
+elseif (str_starts_with($uri, '/auth/addresses')) {
+    require __DIR__ . '/routes/auth_addresses.php';
+}
 elseif ($uri === '/orders' && $method === 'POST') {
     require __DIR__ . '/routes/orders.php';
 }

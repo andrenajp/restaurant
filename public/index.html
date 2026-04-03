@@ -289,13 +289,84 @@
         <!-- Étape 3 : Adresse (livraison uniquement) -->
         <div x-show="checkoutStep === 3 && mode === 'delivery'">
           <label class="checkout-label">Adresse de livraison</label>
-          <input class="checkout-input" type="text" placeholder="Numéro et nom de rue"
-                 x-model="checkoutAddress">
-          <input class="checkout-input" type="text" placeholder="Ville"
-                 x-model="checkoutCity">
+
+          <!-- Adresses sauvegardées (si connecté) -->
+          <template x-if="savedAddresses.length > 0">
+            <div style="margin-bottom:12px;">
+              <template x-for="a in savedAddresses" :key="a.id">
+                <div @click="selectSavedAddress(a)"
+                     :style="selectedAddressId===a.id
+                       ? 'border-color:var(--color-primary);background:rgba(204,0,0,.07);'
+                       : 'border-color:#e0e0e0;'"
+                     style="border:2px solid;border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px;">
+                  <span style="font-size:20px;" x-text="addrEmoji(a.label)"></span>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-weight:700;font-size:14px;" x-text="a.label"></div>
+                    <div style="font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" x-text="a.address"></div>
+                  </div>
+                  <div x-show="selectedAddressId===a.id" style="color:var(--color-primary);font-size:18px;">✓</div>
+                </div>
+              </template>
+            </div>
+          </template>
+
+          <!-- Boutons GPS + Nouvelle adresse -->
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <button @click="useGPS()"
+                    :disabled="gpsLoading"
+                    style="flex:1;background:#f5f5f5;border:1.5px solid #ddd;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+              <span x-show="!gpsLoading">📍 Ma position</span>
+              <span x-show="gpsLoading">Localisation...</span>
+            </button>
+            <button @click="addrMode='manual'; selectedAddressId=null"
+                    :style="addrMode==='manual' && !selectedAddressId
+                      ? 'border-color:var(--color-primary);background:rgba(204,0,0,.07);'
+                      : 'border-color:#ddd;background:#f5f5f5;'"
+                    style="flex:1;border:1.5px solid;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">
+              ✏️ Saisir
+            </button>
+          </div>
+
+          <!-- Saisie manuelle -->
+          <div x-show="addrMode === 'manual'">
+            <input class="checkout-input" type="text" placeholder="Numéro et nom de rue"
+                   x-model="checkoutAddress" @input="selectedAddressId=null">
+            <input class="checkout-input" type="text" placeholder="Ville"
+                   x-model="checkoutCity" @input="selectedAddressId=null">
+
+            <!-- Sauvegarder (si connecté) -->
+            <template x-if="authUser">
+              <div style="margin-bottom:14px;">
+                <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
+                  <input type="checkbox" x-model="saveAddressCheck" style="width:16px;height:16px;">
+                  Sauvegarder cette adresse
+                </label>
+                <template x-if="saveAddressCheck">
+                  <div style="margin-top:8px;">
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                      <template x-for="preset in ['Maison','Travail','Famille','Autre']" :key="preset">
+                        <button @click="saveAddressLabel=preset"
+                                :style="saveAddressLabel===preset
+                                  ? 'background:var(--color-primary);color:white;border-color:var(--color-primary);'
+                                  : 'background:white;color:#333;border-color:#ddd;'"
+                                style="border:1.5px solid;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;"
+                                x-text="preset">
+                        </button>
+                      </template>
+                    </div>
+                    <input class="checkout-input" type="text" placeholder="Nom du lieu (ex: Chez mamie)"
+                           x-model="saveAddressLabel" style="margin-bottom:0;">
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+
+          <div x-show="addrError" style="color:#e55;font-size:13px;margin-bottom:8px;" x-text="addrError"></div>
+
           <button class="checkout-next-btn"
-                  :disabled="!checkoutAddress.trim() || !checkoutCity.trim()"
-                  @click="checkoutStep=4; initStripe()">
+                  :disabled="!canProceedAddress()"
+                  @click="proceedAddress()">
             Continuer →
           </button>
         </div>
@@ -411,6 +482,15 @@
         checkoutAddress: '',
         checkoutCity:    '',
 
+        // Adresses
+        savedAddresses:    [],
+        selectedAddressId: null,
+        addrMode:          'manual',
+        addrError:         '',
+        gpsLoading:        false,
+        saveAddressCheck:  false,
+        saveAddressLabel:  'Maison',
+
         // Stripe
         stripeInstance:  null,
         stripeCard:      null,
@@ -471,7 +551,23 @@
           if (userData) {
             this.authUser = JSON.parse(userData);
             if (this.authUser.phone) this.checkoutPhone = this.authUser.phone;
-            if (this.authUser.default_address) this.checkoutAddress = this.authUser.default_address;
+            // Charger adresses sauvegardées
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+              fetch('/api/auth/addresses', { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(r => r.json()).then(j => {
+                  if (j.data) {
+                    this.savedAddresses = j.data;
+                    // Pré-sélectionner l'adresse par défaut
+                    const def = j.data.find(a => a.is_default);
+                    if (def) { this.selectedAddressId = def.id; this.checkoutAddress = def.address; this.addrMode = 'saved'; }
+                  }
+                }).catch(() => {});
+            }
+          } else {
+            // Invité : charger la dernière adresse depuis localStorage
+            const lastAddr = localStorage.getItem('last_delivery_address');
+            if (lastAddr) { this.checkoutAddress = lastAddr; this.checkoutCity = localStorage.getItem('last_delivery_city') || ''; }
           }
 
           // Init Stripe
@@ -541,7 +637,94 @@
           this.stripeCard = null;
           this.stripeReady = false;
           this.stripeError = '';
+          this.addrError = '';
+          this.addrMode = this.selectedAddressId ? 'saved' : 'manual';
           this.checkoutOpen = true;
+        },
+
+        // ── Adresses ──
+        addrEmoji(label) {
+          const map = { 'Maison':'🏠','Travail':'💼','Famille':'👨‍👩‍👧','Autre':'📍' };
+          return map[label] || '📍';
+        },
+
+        selectSavedAddress(a) {
+          this.selectedAddressId = a.id;
+          this.checkoutAddress   = a.address;
+          this.checkoutCity      = '';
+          this.addrMode          = 'saved';
+          this.addrError         = '';
+        },
+
+        canProceedAddress() {
+          if (this.selectedAddressId) return true;
+          return this.checkoutAddress.trim().length > 3;
+        },
+
+        async useGPS() {
+          if (!navigator.geolocation) { this.addrError = 'Géolocalisation non disponible'; return; }
+          this.gpsLoading = true;
+          this.addrError  = '';
+          this.selectedAddressId = null;
+          navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+              try {
+                const { latitude: lat, longitude: lon } = pos.coords;
+                const r = await fetch(
+                  `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                  { headers: { 'Accept-Language': 'fr' } }
+                );
+                const data = await r.json();
+                const a = data.address || {};
+                const road    = a.road || a.pedestrian || '';
+                const number  = a.house_number || '';
+                const city    = a.city || a.town || a.village || a.municipality || '';
+                this.checkoutAddress = [number, road].filter(Boolean).join(' ') || data.display_name.split(',')[0];
+                this.checkoutCity    = city;
+              } catch {
+                this.checkoutAddress = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+                this.checkoutCity    = '';
+              }
+              this.addrMode   = 'manual';
+              this.gpsLoading = false;
+            },
+            (err) => {
+              this.addrError  = 'Position refusée. Veuillez saisir manuellement.';
+              this.addrMode   = 'manual';
+              this.gpsLoading = false;
+            },
+            { timeout: 8000 }
+          );
+        },
+
+        async proceedAddress() {
+          this.addrError = '';
+          const finalAddress = this.selectedAddressId
+            ? this.checkoutAddress
+            : [this.checkoutAddress.trim(), this.checkoutCity.trim()].filter(Boolean).join(', ');
+
+          if (!finalAddress) { this.addrError = 'Veuillez renseigner une adresse'; return; }
+
+          // Sauvegarder en localStorage (invité ou connecté)
+          localStorage.setItem('last_delivery_address', this.checkoutAddress.trim());
+          if (this.checkoutCity) localStorage.setItem('last_delivery_city', this.checkoutCity.trim());
+
+          // Sauvegarder dans le profil si demandé
+          if (this.authUser && this.saveAddressCheck && this.checkoutAddress.trim() && this.saveAddressLabel.trim()) {
+            const token = localStorage.getItem('auth_token');
+            fetch('/api/auth/addresses', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+              body: JSON.stringify({ label: this.saveAddressLabel.trim(), address: finalAddress, is_default: 0 }),
+            }).then(r => r.json()).then(j => {
+              if (j.data) this.savedAddresses.unshift(j.data);
+            }).catch(() => {});
+          }
+
+          this.checkoutAddress = finalAddress;
+          this.checkoutCity    = '';
+          this.checkoutStep    = 4;
+          this.initStripe();
         },
 
         initStripe() {
@@ -569,7 +752,7 @@
 
           try {
             const address = this.mode === 'delivery'
-              ? this.checkoutAddress.trim() + ', ' + this.checkoutCity.trim()
+              ? this.checkoutAddress.trim()
               : null;
 
             const result = await api.createIntent({
