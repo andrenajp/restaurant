@@ -167,11 +167,32 @@
     <!-- État connecté -->
     <div x-show="user" x-cloak>
 
+      <!-- Modifier le profil -->
+      <div class="card-section">
+        <h2>Mon profil</h2>
+        <div x-show="profileSuccess" class="alert-success mb-3">Profil mis à jour ✓</div>
+        <div x-show="profileError" class="alert-danger mb-3" x-text="profileError"></div>
+        <div class="mb-3">
+          <label class="form-label">Prénom</label>
+          <input type="text" class="form-control" x-model="profileForm.name" placeholder="Jean">
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Téléphone</label>
+          <input type="tel" class="form-control" x-model="profileForm.phone" placeholder="+594694000000">
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="btn-primary-prt" style="flex:1;" @click="saveProfile()" :disabled="profileLoading">
+            <span x-show="profileLoading" class="spinner-border spinner-border-sm me-2"></span>
+            Enregistrer
+          </button>
+          <button class="logout-btn" @click="doLogout()">Déconnexion</button>
+        </div>
+      </div>
+
       <!-- Historique commandes -->
       <div class="card-section">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h2 style="margin:0">Mes commandes</h2>
-          <button class="logout-btn" @click="doLogout()">Déconnexion</button>
         </div>
 
         <div x-show="ordersLoading" class="empty-state">
@@ -243,6 +264,11 @@
       registerSuccess: false,
       registerLoading: false,
 
+      profileForm:    { name: '', phone: '' },
+      profileLoading: false,
+      profileError:   '',
+      profileSuccess: false,
+
       async init() {
         try {
           const s = await api.getSettings();
@@ -256,6 +282,8 @@
         const userData = localStorage.getItem('auth_user');
         if (token && userData) {
           this.user = JSON.parse(userData);
+          this.profileForm.name  = this.user.name  || '';
+          this.profileForm.phone = this.user.phone || '';
           await this.loadOrders();
         }
       },
@@ -268,11 +296,40 @@
           localStorage.setItem('auth_token', res.token);
           localStorage.setItem('auth_user',  JSON.stringify(res.user)); // contient {id, phone, role}
           this.user = res.user;
+          this.profileForm.name  = res.user.name  || '';
+          this.profileForm.phone = res.user.phone || '';
           await this.loadOrders();
         } catch (e) {
           this.loginError = e.message || 'Numéro ou mot de passe incorrect.';
         } finally {
           this.loginLoading = false;
+        }
+      },
+
+      async saveProfile() {
+        this.profileError   = '';
+        this.profileSuccess = false;
+        this.profileLoading = true;
+        try {
+          const token = localStorage.getItem('auth_token');
+          const res = await fetch('/api/auth/profile', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({
+              name:  this.profileForm.name.trim()  || null,
+              phone: this.profileForm.phone.trim(),
+            }),
+          });
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error || 'Erreur serveur');
+          this.user = json.data;
+          localStorage.setItem('auth_user', JSON.stringify(this.user));
+          this.profileSuccess = true;
+          setTimeout(() => this.profileSuccess = false, 3000);
+        } catch (e) {
+          this.profileError = e.message;
+        } finally {
+          this.profileLoading = false;
         }
       },
 

@@ -595,7 +595,13 @@
               this.stripeError = error.message;
             } else if (paymentIntent.status === 'succeeded') {
               this.checkoutOpen = false;
-              this.postPaymentOpen = true;
+              // Si connecté avec un nom déjà renseigné → pas de popup
+              if (this.authUser?.name) {
+                this.customerName = this.authUser.name;
+                await this.finalizeOrder();
+              } else {
+                this.postPaymentOpen = true;
+              }
             }
           } catch (err) {
             this.stripeError = err.message;
@@ -611,12 +617,31 @@
               headers: { 'Content-Type': 'application/json' },
             }).catch(() => {});
 
-            if (this.customerName.trim()) {
+            const name = this.customerName.trim();
+            if (name) {
+              // Sauvegarder le nom sur la commande
               await fetch('/api/orders/' + this.pendingOrderToken + '/name', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ customer_name: this.customerName.trim() }),
+                body: JSON.stringify({ customer_name: name }),
               }).catch(() => {});
+
+              // Si connecté et pas encore de nom → sauvegarder dans le profil
+              if (this.authUser && !this.authUser.name) {
+                const token = localStorage.getItem('auth_token');
+                const res = await fetch('/api/auth/profile', {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                  body: JSON.stringify({ name }),
+                }).catch(() => null);
+                if (res?.ok) {
+                  const updated = await res.json().catch(() => null);
+                  if (updated?.data) {
+                    this.authUser = { ...this.authUser, name };
+                    localStorage.setItem('auth_user', JSON.stringify(this.authUser));
+                  }
+                }
+              }
             }
           }
           this.$store.cart.clear();
