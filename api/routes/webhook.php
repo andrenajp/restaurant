@@ -6,7 +6,17 @@ $payload    = file_get_contents('php://input');
 $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
 $secret     = env('STRIPE_WEBHOOK_SECRET', '');
 
-// Vérification de signature Stripe (si webhook secret configuré)
+$is_live = env('APP_ENV', 'development') === 'production';
+
+// En mode live : le secret doit être configuré, sinon erreur 500
+if ($is_live && (!$secret || str_contains($secret, '...'))) {
+    http_response_code(500);
+    exit(json_encode(['error' => 'STRIPE_WEBHOOK_SECRET non configuré']));
+}
+
+// Vérification de signature Stripe
+// - mode live  : toujours vérifiée (secret obligatoire)
+// - mode test  : vérifiée seulement si le secret est configuré
 if ($secret && !str_contains($secret, '...')) {
     $parts     = [];
     foreach (explode(',', $sig_header) as $part) {
