@@ -103,6 +103,9 @@ if ($action === 'reset') {
     validate_required($body, ['phone', 'code', 'password']);
     $body['phone'] = normalize_phone($body['phone']);
 
+    // 5 tentatives max sur 15 min → blocage 15 min
+    rate_limit_check("reset:{$client_ip}", 5, 900, 900);
+
     if (strlen($body['password']) < 6) {
         json_error('Le mot de passe doit faire au moins 6 caractères', 422);
     }
@@ -126,6 +129,7 @@ if ($action === 'reset') {
     db()->prepare('UPDATE users SET password_hash=? WHERE phone=?')
         ->execute([$hash, $body['phone']]);
 
+    rate_limit_reset("reset:{$client_ip}");
     json_success(['reset' => true]);
 }
 
