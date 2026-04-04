@@ -72,6 +72,14 @@ if ($method === 'PUT' && $user_id) {
     if (isset($body['role'])) {
         $allowed_roles = ['client', 'kitchen', 'delivery', 'admin'];
         if (!in_array($body['role'], $allowed_roles)) json_error('Rôle invalide', 422);
+        if ($body['role'] !== 'admin') {
+            $cur = db()->prepare('SELECT role FROM users WHERE id=?');
+            $cur->execute([$user_id]);
+            if ($cur->fetchColumn() === 'admin') {
+                $admin_count = (int)db()->query("SELECT COUNT(*) FROM users WHERE role='admin'")->fetchColumn();
+                if ($admin_count <= 1) json_error('Impossible de rétrograder le dernier administrateur', 422);
+            }
+        }
         $fields[] = 'role=?';
         $params[] = $body['role'];
     }
