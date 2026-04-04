@@ -23,6 +23,7 @@ if ($method === 'GET' && !$addr_id) {
 // POST /api/auth/addresses
 if ($method === 'POST') {
     validate_required($body, ['label', 'address']);
+    validate_lengths($body, ['label' => 50, 'address' => 300]);
     $label   = trim($body['label']);
     $address = trim($body['address']);
     if (!$label || !$address) json_error('Label et adresse requis', 422);

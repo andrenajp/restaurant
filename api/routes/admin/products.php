@@ -9,6 +9,7 @@ if ($method === 'GET' && !$product_id) {
 
 if ($method === 'POST') {
     validate_required($body, ['category_id', 'name', 'price']);
+    validate_lengths($body, ['name' => 150, 'description' => 500, 'image_url' => 500]);
     $stmt = db()->prepare(
         'INSERT INTO products (category_id, name, description, price, image_url, is_available, sort_order)
          VALUES (?, ?, ?, ?, ?, ?, ?)'
@@ -27,6 +28,7 @@ if ($method === 'POST') {
 
 if ($method === 'PUT' && $product_id) {
     validate_required($body, ['name', 'price']);
+    validate_lengths($body, ['name' => 150, 'description' => 500, 'image_url' => 500]);
     $stmt = db()->prepare(
         'UPDATE products SET category_id=?, name=?, description=?, price=?, image_url=?, is_available=?, sort_order=? WHERE id=?'
     );

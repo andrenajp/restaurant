@@ -8,6 +8,8 @@ $user_id = (int) $payload['sub'];
 
 if ($method !== 'PATCH') json_error('Méthode non supportée', 405);
 
+validate_lengths($body, ['name' => 100]);
+
 $updates = [];
 $params  = [];
 

@@ -17,6 +17,7 @@ if ($method === 'GET') {
 
 if ($method === 'POST') {
     validate_required($body, ['product_id', 'group_name', 'option_name']);
+    validate_lengths($body, ['group_name' => 80, 'option_name' => 80]);
     $stmt = db()->prepare(
         'INSERT INTO product_options (product_id, group_name, option_name, extra_price, is_default) VALUES (?,?,?,?,?)'
     );
@@ -32,6 +33,7 @@ if ($method === 'POST') {
 
 if ($method === 'PUT' && $opt_id) {
     validate_required($body, ['group_name', 'option_name']);
+    validate_lengths($body, ['group_name' => 80, 'option_name' => 80]);
     $check = db()->prepare('SELECT id FROM product_options WHERE id=?');
     $check->execute([$opt_id]);
     if (!$check->fetch()) json_error('Option introuvable', 404);

@@ -9,6 +9,7 @@ $action = $m[1] ?? '';
 
 if ($action === 'register') {
     validate_required($body, ['phone', 'password']);
+    validate_lengths($body, ['name' => 100, 'password' => 128]);
     $body['phone'] = normalize_phone($body['phone']);
 
     if (!validate_phone($body['phone'])) {
@@ -101,6 +102,7 @@ if ($action === 'forgot') {
 
 if ($action === 'reset') {
     validate_required($body, ['phone', 'code', 'password']);
+    validate_lengths($body, ['password' => 128]);
     $body['phone'] = normalize_phone($body['phone']);
 
     // 5 tentatives max sur 15 min → blocage 15 min

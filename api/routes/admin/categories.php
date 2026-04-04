@@ -8,6 +8,7 @@ if ($method === 'GET') {
 
 if ($method === 'POST') {
     validate_required($body, ['name']);
+    validate_lengths($body, ['name' => 80, 'emoji' => 10, 'color' => 20]);
     $stmt = db()->prepare(
         'INSERT INTO categories (name, emoji, color, sort_order, is_active) VALUES (?, ?, ?, ?, 1)'
     );
@@ -17,6 +18,7 @@ if ($method === 'POST') {
 
 if ($method === 'PUT' && $cat_id) {
     validate_required($body, ['name']);
+    validate_lengths($body, ['name' => 80, 'emoji' => 10, 'color' => 20]);
     $stmt = db()->prepare('UPDATE categories SET name=?, emoji=?, color=?, sort_order=?, is_active=? WHERE id=?');
     $stmt->execute([$body['name'], $body['emoji'] ?? null, $body['color'] ?? '#CC0000', (int)($body['sort_order'] ?? 0), (int)($body['is_active'] ?? 1), $cat_id]);
     json_success(['updated' => true]);

@@ -13,6 +13,7 @@ if ($method === 'GET' && !$user_id) {
 // POST /api/admin/users — créer un utilisateur
 if ($method === 'POST') {
     validate_required($body, ['phone', 'password']);
+    validate_lengths($body, ['name' => 100, 'password' => 128]);
     $body['phone'] = normalize_phone($body['phone']);
 
     if (!validate_phone($body['phone'])) json_error('Numéro de téléphone invalide', 422);

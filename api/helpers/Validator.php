@@ -17,3 +17,16 @@ function normalize_phone(string $phone): string {
 function validate_phone(string $phone): bool {
     return (bool) preg_match('/^\+?[0-9]{8,15}$/', $phone);
 }
+
+/**
+ * Vérifie que les champs texte ne dépassent pas les longueurs max autorisées.
+ * @param array $data   Corps de la requête
+ * @param array $limits [ 'field' => max_chars, ... ]
+ */
+function validate_lengths(array $data, array $limits): void {
+    foreach ($limits as $field => $max) {
+        if (isset($data[$field]) && mb_strlen((string) $data[$field]) > $max) {
+            json_error("Le champ '$field' ne doit pas dépasser $max caractères", 422);
+        }
+    }
+}
