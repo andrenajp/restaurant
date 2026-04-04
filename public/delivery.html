@@ -59,6 +59,10 @@
     .f-label { font-size:12px; color:#888; font-weight:600; text-transform:uppercase; display:block; margin-bottom:5px; }
     .f-input  { width:100%; background:#242424; border:1px solid #333; border-radius:8px; padding:11px 13px; color:#f0f0f0; font-size:15px; outline:none; margin-bottom:14px; }
     .f-input:focus { border-color:var(--red); }
+    .phone-group { display:flex; gap:6px; margin-bottom:14px; }
+    .phone-group .dial-select { flex-shrink:0; width:85px; background:#242424; border:1px solid #333; border-radius:8px; padding:11px 6px; color:#f0f0f0; font-size:13px; cursor:pointer; }
+    .phone-group .dial-select:focus { border-color:var(--red); outline:none; }
+    .phone-group .f-input { flex:1; min-width:0; margin-bottom:0; }
     .btn-red { background:var(--red); color:white; border:none; border-radius:8px; padding:13px; width:100%; font-size:15px; font-weight:700; cursor:pointer; }
     .btn-red:disabled { opacity:.6; }
     .alert-err { background:#2e0a0a; border:1px solid #991b1b; color:#f87171; border-radius:8px; padding:10px 14px; font-size:13px; margin-bottom:14px; }
@@ -79,7 +83,12 @@
     <div class="login-sub">Espace livreur</div>
     <div x-show="loginError" class="alert-err" x-text="loginError"></div>
     <label class="f-label">Téléphone</label>
-    <input class="f-input" type="tel" x-model="phone" @keyup.enter="doLogin()">
+    <div class="phone-group">
+      <select class="dial-select" x-model="dialCode">
+        <template x-for="dc in DIAL_CODES" :key="dc"><option :value="dc" x-text="dc"></option></template>
+      </select>
+      <input class="f-input" type="tel" x-model="phoneRaw" placeholder="694000000" @keyup.enter="doLogin()">
+    </div>
     <label class="f-label">Mot de passe</label>
     <input class="f-input" type="password" x-model="password" @keyup.enter="doLogin()">
     <button class="btn-red" @click="doLogin()" :disabled="loading">
@@ -177,7 +186,9 @@
 function deliveryApp() {
   return {
     authed: false,
-    phone: '', password: '', loginError: '', loading: false,
+    DIAL_CODES: ['+594','+596','+590','+262','+33','+32','+41','+1'],
+    dialCode: '+594', phoneRaw: '',
+    password: '', loginError: '', loading: false,
     driverName: '',
     orders: [],
     polling: false,
@@ -201,7 +212,8 @@ function deliveryApp() {
       this.loginError = '';
       this.loading    = true;
       try {
-        const res = await api.login({ phone: this.phone, password: this.password });
+        const phone = this.dialCode + this.phoneRaw.trim().replace(/^0+/, '');
+        const res = await api.login({ phone, password: this.password });
         if (res.user.role !== 'delivery' && res.user.role !== 'admin') {
           throw new Error('Accès réservé aux livreurs.');
         }

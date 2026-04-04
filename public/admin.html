@@ -142,6 +142,10 @@
     .f-textarea { resize: vertical; min-height: 72px; }
     .f-select option { background: #1a1a1a; }
     .f-group { margin-bottom: 14px; }
+    .phone-group { display: flex; gap: 6px; }
+    .phone-group .dial-select { flex-shrink: 0; width: 90px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 6px; font-size: 13px; color: var(--fg); cursor: pointer; }
+    .phone-group .dial-select:focus { border-color: var(--red); outline: none; }
+    .phone-group .f-input { flex: 1; min-width: 0; }
     .f-row { display: grid; gap: 12px; }
     .f-row.col2 { grid-template-columns: 1fr 1fr; }
     .f-row.col3 { grid-template-columns: 1fr 1fr 1fr; }
@@ -230,8 +234,14 @@
 
     <div class="f-group">
       <label class="f-label">Téléphone</label>
-      <input class="f-input" type="tel" x-model="loginPhone" placeholder="+594 6 94 00 00 00"
-             @keyup.enter="doLogin()">
+      <div class="phone-group">
+        <select class="dial-select" x-model="loginDialCode">
+          <template x-for="dc in DIAL_CODES" :key="dc.code">
+            <option :value="dc.code" x-text="dc.code"></option>
+          </template>
+        </select>
+        <input class="f-input" type="tel" x-model="loginPhoneRaw" placeholder="694000000" @keyup.enter="doLogin()">
+      </div>
     </div>
     <div class="f-group">
       <label class="f-label">Mot de passe</label>
@@ -352,7 +362,8 @@
       <template x-if="!ordersLoading">
         <div>
           <template x-for="order in orders" :key="order.id">
-            <div class="order-card">
+            <div class="order-card"
+                 :style="order.status === 'delivered' ? 'border-color:#166534; background:#0a2e1a;' : ''">
               <div class="order-card-top">
                 <div>
                   <span class="order-id">#<span x-text="order.id"></span></span>
@@ -785,7 +796,14 @@
           </div>
           <div class="f-group">
             <label class="f-label">Téléphone *</label>
-            <input class="f-input" type="tel" x-model="newUser.phone" placeholder="+594694000000">
+            <div class="phone-group">
+              <select class="dial-select" x-model="newUserDialCode">
+                <template x-for="dc in DIAL_CODES" :key="dc.code">
+                  <option :value="dc.code" x-text="dc.code"></option>
+                </template>
+              </select>
+              <input class="f-input" type="tel" x-model="newUserPhoneRaw" placeholder="694000000">
+            </div>
           </div>
           <div class="f-group">
             <label class="f-label">Mot de passe *</label>
@@ -978,7 +996,22 @@ function adminApp() {
     authed: false,
     tab: 'orders',
 
-    loginPhone: '', loginPassword: '', loginError: '', loginLoading: false,
+    DIAL_CODES: [
+      { code: '+594', label: '+594 (Guyane)' },
+      { code: '+596', label: '+596 (Martinique)' },
+      { code: '+590', label: '+590 (Guadeloupe)' },
+      { code: '+262', label: '+262 (Réunion/Mayotte)' },
+      { code: '+33',  label: '+33 (France)' },
+      { code: '+32',  label: '+32 (Belgique)' },
+      { code: '+41',  label: '+41 (Suisse)' },
+      { code: '+1',   label: '+1 (USA/Canada)' },
+    ],
+    buildPhone(dialCode, raw) {
+      const r = (raw || '').trim().replace(/^0+/, '');
+      return r ? dialCode + r : '';
+    },
+
+    loginDialCode: '+594', loginPhoneRaw: '', loginPassword: '', loginError: '', loginLoading: false,
 
     orders: [], ordersLoading: false, orderFilter: '',
     products: [], categories: [], deliveryFees: [],
@@ -1000,7 +1033,8 @@ function adminApp() {
     stats: null,
     users: [],
     drivers: [],
-    newUser: { name:'', phone:'', password:'', role:'client' },
+    newUser: { name:'', password:'', role:'client' },
+    newUserDialCode: '+594', newUserPhoneRaw: '',
     newUserLoading: false, newUserError: '', newUserSuccess: '',
 
     refreshTimer: null,
@@ -1052,7 +1086,7 @@ function adminApp() {
       this.loginError = '';
       this.loginLoading = true;
       try {
-        const res = await api.login({ phone: this.loginPhone, password: this.loginPassword });
+        const res = await api.login({ phone: this.buildPhone(this.loginDialCode, this.loginPhoneRaw), password: this.loginPassword });
         if (res.user?.role !== 'admin') throw new Error('Accès refusé : compte non administrateur.');
         localStorage.setItem('auth_token', res.token);
         localStorage.setItem('auth_user', JSON.stringify(res.user));
@@ -1404,7 +1438,8 @@ function adminApp() {
     async createUser() {
       this.newUserError   = '';
       this.newUserSuccess = '';
-      if (!this.newUser.phone.trim() || !this.newUser.password.trim()) {
+      const newPhone = this.buildPhone(this.newUserDialCode, this.newUserPhoneRaw);
+      if (!newPhone || !this.newUser.password.trim()) {
         this.newUserError = 'Téléphone et mot de passe requis.'; return;
       }
       this.newUserLoading = true;
@@ -1412,14 +1447,15 @@ function adminApp() {
         const created = await apiFetch('/admin/users', {
           method: 'POST',
           body: JSON.stringify({
-            name:     this.newUser.name.trim()     || null,
-            phone:    this.newUser.phone.trim(),
+            name:     this.newUser.name.trim() || null,
+            phone:    newPhone,
             password: this.newUser.password.trim(),
             role:     this.newUser.role,
           }),
         });
         this.users.unshift(created);
-        this.newUser = { name:'', phone:'', password:'', role:'client' };
+        this.newUser = { name:'', password:'', role:'client' };
+        this.newUserPhoneRaw = '';
         this.newUserSuccess = 'Utilisateur créé avec succès.';
         setTimeout(() => this.newUserSuccess = '', 4000);
         // Rafraîchir la liste des livreurs si besoin

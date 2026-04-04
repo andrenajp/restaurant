@@ -97,6 +97,7 @@ if ($method === 'GET' && preg_match('#^/orders/([a-f0-9\-]{32,64})$#', $uri, $m)
 // POST /api/orders — création directe de commande (sans paiement Stripe)
 if ($method === 'POST' && $uri === '/orders') {
     validate_required($body, ['phone', 'type', 'items']);
+    $body['phone'] = normalize_phone($body['phone']);
 
     if (!in_array($body['type'], ['pickup', 'delivery'])) {
         json_error('Type invalide : pickup ou delivery', 422);

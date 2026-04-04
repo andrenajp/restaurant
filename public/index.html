@@ -274,13 +274,20 @@
         <!-- Étape 2 : Téléphone -->
         <div x-show="checkoutStep === 2">
           <label class="checkout-label">Votre numéro de téléphone</label>
-          <input class="checkout-input" type="tel" placeholder="+594 6 94 00 00 00"
-                 x-model="checkoutPhone" @keyup.enter="checkoutPhone.length >= 8 && (checkoutStep=3, mode==='pickup' && initStripe())">
+          <div class="checkout-phone-group">
+            <select class="dial-select" x-model="checkoutDialCode">
+              <template x-for="dc in DIAL_CODES" :key="dc.code">
+                <option :value="dc.code" x-text="dc.code"></option>
+              </template>
+            </select>
+            <input class="checkout-input" type="tel" placeholder="694000000"
+                   x-model="checkoutPhoneRaw" @keyup.enter="checkoutPhoneRaw.trim().length >= 5 && (checkoutStep=3, mode==='pickup' && initStripe())">
+          </div>
           <p style="font-size:12px; color:var(--color-sub); margin-bottom:16px;">
             Vous recevrez un SMS de confirmation à ce numéro.
           </p>
           <button class="checkout-next-btn"
-                  :disabled="checkoutPhone.length < 8"
+                  :disabled="checkoutPhoneRaw.trim().length < 5"
                   @click="checkoutStep=3; mode==='pickup' && initStripe()">
             Continuer →
           </button>
@@ -476,9 +483,11 @@
         modalQty:        1,
 
         // Checkout
-        checkoutOpen:    false,
-        checkoutStep:    1,
-        checkoutPhone:   '',
+        checkoutOpen:     false,
+        checkoutStep:     1,
+        checkoutDialCode: '+594',
+        checkoutPhoneRaw: '',
+        checkoutPhone:    '',
         checkoutAddress: '',
         checkoutCity:    '',
 
@@ -502,6 +511,30 @@
         // Post paiement
         postPaymentOpen: false,
         customerName:    '',
+
+        DIAL_CODES: [
+          { code: '+594', label: '+594 (Guyane)' },
+          { code: '+596', label: '+596 (Martinique)' },
+          { code: '+590', label: '+590 (Guadeloupe)' },
+          { code: '+262', label: '+262 (Réunion/Mayotte)' },
+          { code: '+33',  label: '+33 (France)' },
+          { code: '+32',  label: '+32 (Belgique)' },
+          { code: '+41',  label: '+41 (Suisse)' },
+          { code: '+1',   label: '+1 (USA/Canada)' },
+        ],
+
+        buildPhone(dialCode, raw) {
+          const r = (raw || '').trim().replace(/^0+/, '');
+          return r ? dialCode + r : '';
+        },
+
+        detectDialCode(phone) {
+          if (!phone) return { code: '+594', raw: '' };
+          for (const dc of this.DIAL_CODES) {
+            if (phone.startsWith(dc.code)) return { code: dc.code, raw: phone.slice(dc.code.length) };
+          }
+          return { code: '+594', raw: phone };
+        },
 
         get filteredProducts() {
           const list = this.products.filter(p => p.is_available == 1);
@@ -550,7 +583,12 @@
           const userData = localStorage.getItem('auth_user');
           if (userData) {
             this.authUser = JSON.parse(userData);
-            if (this.authUser.phone) this.checkoutPhone = this.authUser.phone;
+            if (this.authUser.phone) {
+              const p = this.detectDialCode(this.authUser.phone);
+              this.checkoutDialCode = p.code;
+              this.checkoutPhoneRaw = p.raw;
+              this.checkoutPhone    = this.authUser.phone;
+            }
             // Charger adresses sauvegardées
             const token = localStorage.getItem('auth_token');
             if (token) {
@@ -589,6 +627,10 @@
 
         // ===== FICHE PLAT =====
         openProduct(product) {
+          if (!product.options || product.options.length === 0) {
+            this.quickAdd(product);
+            return;
+          }
           this.selectedProduct = product;
           this.modalQty = 1;
           this.selectedOptions = [];
@@ -761,7 +803,7 @@
                 qty:     i.qty,
                 options: i.options,
               })),
-              phone:            this.checkoutPhone,
+              phone:            this.buildPhone(this.checkoutDialCode, this.checkoutPhoneRaw) || this.checkoutPhone,
               type:             this.mode === 'pickup' ? 'pickup' : 'delivery',
               delivery_address: address,
             });

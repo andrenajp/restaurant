@@ -17,7 +17,7 @@ if (isset($body['name'])) {
 }
 
 if (isset($body['phone'])) {
-    $new_phone = trim($body['phone']);
+    $new_phone = normalize_phone(trim($body['phone']));
     if (!validate_phone($new_phone)) json_error('Numéro de téléphone invalide', 422);
 
     // Vérifier que le numéro n'est pas déjà pris par quelqu'un d'autre

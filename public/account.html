@@ -52,6 +52,10 @@
     .logout-btn { background: none; border: none; color: #dc3545; font-size: 14px; font-weight: 600; padding: 0; }
     .empty-state { text-align: center; padding: 32px 0; color: #aaa; }
     .spinner-border-sm { width: 1rem; height: 1rem; }
+    .phone-group { display: flex; gap: 6px; }
+    .phone-group .dial-select { width: 95px; flex-shrink: 0; border-radius: 12px; border: 2px solid #eee; padding: 12px 6px; font-size: 13px; background: white; cursor: pointer; }
+    .phone-group .dial-select:focus { border-color: var(--color-primary); outline: none; }
+    .phone-group .form-control { flex: 1; min-width: 0; }
   </style>
 </head>
 <body x-data="accountApp()" x-init="init()">
@@ -79,7 +83,14 @@
         <h2>Se connecter</h2>
         <div class="mb-3">
           <label class="form-label">Téléphone</label>
-          <input type="tel" class="form-control" x-model="loginForm.phone" placeholder="+594694000000" @keyup.enter="doLogin()">
+          <div class="phone-group">
+            <select class="dial-select" x-model="loginDialCode">
+              <template x-for="dc in DIAL_CODES" :key="dc.code">
+                <option :value="dc.code" x-text="dc.code"></option>
+              </template>
+            </select>
+            <input type="tel" class="form-control" x-model="loginPhoneRaw" placeholder="694000000" @keyup.enter="doLogin()">
+          </div>
         </div>
         <div class="mb-4">
           <label class="form-label">Mot de passe</label>
@@ -94,7 +105,7 @@
         <!-- Lien mot de passe oublié -->
         <div style="text-align:center;margin-top:12px;">
           <button style="background:none;border:none;color:var(--color-primary);font-size:13px;cursor:pointer;font-weight:600;"
-                  @click="forgotStep=1; forgotPhone=loginForm.phone">
+                  @click="forgotStep=1; forgotDialCode=loginDialCode; forgotPhoneRaw=loginPhoneRaw">
             Mot de passe oublié ?
           </button>
         </div>
@@ -110,7 +121,14 @@
           <div x-show="forgotStep === 1">
             <div class="mb-3">
               <label class="form-label">Votre numéro de téléphone</label>
-              <input type="tel" class="form-control" x-model="forgotPhone" placeholder="+594694000000">
+              <div class="phone-group">
+                <select class="dial-select" x-model="forgotDialCode">
+                  <template x-for="dc in DIAL_CODES" :key="dc.code">
+                    <option :value="dc.code" x-text="dc.code"></option>
+                  </template>
+                </select>
+                <input type="tel" class="form-control" x-model="forgotPhoneRaw" placeholder="694000000">
+              </div>
             </div>
             <button class="btn-primary-prt" @click="doForgot()" :disabled="forgotLoading">
               Envoyer le code SMS
@@ -148,7 +166,14 @@
         </div>
         <div class="mb-3">
           <label class="form-label">Téléphone</label>
-          <input type="tel" class="form-control" x-model="registerForm.phone" placeholder="+594694000000">
+          <div class="phone-group">
+            <select class="dial-select" x-model="registerDialCode">
+              <template x-for="dc in DIAL_CODES" :key="dc.code">
+                <option :value="dc.code" x-text="dc.code"></option>
+              </template>
+            </select>
+            <input type="tel" class="form-control" x-model="registerPhoneRaw" placeholder="694000000">
+          </div>
         </div>
         <div class="mb-4">
           <label class="form-label">Mot de passe</label>
@@ -178,7 +203,14 @@
         </div>
         <div class="mb-4">
           <label class="form-label">Téléphone</label>
-          <input type="tel" class="form-control" x-model="profileForm.phone" placeholder="+594694000000">
+          <div class="phone-group">
+            <select class="dial-select" x-model="profileDialCode">
+              <template x-for="dc in DIAL_CODES" :key="dc.code">
+                <option :value="dc.code" x-text="dc.code"></option>
+              </template>
+            </select>
+            <input type="tel" class="form-control" x-model="profilePhoneRaw" placeholder="694000000">
+          </div>
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
           <button class="btn-primary-prt" style="flex:1;" @click="saveProfile()" :disabled="profileLoading">
@@ -294,30 +326,62 @@
       orders:          [],
       ordersLoading:   false,
 
-      loginForm:    { phone: '', password: '' },
-      loginError:   '',
-      loginLoading: false,
+      DIAL_CODES: [
+        { code: '+594', label: '+594 (Guyane)' },
+        { code: '+596', label: '+596 (Martinique)' },
+        { code: '+590', label: '+590 (Guadeloupe)' },
+        { code: '+262', label: '+262 (Réunion/Mayotte)' },
+        { code: '+33',  label: '+33 (France)' },
+        { code: '+32',  label: '+32 (Belgique)' },
+        { code: '+41',  label: '+41 (Suisse)' },
+        { code: '+1',   label: '+1 (USA/Canada)' },
+      ],
 
-      forgotStep:     0,
-      forgotPhone:    '',
-      forgotCode:     '',
-      forgotPassword: '',
-      forgotLoading:  false,
-      forgotError:    '',
-      forgotSuccess:  false,
+      loginDialCode:    '+594',
+      loginPhoneRaw:    '',
+      loginForm:        { password: '' },
+      loginError:       '',
+      loginLoading:     false,
 
-      registerForm:    { name: '', phone: '', password: '' },
-      registerError:   '',
-      registerSuccess: false,
-      registerLoading: false,
+      forgotStep:       0,
+      forgotPhone:      '',
+      forgotDialCode:   '+594',
+      forgotPhoneRaw:   '',
+      forgotCode:       '',
+      forgotPassword:   '',
+      forgotLoading:    false,
+      forgotError:      '',
+      forgotSuccess:    false,
 
-      profileForm:    { name: '', phone: '' },
-      profileLoading: false,
-      profileError:   '',
-      profileSuccess: false,
+      registerDialCode: '+594',
+      registerPhoneRaw: '',
+      registerForm:     { name: '', password: '' },
+      registerError:    '',
+      registerSuccess:  false,
+      registerLoading:  false,
+
+      profileDialCode:  '+594',
+      profilePhoneRaw:  '',
+      profileForm:      { name: '' },
+      profileLoading:   false,
+      profileError:     '',
+      profileSuccess:   false,
 
       addresses: [],
       newAddr:   { label: 'Maison', address: '' },
+
+      buildPhone(dialCode, raw) {
+        const r = raw.trim().replace(/^0+/, '');
+        return r ? dialCode + r : '';
+      },
+
+      detectDialCode(phone) {
+        if (!phone) return { code: '+594', raw: '' };
+        for (const dc of this.DIAL_CODES) {
+          if (phone.startsWith(dc.code)) return { code: dc.code, raw: phone.slice(dc.code.length) };
+        }
+        return { code: '+594', raw: phone.replace(/^\+?\d{1,4}/, '') || phone };
+      },
 
       async init() {
         try {
@@ -332,8 +396,10 @@
         const userData = localStorage.getItem('auth_user');
         if (token && userData) {
           this.user = JSON.parse(userData);
-          this.profileForm.name  = this.user.name  || '';
-          this.profileForm.phone = this.user.phone || '';
+          this.profileForm.name = this.user.name || '';
+          const p = this.detectDialCode(this.user.phone || '');
+          this.profileDialCode = p.code;
+          this.profilePhoneRaw = p.raw;
           await Promise.all([this.loadOrders(), this.loadAddresses()]);
         }
       },
@@ -342,12 +408,15 @@
         this.loginError   = '';
         this.loginLoading = true;
         try {
-          const res = await api.login({ phone: this.loginForm.phone, password: this.loginForm.password });
+          const phone = this.buildPhone(this.loginDialCode, this.loginPhoneRaw);
+          const res = await api.login({ phone, password: this.loginForm.password });
           localStorage.setItem('auth_token', res.token);
-          localStorage.setItem('auth_user',  JSON.stringify(res.user)); // contient {id, phone, role}
+          localStorage.setItem('auth_user',  JSON.stringify(res.user));
           this.user = res.user;
-          this.profileForm.name  = res.user.name  || '';
-          this.profileForm.phone = res.user.phone || '';
+          this.profileForm.name = res.user.name || '';
+          const p = this.detectDialCode(res.user.phone || '');
+          this.profileDialCode = p.code;
+          this.profilePhoneRaw = p.raw;
           await this.loadOrders();
         } catch (e) {
           this.loginError = e.message || 'Numéro ou mot de passe incorrect.';
@@ -362,12 +431,13 @@
         this.profileLoading = true;
         try {
           const token = localStorage.getItem('auth_token');
+          const phone = this.buildPhone(this.profileDialCode, this.profilePhoneRaw);
           const res = await fetch('/api/auth/profile', {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
             body: JSON.stringify({
-              name:  this.profileForm.name.trim()  || null,
-              phone: this.profileForm.phone.trim(),
+              name:  this.profileForm.name.trim() || null,
+              phone: phone || undefined,
             }),
           });
           const json = await res.json();
@@ -434,9 +504,10 @@
         this.registerSuccess = false;
         this.registerLoading = true;
         try {
+          const phone = this.buildPhone(this.registerDialCode, this.registerPhoneRaw);
           const res = await api.register({
-            name:     this.registerForm.name  || null,
-            phone:    this.registerForm.phone,
+            name:     this.registerForm.name || null,
+            phone,
             password: this.registerForm.password,
           });
           localStorage.setItem('auth_token', res.token);
@@ -491,6 +562,7 @@
       async doForgot() {
         this.forgotError = '';
         this.forgotLoading = true;
+        this.forgotPhone = this.buildPhone(this.forgotDialCode, this.forgotPhoneRaw);
         try {
           await fetch('/api/auth/forgot', {
             method: 'POST',

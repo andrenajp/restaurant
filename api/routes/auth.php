@@ -6,6 +6,7 @@ $action = $m[1] ?? '';
 
 if ($action === 'register') {
     validate_required($body, ['phone', 'password']);
+    $body['phone'] = normalize_phone($body['phone']);
 
     if (!validate_phone($body['phone'])) {
         json_error('Numéro de téléphone invalide', 422);
@@ -36,6 +37,7 @@ if ($action === 'register') {
 
 if ($action === 'login') {
     validate_required($body, ['phone', 'password']);
+    $body['phone'] = normalize_phone($body['phone']);
 
     $stmt = db()->prepare('SELECT * FROM users WHERE phone = ?');
     $stmt->execute([$body['phone']]);
@@ -59,6 +61,7 @@ if ($action === 'login') {
 
 if ($action === 'forgot') {
     validate_required($body, ['phone']);
+    $body['phone'] = normalize_phone($body['phone']);
 
     // Vérifier que le numéro existe
     $stmt = db()->prepare('SELECT id FROM users WHERE phone=?');
@@ -87,6 +90,7 @@ if ($action === 'forgot') {
 
 if ($action === 'reset') {
     validate_required($body, ['phone', 'code', 'password']);
+    $body['phone'] = normalize_phone($body['phone']);
 
     if (strlen($body['password']) < 6) {
         json_error('Le mot de passe doit faire au moins 6 caractères', 422);

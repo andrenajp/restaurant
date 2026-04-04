@@ -9,6 +9,11 @@ function validate_required(array $data, array $fields): void {
     }
 }
 
+function normalize_phone(string $phone): string {
+    // Supprimer les espaces, tirets, points
+    return preg_replace('/[\s\-\.]/', '', $phone);
+}
+
 function validate_phone(string $phone): bool {
-    return (bool) preg_match('/^\+?[0-9]{8,15}$/', preg_replace('/\s/', '', $phone));
+    return (bool) preg_match('/^\+?[0-9]{8,15}$/', $phone);
 }

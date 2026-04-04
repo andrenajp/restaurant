@@ -459,6 +459,10 @@ body {
   color: var(--color-text);
 }
 .checkout-input:focus { border-color: var(--color-primary); outline: none; box-shadow: 0 0 0 3px rgba(204,0,0,.1); }
+.checkout-phone-group { display: flex; gap: 8px; width: 100%; margin-bottom: 16px; }
+.checkout-phone-group .dial-select { flex-shrink: 0; width: 100px; border: 2px solid #d8d8d8; border-radius: 14px; padding: 14px 8px; font-size: 14px; background: var(--color-card); color: var(--color-text); cursor: pointer; }
+.checkout-phone-group .dial-select:focus { border-color: var(--color-primary); outline: none; }
+.checkout-phone-group .checkout-input { flex: 1; min-width: 0; margin-bottom: 0; }
 .checkout-label {
   font-weight: 700;
   font-size: 12px;

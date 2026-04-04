@@ -1,5 +1,5 @@
 <?php
-$admin_uri = preg_replace('#^/api/admin#', '', $uri);
+// $admin_uri est déjà défini par index.php (ex: /orders/drivers, /orders/48, /orders/48/assign)
 
 // GET /api/admin/orders/drivers — liste des livreurs
 if ($method === 'GET' && $admin_uri === '/orders/drivers') {
@@ -32,6 +32,27 @@ if ($method === 'GET') {
     $stmt = db()->prepare($sql);
     $stmt->execute($params);
     json_success($stmt->fetchAll());
+}
+
+// PATCH /api/admin/orders/{id}/assign — assigner un livreur
+if ($method === 'PATCH' && preg_match('#/orders/(\d+)/assign$#', $admin_uri, $m)) {
+    $order_id  = (int) $m[1];
+    $driver_id = isset($body['driver_id']) ? (int) $body['driver_id'] : null;
+
+    $check = db()->prepare('SELECT id FROM orders WHERE id=?');
+    $check->execute([$order_id]);
+    if (!$check->fetch()) json_error('Commande introuvable', 404);
+
+    if ($driver_id) {
+        $dcheck = db()->prepare("SELECT id FROM users WHERE id=? AND role='delivery'");
+        $dcheck->execute([$driver_id]);
+        if (!$dcheck->fetch()) json_error('Livreur introuvable', 404);
+    }
+
+    db()->prepare('UPDATE orders SET delivery_driver_id=? WHERE id=?')
+        ->execute([$driver_id ?: null, $order_id]);
+
+    json_success(['assigned' => true, 'driver_id' => $driver_id]);
 }
 
 // PATCH /api/admin/orders/{id} — changer le statut
@@ -78,27 +99,6 @@ if ($method === 'PATCH') {
     }
 
     json_success(['updated' => true, 'status' => $body['status']]);
-}
-
-// PATCH /api/admin/orders/{id}/assign — assigner un livreur
-if ($method === 'PATCH' && preg_match('#/orders/(\d+)/assign$#', $admin_uri, $m)) {
-    $order_id  = (int) $m[1];
-    $driver_id = isset($body['driver_id']) ? (int) $body['driver_id'] : null;
-
-    $check = db()->prepare('SELECT id FROM orders WHERE id=?');
-    $check->execute([$order_id]);
-    if (!$check->fetch()) json_error('Commande introuvable', 404);
-
-    if ($driver_id) {
-        $dcheck = db()->prepare("SELECT id FROM users WHERE id=? AND role='delivery'");
-        $dcheck->execute([$driver_id]);
-        if (!$dcheck->fetch()) json_error('Livreur introuvable', 404);
-    }
-
-    db()->prepare('UPDATE orders SET delivery_driver_id=? WHERE id=?')
-        ->execute([$driver_id ?: null, $order_id]);
-
-    json_success(['assigned' => true, 'driver_id' => $driver_id]);
 }
 
 json_error('Méthode non supportée pour admin/orders', 405);

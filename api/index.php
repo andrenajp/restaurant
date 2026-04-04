@@ -82,6 +82,7 @@ elseif (str_starts_with($uri, '/delivery/orders')) {
 elseif (str_starts_with($uri, '/kitchen')) {
     require_once __DIR__ . '/middleware/Auth.php';
     auth_require_role(['admin', 'kitchen']);
+    $admin_uri = preg_replace('#^/kitchen#', '', $uri);
     require __DIR__ . '/routes/admin/orders.php';
 }
 else {
