@@ -33,7 +33,7 @@ $line_items = [];
 foreach ($body['items'] as $item) {
     $pid = (int)($item['id'] ?? 0);
     if (!isset($db_products[$pid])) json_error("Produit $pid introuvable ou indisponible", 422);
-    $qty = max(1, (int)($item['qty'] ?? 1));
+    $qty = min(99, max(1, (int)($item['qty'] ?? 1)));
     $unit_price = (float)$db_products[$pid]['price'];
 
     $options_validated = [];

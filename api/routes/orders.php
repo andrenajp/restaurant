@@ -132,7 +132,7 @@ if ($method === 'POST' && $uri === '/orders') {
                 if ($opt) $unit_price += (float) $opt['extra_price'];
             }
         }
-        $qty = max(1, (int) $item['quantity']);
+        $qty = min(99, max(1, (int) $item['quantity']));
         $total += $unit_price * $qty;
         $items_validated[] = ['product_id' => (int) $item['product_id'], 'quantity' => $qty, 'unit_price' => $unit_price, 'options' => $item['options'] ?? []];
     }
