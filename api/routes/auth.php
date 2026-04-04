@@ -51,10 +51,12 @@ if ($action === 'login') {
     $user = $stmt->fetch();
 
     if (!$user || !password_verify($body['password'], $user['password_hash'])) {
+        error_log("[AUTH] Login échoué - IP:{$client_ip} phone:{$body['phone']}");
         json_error('Identifiants invalides', 401);
     }
 
     rate_limit_reset("login:{$client_ip}");
+    error_log("[AUTH] Login réussi - IP:{$client_ip} user_id:{$user['id']} role:{$user['role']}");
 
     json_success([
         'token' => auth_make_token($user['id'], $user['role']),
@@ -120,7 +122,10 @@ if ($action === 'reset') {
     $stmt->execute([$body['phone'], $body['code']]);
     $reset = $stmt->fetch();
 
-    if (!$reset) json_error('Code invalide ou expiré', 422);
+    if (!$reset) {
+        error_log("[AUTH] Reset mot de passe échoué - IP:{$client_ip} phone:{$body['phone']}");
+        json_error('Code invalide ou expiré', 422);
+    }
 
     // Marquer le code comme utilisé
     db()->prepare('UPDATE password_resets SET used=1 WHERE id=?')
@@ -132,6 +137,7 @@ if ($action === 'reset') {
         ->execute([$hash, $body['phone']]);
 
     rate_limit_reset("reset:{$client_ip}");
+    error_log("[AUTH] Mot de passe réinitialisé - IP:{$client_ip} phone:{$body['phone']}");
     json_success(['reset' => true]);
 }
 

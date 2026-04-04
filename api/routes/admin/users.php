@@ -101,6 +101,8 @@ if ($method === 'PATCH' && $user_id) {
     $stmt = db()->prepare('UPDATE users SET role=? WHERE id=?');
     $stmt->execute([$body['role'], $user_id]);
     if ($stmt->rowCount() === 0) json_error('Utilisateur introuvable', 404);
+    $actor = auth_get_payload()['sub'] ?? '?';
+    error_log("[ADMIN] Rôle modifié - user_id:{$user_id} nouveau_role:{$body['role']} par admin_id:{$actor}");
     json_success(['updated' => true]);
 }
 
@@ -118,6 +120,8 @@ if ($method === 'DELETE' && $user_id) {
         json_error('Impossible de supprimer le dernier administrateur', 422);
     }
     db()->prepare('DELETE FROM users WHERE id=?')->execute([$user_id]);
+    $actor = auth_get_payload()['sub'] ?? '?';
+    error_log("[ADMIN] Utilisateur supprimé - user_id:{$user_id} par admin_id:{$actor}");
     json_success(['deleted' => true]);
 }
 

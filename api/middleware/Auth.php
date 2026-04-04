@@ -39,7 +39,7 @@ function auth_make_token(int $user_id, string $role): string {
         'sub'  => $user_id,
         'role' => $role,
         'iat'  => time(),
-        'exp'  => time() + (int) env('JWT_EXPIRY', '86400'),
+        'exp'  => time() + (int) env('JWT_EXPIRY', '7776000'), // 90 jours par défaut
     ];
     return JWT::encode($payload, jwt_secret(), 'HS256');
 }
