@@ -1,5 +1,8 @@
 <?php
 require_once dirname(__DIR__) . '/middleware/Auth.php';
+require_once dirname(__DIR__) . '/helpers/RateLimit.php';
+
+$client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
 preg_match('#/(register|login|forgot|reset)$#', $uri, $m);
 $action = $m[1] ?? '';
@@ -39,6 +42,9 @@ if ($action === 'login') {
     validate_required($body, ['phone', 'password']);
     $body['phone'] = normalize_phone($body['phone']);
 
+    // 5 tentatives max sur 15 min → blocage 15 min
+    rate_limit_check("login:{$client_ip}", 5, 900, 900);
+
     $stmt = db()->prepare('SELECT * FROM users WHERE phone = ?');
     $stmt->execute([$body['phone']]);
     $user = $stmt->fetch();
@@ -46,6 +52,8 @@ if ($action === 'login') {
     if (!$user || !password_verify($body['password'], $user['password_hash'])) {
         json_error('Identifiants invalides', 401);
     }
+
+    rate_limit_reset("login:{$client_ip}");
 
     json_success([
         'token' => auth_make_token($user['id'], $user['role']),
@@ -62,6 +70,9 @@ if ($action === 'login') {
 if ($action === 'forgot') {
     validate_required($body, ['phone']);
     $body['phone'] = normalize_phone($body['phone']);
+
+    // 3 tentatives max sur 1h → blocage 1h
+    rate_limit_check("forgot:{$client_ip}", 3, 3600, 3600);
 
     // Vérifier que le numéro existe
     $stmt = db()->prepare('SELECT id FROM users WHERE phone=?');
