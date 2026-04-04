@@ -4,7 +4,17 @@ require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/helpers/Response.php';
 require_once __DIR__ . '/helpers/Validator.php';
 
-header('Access-Control-Allow-Origin: *');
+// CORS : wildcard en dev, domaine APP_URL restreint en production
+if (env('APP_ENV', 'development') === 'production') {
+    $allowed_origin = rtrim(env('APP_URL', ''), '/');
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+    if ($origin === $allowed_origin) {
+        header('Access-Control-Allow-Origin: ' . $allowed_origin);
+        header('Vary: Origin');
+    }
+} else {
+    header('Access-Control-Allow-Origin: *');
+}
 header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
