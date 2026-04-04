@@ -39,13 +39,22 @@ if ($method === 'GET' && preg_match('#^/orders/([a-f0-9\-]{32,64})$#', $uri, $m)
     $token = $m[1];
 
     $stmt = db()->prepare(
-        'SELECT o.id, o.status, o.type, o.total, o.delivery_fee, o.customer_name, o.created_at
+        'SELECT o.id, o.status, o.type, o.total, o.delivery_fee, o.customer_name, o.created_at, o.updated_at
          FROM orders o WHERE o.tracking_token = ?'
     );
     $stmt->execute([$token]);
     $order = $stmt->fetch();
 
     if (!$order) json_error('Commande introuvable', 404);
+
+    // Lien de suivi expiré 7 jours après livraison ou annulation
+    $terminal = ['delivered', 'cancelled'];
+    if (in_array($order['status'], $terminal)) {
+        $expires_at = strtotime($order['updated_at']) + (7 * 24 * 3600);
+        if (time() > $expires_at) {
+            json_error('Ce lien de suivi a expiré', 410);
+        }
+    }
 
     $stmt2 = db()->prepare(
         'SELECT oi.id as item_id, oi.quantity, oi.unit_price, oi.options_json, p.name as product_name
