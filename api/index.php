@@ -37,45 +37,34 @@ $body      = json_decode($raw_input, true) ?? [];
 // Routes publiques
 if ($uri === '/settings' && $method === 'GET') {
     require __DIR__ . '/routes/settings.php';
-}
-elseif (preg_match('#^/categories$#', $uri) && $method === 'GET') {
+} elseif (preg_match('#^/categories$#', $uri) && $method === 'GET') {
     require __DIR__ . '/routes/menu.php';
-}
-elseif (preg_match('#^/products$#', $uri) && $method === 'GET') {
+} elseif (preg_match('#^/products$#', $uri) && $method === 'GET') {
     require __DIR__ . '/routes/menu.php';
-}
-elseif (preg_match('#^/auth/(register|login|forgot|reset)$#', $uri, $m) && $method === 'POST') {
+} elseif (preg_match('#^/auth/(register|login|forgot|reset)$#', $uri, $m) && $method === 'POST') {
     require __DIR__ . '/routes/auth.php';
-}
-elseif ($uri === '/auth/profile' && $method === 'PATCH') {
+} elseif ($uri === '/auth/profile' && $method === 'PATCH') {
     require __DIR__ . '/routes/auth_profile.php';
-}
-elseif (str_starts_with($uri, '/auth/addresses')) {
+} elseif (str_starts_with($uri, '/auth/addresses')) {
     require __DIR__ . '/routes/auth_addresses.php';
-}
-elseif ($uri === '/orders' && $method === 'POST') {
+} elseif ($uri === '/orders' && $method === 'POST') {
     require __DIR__ . '/routes/orders.php';
-}
-elseif (preg_match('#^/orders/([a-f0-9\-]{32,64})$#', $uri, $m) && $method === 'GET') {
+} elseif (preg_match('#^/orders/([a-f0-9\-]{32,64})$#', $uri, $m) && $method === 'GET') {
     // Suivi par tracking_token
     require __DIR__ . '/routes/orders.php';
-}
-elseif (preg_match('#^/orders/([a-f0-9\-]{32,64})/(confirm|name)$#', $uri) && $method === 'PATCH') {
+} elseif (preg_match('#^/orders/([a-f0-9\-]{32,64})/(confirm|name)$#', $uri) && $method === 'PATCH') {
     require __DIR__ . '/routes/orders.php';
-}
-elseif ($uri === '/orders/mine' && $method === 'GET') {
+} elseif ($uri === '/orders/mine' && $method === 'GET') {
     require __DIR__ . '/routes/orders.php';
-}
-elseif ($uri === '/payment/create-intent' && $method === 'POST') {
+} elseif ($uri === '/payment/create-intent' && $method === 'POST') {
     require __DIR__ . '/routes/payment.php';
-}
-elseif ($uri === '/webhook/stripe' && $method === 'POST') {
+} elseif ($uri === '/webhook/stripe' && $method === 'POST') {
     require __DIR__ . '/routes/webhook.php';
 }
 // Routes admin (préfixe /admin)
 elseif (str_starts_with($uri, '/admin')) {
     require_once __DIR__ . '/middleware/Auth.php';
-    auth_require_role(['admin']);
+    auth_require_role(['admin', 'kitchen']);
     $admin_uri = preg_replace('#^/admin#', '', $uri);
     if ($admin_uri === '/orders/drivers' && $method === 'GET') require __DIR__ . '/routes/admin/orders.php';
     elseif (str_starts_with($admin_uri, '/orders'))    require __DIR__ . '/routes/admin/orders.php';
@@ -99,7 +88,6 @@ elseif (str_starts_with($uri, '/kitchen')) {
     auth_require_role(['admin', 'kitchen']);
     $admin_uri = preg_replace('#^/kitchen#', '', $uri);
     require __DIR__ . '/routes/admin/orders.php';
-}
-else {
+} else {
     json_error('Route non trouvée', 404);
 }

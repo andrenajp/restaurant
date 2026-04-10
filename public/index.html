@@ -1,880 +1,1570 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#CC0000">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>P.R.T — Restaurant</title>
-  <link rel="manifest" href="/manifest.json">
-  <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/assets/css/styles.css">
-  <link rel="stylesheet" href="/assets/css/prt.css">
-</head>
-<body x-data="appData()" x-init="init()" x-cloak>
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
+        <meta name="theme-color" content="#CC0000" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="black-translucent"
+        />
+        <title>P.R.T — Restaurant</title>
+        <link rel="manifest" href="/manifest.json" />
+        <link
+            rel="stylesheet"
+            href="/assets/vendor/bootstrap/css/bootstrap.min.css"
+        />
+        <link rel="stylesheet" href="/assets/css/styles.css" />
+        <link rel="stylesheet" href="/assets/css/prt.css" />
+    </head>
+    <body x-data="appData()" x-init="init()" x-cloak>
+        <!-- ===== ZONE STICKY (header + bandes + promo + catégories) ===== -->
+        <div class="sticky-top-bar">
+            <!-- ===== HEADER ===== -->
+            <div
+                class="app-header"
+                :style="'background:' + settings.color_primary"
+            >
+                <!-- Marque : logo + nom -->
+                <div class="app-header-brand">
+                    <img
+                        :src="settings.logo_url || '/assets/img/logo.png'"
+                        class="app-header-logo"
+                        alt=""
+                        onerror="this.style.display = 'none'"
+                    />
+                    <span
+                        class="app-header-name"
+                        x-text="settings.restaurant_name || 'P.R.T'"
+                    ></span>
+                </div>
+                <!-- Centre vide -->
+                <div class="app-header-center"></div>
+                <!-- Compte -->
+                <div class="app-header-action">
+                    <a
+                        href="/account.html"
+                        class="app-header-account"
+                        aria-label="Mon compte"
+                    >
+                        <!-- Icône user SVG -->
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <circle cx="12" cy="8" r="4" />
+                            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                        </svg>
+                        <span
+                            x-text="authUser ? (authUser.name || 'Compte') : 'Connexion'"
+                            style="font-size: 12px"
+                        ></span>
+                    </a>
+                </div>
+            </div>
 
-  <!-- ===== ZONE STICKY (header + bandes + promo + catégories) ===== -->
-  <div class="sticky-top-bar">
+            <!-- 4 bandes signature -->
+            <div class="signature-bands">
+                <span :style="'background:' + settings.color_band_1"></span>
+                <span :style="'background:' + settings.color_band_2"></span>
+                <span :style="'background:' + settings.color_band_3"></span>
+                <span :style="'background:' + settings.color_band_4"></span>
+            </div>
 
-  <!-- ===== HEADER ===== -->
-  <div class="app-header" :style="'background:' + settings.color_primary">
-    <!-- Marque : logo + nom -->
-    <div class="app-header-brand">
-      <img :src="settings.logo_url || '/assets/img/logo.png'"
-           class="app-header-logo"
-           alt=""
-           onerror="this.style.display='none'">
-      <span class="app-header-name" x-text="settings.restaurant_name || 'P.R.T'"></span>
-    </div>
-    <!-- Centre vide -->
-    <div class="app-header-center"></div>
-    <!-- Compte -->
-    <div class="app-header-action">
-      <a href="/account.html" class="app-header-account" aria-label="Mon compte">
-        <!-- Icône user SVG -->
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="8" r="4"/>
-          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-        </svg>
-        <span x-text="authUser ? (authUser.name || 'Compte') : 'Connexion'"
-              style="font-size:12px;"></span>
-      </a>
-    </div>
-  </div>
+            <!-- Bannière promo -->
+            <div
+                class="promo-banner"
+                x-show="settings.promo_banner"
+                :style="'background:' + settings.color_accent"
+                x-text="settings.promo_banner"
+            ></div>
 
-
-  <!-- 4 bandes signature -->
-  <div class="signature-bands">
-    <span :style="'background:' + settings.color_band_1"></span>
-    <span :style="'background:' + settings.color_band_2"></span>
-    <span :style="'background:' + settings.color_band_3"></span>
-    <span :style="'background:' + settings.color_band_4"></span>
-  </div>
-
-  <!-- Bannière promo -->
-  <div class="promo-banner" x-show="settings.promo_banner"
-       :style="'background:' + settings.color_accent"
-       x-text="settings.promo_banner"></div>
-
-  <!-- ===== ONGLETS CATÉGORIES ===== -->
-  <div class="category-tabs">
-    <button class="category-tab" :class="activeCategory===null ? 'active' : ''"
-            @click="activeCategory=null">🍽️ Tout</button>
-    <template x-for="cat in categories" :key="cat.id">
-      <button class="category-tab" :class="activeCategory===cat.id ? 'active' : ''"
-              @click="activeCategory=cat.id">
-        <span x-text="(cat.emoji ? cat.emoji + ' ' : '') + cat.name"></span>
-      </button>
-    </template>
-  </div>
-
-  </div><!-- /sticky-top-bar -->
-
-  <!-- ===== LISTE PLATS ===== -->
-  <div class="products-grid" style="padding-bottom:90px;">
-    <div x-show="loading" style="text-align:center; color:#888; padding:40px 0;">
-      Chargement du menu…
-    </div>
-    <template x-for="product in filteredProducts" :key="product.id">
-      <div class="product-card" @click="openProduct(product)">
-        <img :src="product.image_url || '/assets/img/logo.png'" :alt="product.name"
-             onerror="this.src='/assets/img/logo.png'">
-        <div class="product-info">
-          <p class="product-name" x-text="product.name"></p>
-          <p class="product-desc" x-text="product.description"></p>
-          <p class="product-price" x-text="parseFloat(product.price).toFixed(2) + ' €'"></p>
+            <!-- ===== ONGLETS CATÉGORIES ===== -->
+            <div class="category-tabs">
+                <button
+                    class="category-tab"
+                    :class="activeCategory===null ? 'active' : ''"
+                    @click="activeCategory=null"
+                >
+                    🍽️ Tout
+                </button>
+                <template x-for="cat in categories" :key="cat.id">
+                    <button
+                        class="category-tab"
+                        :class="activeCategory===cat.id ? 'active' : ''"
+                        @click="activeCategory=cat.id"
+                    >
+                        <span
+                            x-text="(cat.emoji ? cat.emoji + ' ' : '') + cat.name"
+                        ></span>
+                    </button>
+                </template>
+            </div>
         </div>
-        <button class="product-add-btn" @click.stop="quickAdd(product)">+</button>
-      </div>
-    </template>
-    <div x-show="!loading && filteredProducts.length === 0"
-         style="text-align:center; color:#888; padding:40px 0; font-size:14px;">
-      Aucun plat dans cette catégorie.
-    </div>
-  </div>
+        <!-- /sticky-top-bar -->
 
-  <!-- ===== BARRE FLOTTANTE PANIER ===== -->
-  <div class="cart-bar" x-show="$store.cart.count > 0" @click="cartOpen=true"
-       x-transition:enter="transition ease-out duration-200"
-       x-transition:enter-start="opacity-0 translate-y-4"
-       x-transition:enter-end="opacity-100 translate-y-0">
-    <span class="cart-bar-count"
-          x-text="$store.cart.count + ' article' + ($store.cart.count>1 ? 's' : '')"></span>
-    <span class="cart-bar-label">Voir le panier</span>
-    <span class="cart-bar-total" x-text="$store.cart.subtotal.toFixed(2) + ' €'"></span>
-  </div>
-
-  <!-- ===== DRAWER PANIER ===== -->
-  <div class="cart-drawer-overlay" x-show="cartOpen" x-cloak
-       @click.self="cartOpen=false"
-       x-transition:enter="transition ease-out duration-200"
-       x-transition:enter-start="opacity-0"
-       x-transition:enter-end="opacity-100">
-    <div class="cart-drawer"
-         x-transition:enter="transition ease-out duration-200"
-         x-transition:enter-start="translate-y-full"
-         x-transition:enter-end="translate-y-0">
-      <div class="cart-drawer-handle"></div>
-      <div class="cart-drawer-header">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-          <path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.61L23 6H6"/>
-        </svg>
-        Votre panier
-      </div>
-
-      <template x-for="item in $store.cart.items" :key="item.key">
-        <div class="cart-item">
-          <div style="flex:1;">
-            <div class="cart-item-name" x-text="item.name"></div>
-            <div class="cart-item-options"
-                 x-text="item.options.map(o=>o.option_name).join(', ')"></div>
-            <div class="cart-item-price"
-                 x-text="(item.unitTotal * item.qty).toFixed(2) + ' €'"></div>
-          </div>
-          <div class="cart-item-qty">
-            <button @click="$store.cart.updateQty(item.key, -1)">−</button>
-            <span x-text="item.qty"></span>
-            <button @click="$store.cart.updateQty(item.key, +1)">+</button>
-          </div>
-        </div>
-      </template>
-
-      <div class="cart-total-section">
-        <div class="cart-total-row">
-          <span>Sous-total</span>
-          <span x-text="$store.cart.subtotal.toFixed(2) + ' €'"></span>
-        </div>
-        <div class="cart-total-row" x-show="mode==='delivery' && deliveryFee > 0">
-          <span>Frais de livraison</span>
-          <span x-text="deliveryFee.toFixed(2) + ' €'"></span>
-        </div>
-        <div class="cart-total-row" x-show="mode==='delivery' && deliveryFee === 0 && settings.delivery_free_above > 0">
-          <span>Livraison</span>
-          <span style="color:#1A7A1A; font-weight:700;">Offerte 🎉</span>
-        </div>
-        <div class="cart-total-row grand">
-          <span>Total</span>
-          <span x-text="grandTotal.toFixed(2) + ' €'"></span>
-        </div>
-        <button class="checkout-btn" @click="cartOpen=false; openCheckout()">
-          Commander →
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MODAL FICHE PLAT ===== -->
-  <div class="product-modal-overlay" x-show="selectedProduct" x-cloak
-       @click.self="selectedProduct=null">
-    <div class="product-modal">
-      <img class="product-modal-img"
-           :src="selectedProduct?.image_url || '/assets/img/logo.png'"
-           :alt="selectedProduct?.name"
-           onerror="this.src='/assets/img/logo.png'">
-      <div class="product-modal-body">
-        <h2 class="product-modal-name" x-text="selectedProduct?.name"></h2>
-        <p class="product-modal-desc" x-text="selectedProduct?.description"></p>
-
-        <!-- Groupes d'options -->
-        <template x-for="group in optionGroups" :key="group.name">
-          <div class="option-group">
-            <div class="option-group-title" x-text="group.name"></div>
-            <template x-for="opt in group.options" :key="opt.id">
-              <div class="option-item"
-                   :class="isOptionSelected(opt) ? 'selected' : ''"
-                   @click="toggleOption(group, opt)">
-                <span class="option-item-label" x-text="opt.option_name"></span>
-                <span class="option-item-price" x-show="parseFloat(opt.extra_price) > 0"
-                      x-text="'+' + parseFloat(opt.extra_price).toFixed(2) + ' €'"></span>
-              </div>
+        <!-- ===== LISTE PLATS ===== -->
+        <div class="products-grid" style="padding-bottom: 90px">
+            <div
+                x-show="loading"
+                style="text-align: center; color: #888; padding: 40px 0"
+            >
+                Chargement du menu…
+            </div>
+            <template x-for="product in filteredProducts" :key="product.id">
+                <div class="product-card" @click="openProduct(product)">
+                    <img
+                        :src="product.image_url || '/assets/img/logo.png'"
+                        :alt="product.name"
+                        onerror="this.src = '/assets/img/logo.png'"
+                    />
+                    <div class="product-info">
+                        <p class="product-name" x-text="product.name"></p>
+                        <p
+                            class="product-desc"
+                            x-text="product.description"
+                        ></p>
+                        <p
+                            class="product-price"
+                            x-text="parseFloat(product.price).toFixed(2) + ' €'"
+                        ></p>
+                    </div>
+                    <button
+                        class="product-add-btn"
+                        @click.stop="quickAdd(product)"
+                    >
+                        +
+                    </button>
+                </div>
             </template>
-          </div>
-        </template>
-
-        <!-- Sélecteur quantité -->
-        <div class="qty-selector">
-          <button class="qty-btn" @click="modalQty = Math.max(1, modalQty - 1)">−</button>
-          <span class="qty-value" x-text="modalQty"></span>
-          <button class="qty-btn" @click="modalQty++">+</button>
+            <div
+                x-show="!loading && filteredProducts.length === 0"
+                style="
+                    text-align: center;
+                    color: #888;
+                    padding: 40px 0;
+                    font-size: 14px;
+                "
+            >
+                Aucun plat dans cette catégorie.
+            </div>
         </div>
 
-        <button class="checkout-btn" @click="addToCart()">
-          Ajouter au panier — <span x-text="modalTotal.toFixed(2) + ' €'"></span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MODAL CHECKOUT ===== -->
-  <div class="checkout-modal-overlay" x-show="checkoutOpen" x-cloak>
-    <div class="checkout-modal">
-      <div class="checkout-modal-header" :style="'background:' + settings.color_primary">
-        <button class="checkout-modal-back"
-                @click="checkoutStep > 1 ? checkoutStep-- : checkoutOpen=false">←</button>
-        <h2 x-text="checkoutStep === 1 ? 'Votre commande' : (mode==='pickup' ? 'Récupérer sur place' : 'Livraison à domicile')"></h2>
-        <div class="step-indicator">
-          <template x-for="n in (mode==='pickup' ? 3 : 4)" :key="n">
-            <div class="step-dot"
-                 :class="n === checkoutStep ? 'active' : (n < checkoutStep ? 'done' : '')"></div>
-          </template>
-        </div>
-      </div>
-
-      <div class="checkout-steps">
-
-        <!-- Étape 1 : Choix du mode -->
-        <div x-show="checkoutStep === 1">
-          <p style="font-size:14px;color:#555;margin-bottom:16px;line-height:1.5;">
-            Comment souhaitez-vous recevoir votre commande ?
-          </p>
-
-          <!-- Récupérer sur place -->
-          <div class="mode-choice-card" @click="mode='pickup'; checkoutStep=2">
-            <div class="mode-choice-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <path d="M16 10a4 4 0 01-8 0"/>
-              </svg>
-            </div>
-            <div class="mode-choice-text">
-              <div class="mode-choice-title">Récupérer sur place</div>
-              <div class="mode-choice-sub">Venez chercher votre commande au restaurant</div>
-            </div>
-            <span class="mode-choice-badge free">Gratuit</span>
-          </div>
-
-          <!-- Livraison -->
-          <div class="mode-choice-card" @click="mode='delivery'; checkoutStep=2">
-            <div class="mode-choice-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="6" cy="17" r="2"/><circle cx="18" cy="17" r="2"/>
-                <path d="M5 17H3v-5l2-2 4-4h6l2 3 3 3v5h-2"/>
-                <path d="M9 6l1 5H5"/>
-              </svg>
-            </div>
-            <div class="mode-choice-text">
-              <div class="mode-choice-title">Livraison à domicile</div>
-              <div class="mode-choice-sub"
-                   x-text="settings.delivery_free_above > 0 ? 'Offerte dès ' + settings.delivery_free_above + ' €' : 'Frais calculés à la commande'"></div>
-            </div>
-            <svg class="mode-choice-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                 stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="9 18 15 12 9 6"/>
-            </svg>
-          </div>
+        <!-- ===== BARRE FLOTTANTE PANIER ===== -->
+        <div
+            class="cart-bar"
+            x-show="$store.cart.count > 0"
+            @click="cartOpen=true"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 translate-y-4"
+            x-transition:enter-end="opacity-100 translate-y-0"
+        >
+            <span
+                class="cart-bar-count"
+                x-text="$store.cart.count + ' article' + ($store.cart.count>1 ? 's' : '')"
+            ></span>
+            <span class="cart-bar-label">Voir le panier</span>
+            <span
+                class="cart-bar-total"
+                x-text="$store.cart.subtotal.toFixed(2) + ' €'"
+            ></span>
         </div>
 
-        <!-- Étape 2 : Téléphone -->
-        <div x-show="checkoutStep === 2">
-          <label class="checkout-label">Votre numéro de téléphone</label>
-          <div class="checkout-phone-group">
-            <select class="dial-select" x-model="checkoutDialCode">
-              <template x-for="dc in DIAL_CODES" :key="dc.code">
-                <option :value="dc.code" x-text="dc.code"></option>
-              </template>
-            </select>
-            <input class="checkout-input" type="tel" placeholder="694000000"
-                   x-model="checkoutPhoneRaw" @keyup.enter="checkoutPhoneRaw.trim().length >= 5 && (checkoutStep=3, mode==='pickup' && initStripe())">
-          </div>
-          <p style="font-size:12px; color:var(--color-sub); margin-bottom:16px;">
-            Vous recevrez un SMS de confirmation à ce numéro.
-          </p>
-          <button class="checkout-next-btn"
-                  :disabled="checkoutPhoneRaw.trim().length < 5"
-                  @click="checkoutStep=3; mode==='pickup' && initStripe()">
-            Continuer →
-          </button>
+        <!-- ===== DRAWER PANIER ===== -->
+        <div
+            class="cart-drawer-overlay"
+            x-show="cartOpen"
+            x-cloak
+            @click.self="cartOpen=false"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+        >
+            <div
+                class="cart-drawer"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="translate-y-full"
+                x-transition:enter-end="translate-y-0"
+            >
+                <div class="cart-drawer-handle"></div>
+                <div class="cart-drawer-header">
+                    <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <circle cx="9" cy="21" r="1" />
+                        <circle cx="20" cy="21" r="1" />
+                        <path
+                            d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.61L23 6H6"
+                        />
+                    </svg>
+                    Votre panier
+                </div>
+
+                <template x-for="item in $store.cart.items" :key="item.key">
+                    <div class="cart-item">
+                        <div style="flex: 1">
+                            <div
+                                class="cart-item-name"
+                                x-text="item.name"
+                            ></div>
+                            <div
+                                class="cart-item-options"
+                                x-text="item.options.map(o=>o.option_name).join(', ')"
+                            ></div>
+                            <div
+                                class="cart-item-price"
+                                x-text="(item.unitTotal * item.qty).toFixed(2) + ' €'"
+                            ></div>
+                        </div>
+                        <div class="cart-item-qty">
+                            <button
+                                @click="$store.cart.updateQty(item.key, -1)"
+                            >
+                                −
+                            </button>
+                            <span x-text="item.qty"></span>
+                            <button
+                                @click="$store.cart.updateQty(item.key, +1)"
+                            >
+                                +
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="cart-total-section">
+                    <div class="cart-total-row">
+                        <span>Sous-total</span>
+                        <span
+                            x-text="$store.cart.subtotal.toFixed(2) + ' €'"
+                        ></span>
+                    </div>
+                    <div
+                        class="cart-total-row"
+                        x-show="mode==='delivery' && deliveryFee > 0"
+                    >
+                        <span>Frais de livraison</span>
+                        <span x-text="deliveryFee.toFixed(2) + ' €'"></span>
+                    </div>
+                    <div
+                        class="cart-total-row"
+                        x-show="mode==='delivery' && deliveryFee === 0 && settings.delivery_free_above > 0"
+                    >
+                        <span>Livraison</span>
+                        <span style="color: #1a7a1a; font-weight: 700"
+                            >Offerte 🎉</span
+                        >
+                    </div>
+                    <div class="cart-total-row grand">
+                        <span>Total</span>
+                        <span x-text="grandTotal.toFixed(2) + ' €'"></span>
+                    </div>
+                    <button
+                        class="checkout-btn"
+                        @click="cartOpen=false; openCheckout()"
+                    >
+                        Commander →
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <!-- Étape 3 : Adresse (livraison uniquement) -->
-        <div x-show="checkoutStep === 3 && mode === 'delivery'">
-          <label class="checkout-label">Adresse de livraison</label>
+        <!-- ===== MODAL FICHE PLAT ===== -->
+        <div
+            class="product-modal-overlay"
+            x-show="selectedProduct"
+            x-cloak
+            @click.self="selectedProduct=null"
+        >
+            <div class="product-modal">
+                <img
+                    class="product-modal-img"
+                    :src="selectedProduct?.image_url || '/assets/img/logo.png'"
+                    :alt="selectedProduct?.name"
+                    onerror="this.src = '/assets/img/logo.png'"
+                />
+                <div class="product-modal-body">
+                    <h2
+                        class="product-modal-name"
+                        x-text="selectedProduct?.name"
+                    ></h2>
+                    <p
+                        class="product-modal-desc"
+                        x-text="selectedProduct?.description"
+                    ></p>
 
-          <!-- Adresses sauvegardées (si connecté) -->
-          <template x-if="savedAddresses.length > 0">
-            <div style="margin-bottom:12px;">
-              <template x-for="a in savedAddresses" :key="a.id">
-                <div @click="selectSavedAddress(a)"
-                     :style="selectedAddressId===a.id
+                    <!-- Groupes d'options -->
+                    <template x-for="group in optionGroups" :key="group.name">
+                        <div class="option-group">
+                            <div
+                                class="option-group-title"
+                                x-text="group.name"
+                            ></div>
+                            <template
+                                x-for="opt in group.options"
+                                :key="opt.id"
+                            >
+                                <div
+                                    class="option-item"
+                                    :class="isOptionSelected(opt) ? 'selected' : ''"
+                                    @click="toggleOption(group, opt)"
+                                >
+                                    <span
+                                        class="option-item-label"
+                                        x-text="opt.option_name"
+                                    ></span>
+                                    <span
+                                        class="option-item-price"
+                                        x-show="parseFloat(opt.extra_price) > 0"
+                                        x-text="'+' + parseFloat(opt.extra_price).toFixed(2) + ' €'"
+                                    ></span>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+
+                    <!-- Sélecteur quantité -->
+                    <div class="qty-selector">
+                        <button
+                            class="qty-btn"
+                            @click="modalQty = Math.max(1, modalQty - 1)"
+                        >
+                            −
+                        </button>
+                        <span class="qty-value" x-text="modalQty"></span>
+                        <button class="qty-btn" @click="modalQty++">+</button>
+                    </div>
+
+                    <button class="checkout-btn" @click="addToCart()">
+                        Ajouter au panier —
+                        <span x-text="modalTotal.toFixed(2) + ' €'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MODAL CHECKOUT ===== -->
+        <div class="checkout-modal-overlay" x-show="checkoutOpen" x-cloak>
+            <div class="checkout-modal">
+                <div
+                    class="checkout-modal-header"
+                    :style="'background:' + settings.color_primary"
+                >
+                    <button
+                        class="checkout-modal-back"
+                        @click="checkoutStep > 1 ? checkoutStep-- : checkoutOpen=false"
+                    >
+                        ←
+                    </button>
+                    <h2
+                        x-text="checkoutStep === 1 ? 'Votre commande' : (mode==='pickup' ? 'Récupérer sur place' : 'Livraison à domicile')"
+                    ></h2>
+                    <div class="step-indicator">
+                        <template
+                            x-for="n in (mode==='pickup' ? 3 : 4)"
+                            :key="n"
+                        >
+                            <div
+                                class="step-dot"
+                                :class="n === checkoutStep ? 'active' : (n < checkoutStep ? 'done' : '')"
+                            ></div>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="checkout-steps">
+                    <!-- Étape 1 : Choix du mode -->
+                    <div x-show="checkoutStep === 1">
+                        <p
+                            style="
+                                font-size: 14px;
+                                color: #555;
+                                margin-bottom: 16px;
+                                line-height: 1.5;
+                            "
+                        >
+                            Comment souhaitez-vous recevoir votre commande ?
+                        </p>
+
+                        <!-- Récupérer sur place -->
+                        <div
+                            class="mode-choice-card"
+                            @click="mode='pickup'; checkoutStep=2"
+                        >
+                            <div class="mode-choice-icon">
+                                <svg
+                                    width="28"
+                                    height="28"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <path
+                                        d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
+                                    />
+                                    <line x1="3" y1="6" x2="21" y2="6" />
+                                    <path d="M16 10a4 4 0 01-8 0" />
+                                </svg>
+                            </div>
+                            <div class="mode-choice-text">
+                                <div class="mode-choice-title">
+                                    Récupérer sur place
+                                </div>
+                                <div class="mode-choice-sub">
+                                    Venez chercher votre commande au restaurant
+                                </div>
+                            </div>
+                            <span class="mode-choice-badge free">Gratuit</span>
+                        </div>
+
+                        <!-- Livraison -->
+                        <div
+                            class="mode-choice-card"
+                            @click="mode='delivery'; checkoutStep=2"
+                        >
+                            <div class="mode-choice-icon">
+                                <svg
+                                    width="28"
+                                    height="28"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                >
+                                    <circle cx="6" cy="17" r="2" />
+                                    <circle cx="18" cy="17" r="2" />
+                                    <path
+                                        d="M5 17H3v-5l2-2 4-4h6l2 3 3 3v5h-2"
+                                    />
+                                    <path d="M9 6l1 5H5" />
+                                </svg>
+                            </div>
+                            <div class="mode-choice-text">
+                                <div class="mode-choice-title">
+                                    Livraison à domicile
+                                </div>
+                                <div
+                                    class="mode-choice-sub"
+                                    x-text="settings.delivery_free_above > 0 ? 'Offerte dès ' + settings.delivery_free_above + ' €' : 'Frais calculés à la commande'"
+                                ></div>
+                            </div>
+                            <svg
+                                class="mode-choice-arrow"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#ccc"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Étape 2 : Téléphone -->
+                    <div x-show="checkoutStep === 2">
+                        <label class="checkout-label"
+                            >Votre numéro de téléphone</label
+                        >
+                        <div class="checkout-phone-group">
+                            <select
+                                class="dial-select"
+                                x-model="checkoutDialCode"
+                            >
+                                <template
+                                    x-for="dc in DIAL_CODES"
+                                    :key="dc.code"
+                                >
+                                    <option
+                                        :value="dc.code"
+                                        x-text="dc.code"
+                                    ></option>
+                                </template>
+                            </select>
+                            <input
+                                class="checkout-input"
+                                type="tel"
+                                placeholder="694000000"
+                                x-model="checkoutPhoneRaw"
+                                @keyup.enter="checkoutPhoneRaw.trim().length >= 5 && (checkoutStep=3, mode==='pickup' && initStripe())"
+                            />
+                        </div>
+                        <p
+                            style="
+                                font-size: 12px;
+                                color: var(--color-sub);
+                                margin-bottom: 16px;
+                            "
+                        >
+                            Vous recevrez un SMS de confirmation à ce numéro.
+                        </p>
+                        <button
+                            class="checkout-next-btn"
+                            :disabled="checkoutPhoneRaw.trim().length < 5"
+                            @click="checkoutStep=3; mode==='pickup' && initStripe()"
+                        >
+                            Continuer →
+                        </button>
+                    </div>
+
+                    <!-- Étape 3 : Adresse (livraison uniquement) -->
+                    <div x-show="checkoutStep === 3 && mode === 'delivery'">
+                        <label class="checkout-label"
+                            >Adresse de livraison</label
+                        >
+
+                        <!-- Adresses sauvegardées (si connecté) -->
+                        <template x-if="savedAddresses.length > 0">
+                            <div style="margin-bottom: 12px">
+                                <template
+                                    x-for="a in savedAddresses"
+                                    :key="a.id"
+                                >
+                                    <div
+                                        @click="selectSavedAddress(a)"
+                                        :style="selectedAddressId===a.id
                        ? 'border-color:var(--color-primary);background:rgba(204,0,0,.07);'
                        : 'border-color:#e0e0e0;'"
-                     style="border:2px solid;border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px;">
-                  <span style="font-size:20px;" x-text="addrEmoji(a.label)"></span>
-                  <div style="flex:1;min-width:0;">
-                    <div style="font-weight:700;font-size:14px;" x-text="a.label"></div>
-                    <div style="font-size:12px;color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" x-text="a.address"></div>
-                  </div>
-                  <div x-show="selectedAddressId===a.id" style="color:var(--color-primary);font-size:18px;">✓</div>
-                </div>
-              </template>
-            </div>
-          </template>
+                                        style="
+                                            border: 2px solid;
+                                            border-radius: 12px;
+                                            padding: 12px 14px;
+                                            margin-bottom: 8px;
+                                            cursor: pointer;
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 10px;
+                                        "
+                                    >
+                                        <span
+                                            style="font-size: 20px"
+                                            x-text="addrEmoji(a.label)"
+                                        ></span>
+                                        <div style="flex: 1; min-width: 0">
+                                            <div
+                                                style="
+                                                    font-weight: 700;
+                                                    font-size: 14px;
+                                                "
+                                                x-text="a.label"
+                                            ></div>
+                                            <div
+                                                style="
+                                                    font-size: 12px;
+                                                    color: #888;
+                                                    white-space: nowrap;
+                                                    overflow: hidden;
+                                                    text-overflow: ellipsis;
+                                                "
+                                                x-text="a.address"
+                                            ></div>
+                                        </div>
+                                        <div
+                                            x-show="selectedAddressId===a.id"
+                                            style="
+                                                color: var(--color-primary);
+                                                font-size: 18px;
+                                            "
+                                        >
+                                            ✓
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
 
-          <!-- Boutons GPS + Nouvelle adresse -->
-          <div style="display:flex;gap:8px;margin-bottom:12px;">
-            <button @click="useGPS()"
-                    :disabled="gpsLoading"
-                    style="flex:1;background:#f5f5f5;border:1.5px solid #ddd;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-              <span x-show="!gpsLoading">📍 Ma position</span>
-              <span x-show="gpsLoading">Localisation...</span>
-            </button>
-            <button @click="addrMode='manual'; selectedAddressId=null"
-                    :style="addrMode==='manual' && !selectedAddressId
+                        <!-- Boutons GPS + Nouvelle adresse -->
+                        <div
+                            style="display: flex; gap: 8px; margin-bottom: 12px"
+                        >
+                            <button
+                                @click="useGPS()"
+                                :disabled="gpsLoading"
+                                style="
+                                    flex: 1;
+                                    background: #f5f5f5;
+                                    border: 1.5px solid #ddd;
+                                    border-radius: 10px;
+                                    padding: 10px;
+                                    font-size: 13px;
+                                    font-weight: 700;
+                                    cursor: pointer;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    gap: 6px;
+                                "
+                            >
+                                <span x-show="!gpsLoading">📍 Ma position</span>
+                                <span x-show="gpsLoading">Localisation...</span>
+                            </button>
+                            <button
+                                @click="addrMode='manual'; selectedAddressId=null"
+                                :style="addrMode==='manual' && !selectedAddressId
                       ? 'border-color:var(--color-primary);background:rgba(204,0,0,.07);'
                       : 'border-color:#ddd;background:#f5f5f5;'"
-                    style="flex:1;border:1.5px solid;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">
-              ✏️ Saisir
-            </button>
-          </div>
+                                style="
+                                    flex: 1;
+                                    border: 1.5px solid;
+                                    border-radius: 10px;
+                                    padding: 10px;
+                                    font-size: 13px;
+                                    font-weight: 700;
+                                    cursor: pointer;
+                                "
+                            >
+                                ✏️ Saisir
+                            </button>
+                        </div>
 
-          <!-- Saisie manuelle -->
-          <div x-show="addrMode === 'manual'">
-            <input class="checkout-input" type="text" placeholder="Numéro et nom de rue"
-                   x-model="checkoutAddress" @input="selectedAddressId=null">
-            <input class="checkout-input" type="text" placeholder="Ville"
-                   x-model="checkoutCity" @input="selectedAddressId=null">
+                        <!-- Saisie manuelle -->
+                        <div x-show="addrMode === 'manual'">
+                            <input
+                                class="checkout-input"
+                                type="text"
+                                placeholder="Numéro et nom de rue"
+                                x-model="checkoutAddress"
+                                @input="selectedAddressId=null"
+                            />
+                            <input
+                                class="checkout-input"
+                                type="text"
+                                placeholder="Ville"
+                                x-model="checkoutCity"
+                                @input="selectedAddressId=null"
+                            />
 
-            <!-- Sauvegarder (si connecté) -->
-            <template x-if="authUser">
-              <div style="margin-bottom:14px;">
-                <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;">
-                  <input type="checkbox" x-model="saveAddressCheck" style="width:16px;height:16px;">
-                  Sauvegarder cette adresse
-                </label>
-                <template x-if="saveAddressCheck">
-                  <div style="margin-top:8px;">
-                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-                      <template x-for="preset in ['Maison','Travail','Famille','Autre']" :key="preset">
-                        <button @click="saveAddressLabel=preset"
-                                :style="saveAddressLabel===preset
+                            <!-- Sauvegarder (si connecté) -->
+                            <template x-if="authUser">
+                                <div style="margin-bottom: 14px">
+                                    <label
+                                        style="
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 8px;
+                                            font-size: 13px;
+                                            cursor: pointer;
+                                        "
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            x-model="saveAddressCheck"
+                                            style="width: 16px; height: 16px"
+                                        />
+                                        Sauvegarder cette adresse
+                                    </label>
+                                    <template x-if="saveAddressCheck">
+                                        <div style="margin-top: 8px">
+                                            <div
+                                                style="
+                                                    display: flex;
+                                                    gap: 6px;
+                                                    flex-wrap: wrap;
+                                                    margin-bottom: 6px;
+                                                "
+                                            >
+                                                <template
+                                                    x-for="preset in ['Maison','Travail','Famille','Autre']"
+                                                    :key="preset"
+                                                >
+                                                    <button
+                                                        @click="saveAddressLabel=preset"
+                                                        :style="saveAddressLabel===preset
                                   ? 'background:var(--color-primary);color:white;border-color:var(--color-primary);'
                                   : 'background:white;color:#333;border-color:#ddd;'"
-                                style="border:1.5px solid;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;"
-                                x-text="preset">
+                                                        style="
+                                                            border: 1.5px solid;
+                                                            border-radius: 20px;
+                                                            padding: 4px 12px;
+                                                            font-size: 12px;
+                                                            font-weight: 700;
+                                                            cursor: pointer;
+                                                        "
+                                                        x-text="preset"
+                                                    ></button>
+                                                </template>
+                                            </div>
+                                            <input
+                                                class="checkout-input"
+                                                type="text"
+                                                placeholder="Nom du lieu (ex: Chez mamie)"
+                                                x-model="saveAddressLabel"
+                                                style="margin-bottom: 0"
+                                            />
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div
+                            x-show="addrError"
+                            style="
+                                color: #e55;
+                                font-size: 13px;
+                                margin-bottom: 8px;
+                            "
+                            x-text="addrError"
+                        ></div>
+
+                        <button
+                            class="checkout-next-btn"
+                            :disabled="!canProceedAddress()"
+                            @click="proceedAddress()"
+                        >
+                            Continuer →
                         </button>
-                      </template>
                     </div>
-                    <input class="checkout-input" type="text" placeholder="Nom du lieu (ex: Chez mamie)"
-                           x-model="saveAddressLabel" style="margin-bottom:0;">
-                  </div>
-                </template>
-              </div>
-            </template>
-          </div>
 
-          <div x-show="addrError" style="color:#e55;font-size:13px;margin-bottom:8px;" x-text="addrError"></div>
+                    <!-- Étape paiement (étape 3 pour pickup, 4 pour livraison) -->
+                    <div x-show="checkoutStep === (mode==='pickup' ? 3 : 4)">
+                        <!-- Récapitulatif -->
+                        <div
+                            style="
+                                background: white;
+                                border-radius: 14px;
+                                padding: 14px;
+                                margin-bottom: 16px;
+                            "
+                        >
+                            <div
+                                style="
+                                    font-weight: 800;
+                                    font-size: 15px;
+                                    margin-bottom: 10px;
+                                "
+                            >
+                                Récapitulatif
+                            </div>
+                            <template
+                                x-for="item in $store.cart.items"
+                                :key="item.key"
+                            >
+                                <div
+                                    style="
+                                        display: flex;
+                                        justify-content: space-between;
+                                        font-size: 13px;
+                                        padding: 3px 0;
+                                    "
+                                >
+                                    <span
+                                        x-text="item.qty + '× ' + item.name"
+                                    ></span>
+                                    <span
+                                        x-text="(item.unitTotal * item.qty).toFixed(2) + ' €'"
+                                    ></span>
+                                </div>
+                            </template>
+                            <div
+                                x-show="mode==='delivery' && deliveryFee > 0"
+                                style="
+                                    display: flex;
+                                    justify-content: space-between;
+                                    font-size: 13px;
+                                    color: #888;
+                                    padding-top: 6px;
+                                    border-top: 1px solid #f0f0f0;
+                                    margin-top: 6px;
+                                "
+                            >
+                                <span>Livraison</span>
+                                <span
+                                    x-text="deliveryFee.toFixed(2) + ' €'"
+                                ></span>
+                            </div>
+                            <div
+                                style="
+                                    display: flex;
+                                    justify-content: space-between;
+                                    font-weight: 800;
+                                    font-size: 16px;
+                                    border-top: 1px solid #eee;
+                                    margin-top: 8px;
+                                    padding-top: 8px;
+                                "
+                            >
+                                <span>Total</span>
+                                <span
+                                    x-text="grandTotal.toFixed(2) + ' €'"
+                                    :style="'color:' + settings.color_primary"
+                                ></span>
+                            </div>
+                        </div>
 
-          <button class="checkout-next-btn"
-                  :disabled="!canProceedAddress()"
-                  @click="proceedAddress()">
-            Continuer →
-          </button>
+                        <!-- Widget Stripe -->
+                        <div
+                            x-show="!stripeReady"
+                            style="
+                                text-align: center;
+                                padding: 20px;
+                                color: #888;
+                                font-size: 13px;
+                            "
+                        >
+                            Chargement du paiement…
+                        </div>
+                        <div
+                            id="stripe-card-element"
+                            x-show="stripeReady"
+                        ></div>
+                        <div
+                            style="
+                                color: #cc0000;
+                                font-size: 13px;
+                                margin-bottom: 8px;
+                            "
+                            x-text="stripeError"
+                        ></div>
+
+                        <button
+                            class="checkout-next-btn"
+                            :disabled="payLoading || !stripeReady"
+                            @click="submitPayment()"
+                        >
+                            <span x-show="!payLoading">
+                                Payer
+                                <span
+                                    x-text="grandTotal.toFixed(2) + ' €'"
+                                ></span>
+                            </span>
+                            <span x-show="payLoading"
+                                >Traitement en cours…</span
+                            >
+                        </button>
+
+                        <p
+                            style="
+                                font-size: 11px;
+                                color: #aaa;
+                                text-align: center;
+                                margin-top: 12px;
+                            "
+                        >
+                            🔒 Paiement sécurisé par Stripe
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Étape paiement (étape 3 pour pickup, 4 pour livraison) -->
-        <div x-show="checkoutStep === (mode==='pickup' ? 3 : 4)">
-          <!-- Récapitulatif -->
-          <div style="background:white; border-radius:14px; padding:14px; margin-bottom:16px;">
-            <div style="font-weight:800; font-size:15px; margin-bottom:10px;">Récapitulatif</div>
-            <template x-for="item in $store.cart.items" :key="item.key">
-              <div style="display:flex; justify-content:space-between; font-size:13px; padding:3px 0;">
-                <span x-text="item.qty + '× ' + item.name"></span>
-                <span x-text="(item.unitTotal * item.qty).toFixed(2) + ' €'"></span>
-              </div>
-            </template>
-            <div x-show="mode==='delivery' && deliveryFee > 0"
-                 style="display:flex; justify-content:space-between; font-size:13px; color:#888; padding-top:6px; border-top:1px solid #f0f0f0; margin-top:6px;">
-              <span>Livraison</span>
-              <span x-text="deliveryFee.toFixed(2) + ' €'"></span>
+        <!-- ===== POPUP POST-PAIEMENT ===== -->
+        <div
+            style="
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1100;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 16px;
+            "
+            x-show="postPaymentOpen"
+            x-cloak
+        >
+            <div
+                style="
+                    background: white;
+                    border-radius: 20px;
+                    padding: 28px 24px;
+                    max-width: 340px;
+                    width: 100%;
+                    text-align: center;
+                "
+            >
+                <div style="font-size: 48px; margin-bottom: 12px">🎉</div>
+                <h3 style="margin: 0 0 8px; font-size: 22px; font-weight: 800">
+                    Commande confirmée !
+                </h3>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px">
+                    Un SMS de confirmation va vous être envoyé.
+                </p>
+                <label class="checkout-label" style="text-align: left"
+                    >Votre prénom (facultatif)</label
+                >
+                <input
+                    class="checkout-input"
+                    type="text"
+                    placeholder="Ex: Marie"
+                    x-model="customerName"
+                />
+                <button class="checkout-next-btn" @click="finalizeOrder()">
+                    Suivre ma commande →
+                </button>
             </div>
-            <div style="display:flex; justify-content:space-between; font-weight:800; font-size:16px;
-                        border-top:1px solid #eee; margin-top:8px; padding-top:8px;">
-              <span>Total</span>
-              <span x-text="grandTotal.toFixed(2) + ' €'" :style="'color:' + settings.color_primary"></span>
-            </div>
-          </div>
-
-          <!-- Widget Stripe -->
-          <div x-show="!stripeReady" style="text-align:center; padding:20px; color:#888; font-size:13px;">
-            Chargement du paiement…
-          </div>
-          <div id="stripe-card-element" x-show="stripeReady"></div>
-          <div style="color:#CC0000; font-size:13px; margin-bottom:8px;" x-text="stripeError"></div>
-
-          <button class="checkout-next-btn" :disabled="payLoading || !stripeReady"
-                  @click="submitPayment()">
-            <span x-show="!payLoading">
-              Payer <span x-text="grandTotal.toFixed(2) + ' €'"></span>
-            </span>
-            <span x-show="payLoading">Traitement en cours…</span>
-          </button>
-
-          <p style="font-size:11px; color:#aaa; text-align:center; margin-top:12px;">
-            🔒 Paiement sécurisé par Stripe
-          </p>
         </div>
 
-      </div>
-    </div>
-  </div>
+        <script src="/assets/js/api.js"></script>
+        <script src="/assets/js/app.js"></script>
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"
+        ></script>
+        <script src="https://js.stripe.com/v3/"></script>
 
-  <!-- ===== POPUP POST-PAIEMENT ===== -->
-  <div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1100;
-              display:flex;align-items:center;justify-content:center;padding:16px;"
-       x-show="postPaymentOpen" x-cloak>
-    <div style="background:white;border-radius:20px;padding:28px 24px;max-width:340px;
-                width:100%;text-align:center;">
-      <div style="font-size:48px;margin-bottom:12px;">🎉</div>
-      <h3 style="margin:0 0 8px;font-size:22px;font-weight:800;">Commande confirmée !</h3>
-      <p style="color:#666;font-size:14px;margin-bottom:20px;">
-        Un SMS de confirmation va vous être envoyé.
-      </p>
-      <label class="checkout-label" style="text-align:left;">Votre prénom (facultatif)</label>
-      <input class="checkout-input" type="text" placeholder="Ex: Marie" x-model="customerName">
-      <button class="checkout-next-btn" @click="finalizeOrder()">
-        Suivre ma commande →
-      </button>
-    </div>
-  </div>
+        <script>
+            function appData() {
+                return {
+                    settings: {
+                        color_primary: "#CC0000",
+                        color_accent: "#D4A017",
+                        color_band_1: "#111111",
+                        color_band_2: "#D4A017",
+                        color_band_3: "#FFFFFF",
+                        color_band_4: "#1A7A1A",
+                        promo_banner: "",
+                        restaurant_name: "P.R.T",
+                        logo_url: "",
+                        stripe_pk_public: "",
+                        delivery_free_above: 0,
+                    },
+                    categories: [],
+                    products: [],
+                    activeCategory: null,
+                    mode: "pickup",
+                    loading: true,
+                    authUser: null,
 
-  <script src="/assets/js/api.js"></script>
-  <script src="/assets/js/app.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
-  <script src="https://js.stripe.com/v3/"></script>
+                    // Panier
+                    cartOpen: false,
+                    deliveryFee: 0,
 
-  <script>
-    function appData() {
-      return {
-        settings: {
-          color_primary: '#CC0000',
-          color_accent: '#D4A017',
-          color_band_1: '#111111',
-          color_band_2: '#D4A017',
-          color_band_3: '#FFFFFF',
-          color_band_4: '#1A7A1A',
-          promo_banner: '',
-          restaurant_name: 'P.R.T',
-          logo_url: '',
-          stripe_pk_public: '',
-          delivery_free_above: 0,
-        },
-        categories:    [],
-        products:      [],
-        activeCategory: null,
-        mode:          'pickup',
-        loading:       true,
-        authUser:      null,
+                    // Fiche plat
+                    selectedProduct: null,
+                    optionGroups: [],
+                    selectedOptions: [],
+                    modalQty: 1,
 
-        // Panier
-        cartOpen:     false,
-        deliveryFee:  0,
+                    // Checkout
+                    checkoutOpen: false,
+                    checkoutStep: 1,
+                    checkoutDialCode: "+594",
+                    checkoutPhoneRaw: "",
+                    checkoutPhone: "",
+                    checkoutAddress: "",
+                    checkoutCity: "",
 
-        // Fiche plat
-        selectedProduct: null,
-        optionGroups:    [],
-        selectedOptions: [],
-        modalQty:        1,
+                    // Adresses
+                    savedAddresses: [],
+                    selectedAddressId: null,
+                    addrMode: "manual",
+                    addrError: "",
+                    gpsLoading: false,
+                    saveAddressCheck: false,
+                    saveAddressLabel: "Maison",
 
-        // Checkout
-        checkoutOpen:     false,
-        checkoutStep:     1,
-        checkoutDialCode: '+594',
-        checkoutPhoneRaw: '',
-        checkoutPhone:    '',
-        checkoutAddress: '',
-        checkoutCity:    '',
+                    // Stripe
+                    stripeInstance: null,
+                    stripeCard: null,
+                    stripeReady: false,
+                    stripeError: "",
+                    payLoading: false,
+                    pendingOrderToken: null,
 
-        // Adresses
-        savedAddresses:    [],
-        selectedAddressId: null,
-        addrMode:          'manual',
-        addrError:         '',
-        gpsLoading:        false,
-        saveAddressCheck:  false,
-        saveAddressLabel:  'Maison',
+                    // Post paiement
+                    postPaymentOpen: false,
+                    customerName: "",
 
-        // Stripe
-        stripeInstance:  null,
-        stripeCard:      null,
-        stripeReady:     false,
-        stripeError:     '',
-        payLoading:      false,
-        pendingOrderToken: null,
+                    DIAL_CODES: [
+                        { code: "+594", label: "+594 (Guyane)" },
+                        { code: "+596", label: "+596 (Martinique)" },
+                        { code: "+590", label: "+590 (Guadeloupe)" },
+                        { code: "+262", label: "+262 (Réunion/Mayotte)" },
+                        { code: "+33", label: "+33 (France)" },
+                        { code: "+32", label: "+32 (Belgique)" },
+                        { code: "+41", label: "+41 (Suisse)" },
+                        { code: "+1", label: "+1 (USA/Canada)" },
+                    ],
 
-        // Post paiement
-        postPaymentOpen: false,
-        customerName:    '',
+                    buildPhone(dialCode, raw) {
+                        const r = (raw || "").trim().replace(/^0+/, "");
+                        return r ? dialCode + r : "";
+                    },
 
-        DIAL_CODES: [
-          { code: '+594', label: '+594 (Guyane)' },
-          { code: '+596', label: '+596 (Martinique)' },
-          { code: '+590', label: '+590 (Guadeloupe)' },
-          { code: '+262', label: '+262 (Réunion/Mayotte)' },
-          { code: '+33',  label: '+33 (France)' },
-          { code: '+32',  label: '+32 (Belgique)' },
-          { code: '+41',  label: '+41 (Suisse)' },
-          { code: '+1',   label: '+1 (USA/Canada)' },
-        ],
+                    detectDialCode(phone) {
+                        if (!phone) return { code: "+594", raw: "" };
+                        for (const dc of this.DIAL_CODES) {
+                            if (phone.startsWith(dc.code))
+                                return {
+                                    code: dc.code,
+                                    raw: phone.slice(dc.code.length),
+                                };
+                        }
+                        return { code: "+594", raw: phone };
+                    },
 
-        buildPhone(dialCode, raw) {
-          const r = (raw || '').trim().replace(/^0+/, '');
-          return r ? dialCode + r : '';
-        },
+                    get filteredProducts() {
+                        const list = this.products.filter(
+                            (p) => p.is_available == 1,
+                        );
+                        if (this.activeCategory === null) return list;
+                        return list.filter(
+                            (p) => p.category_id == this.activeCategory,
+                        );
+                    },
 
-        detectDialCode(phone) {
-          if (!phone) return { code: '+594', raw: '' };
-          for (const dc of this.DIAL_CODES) {
-            if (phone.startsWith(dc.code)) return { code: dc.code, raw: phone.slice(dc.code.length) };
-          }
-          return { code: '+594', raw: phone };
-        },
+                    get modalTotal() {
+                        if (!this.selectedProduct) return 0;
+                        const extra = this.selectedOptions.reduce(
+                            (s, o) => s + parseFloat(o.extra_price || 0),
+                            0,
+                        );
+                        return (
+                            (parseFloat(this.selectedProduct.price) + extra) *
+                            this.modalQty
+                        );
+                    },
 
-        get filteredProducts() {
-          const list = this.products.filter(p => p.is_available == 1);
-          if (this.activeCategory === null) return list;
-          return list.filter(p => p.category_id == this.activeCategory);
-        },
+                    get grandTotal() {
+                        return (
+                            this.$store.cart.subtotal +
+                            (this.mode === "delivery" ? this.deliveryFee : 0)
+                        );
+                    },
 
-        get modalTotal() {
-          if (!this.selectedProduct) return 0;
-          const extra = this.selectedOptions.reduce((s, o) => s + parseFloat(o.extra_price || 0), 0);
-          return (parseFloat(this.selectedProduct.price) + extra) * this.modalQty;
-        },
+                    async init() {
+                        const [settingsData, categoriesData, productsData] =
+                            await Promise.all([
+                                api.getSettings().catch(() => ({})),
+                                api.getCategories().catch(() => []),
+                                api.getProducts().catch(() => []),
+                            ]);
 
-        get grandTotal() {
-          return this.$store.cart.subtotal + (this.mode === 'delivery' ? this.deliveryFee : 0);
-        },
+                        if (settingsData.color_primary) {
+                            Object.assign(this.settings, settingsData);
+                            const root = document.documentElement;
+                            root.style.setProperty(
+                                "--color-primary",
+                                settingsData.color_primary,
+                            );
+                            root.style.setProperty(
+                                "--color-accent",
+                                settingsData.color_accent,
+                            );
+                            root.style.setProperty(
+                                "--color-band-1",
+                                settingsData.color_band_1,
+                            );
+                            root.style.setProperty(
+                                "--color-band-2",
+                                settingsData.color_band_2,
+                            );
+                            root.style.setProperty(
+                                "--color-band-3",
+                                settingsData.color_band_3,
+                            );
+                            root.style.setProperty(
+                                "--color-band-4",
+                                settingsData.color_band_4,
+                            );
+                            document.querySelector(
+                                "meta[name=theme-color]",
+                            ).content = settingsData.color_primary;
+                            document.title =
+                                (settingsData.restaurant_name || "P.R.T") +
+                                " — Restaurant";
+                        }
 
-        async init() {
-          const [settingsData, categoriesData, productsData] = await Promise.all([
-            api.getSettings().catch(() => ({})),
-            api.getCategories().catch(() => []),
-            api.getProducts().catch(() => []),
-          ]);
+                        this.categories = categoriesData.filter(
+                            (c) => c.is_active == 1,
+                        );
+                        this.products = productsData;
+                        this.loading = false;
 
-          if (settingsData.color_primary) {
-            Object.assign(this.settings, settingsData);
-            const root = document.documentElement;
-            root.style.setProperty('--color-primary', settingsData.color_primary);
-            root.style.setProperty('--color-accent',  settingsData.color_accent);
-            root.style.setProperty('--color-band-1',  settingsData.color_band_1);
-            root.style.setProperty('--color-band-2',  settingsData.color_band_2);
-            root.style.setProperty('--color-band-3',  settingsData.color_band_3);
-            root.style.setProperty('--color-band-4',  settingsData.color_band_4);
-            document.querySelector('meta[name=theme-color]').content = settingsData.color_primary;
-            document.title = (settingsData.restaurant_name || 'P.R.T') + ' — Restaurant';
-          }
+                        // Calculer frais livraison
+                        this.deliveryFee = this.calcDeliveryFee();
 
-          this.categories = categoriesData.filter(c => c.is_active == 1);
-          this.products = productsData;
-          this.loading = false;
+                        // Charger utilisateur connecté
+                        const userData = localStorage.getItem("auth_user");
+                        if (userData) {
+                            this.authUser = JSON.parse(userData);
+                            if (this.authUser.phone) {
+                                const p = this.detectDialCode(
+                                    this.authUser.phone,
+                                );
+                                this.checkoutDialCode = p.code;
+                                this.checkoutPhoneRaw = p.raw;
+                                this.checkoutPhone = this.authUser.phone;
+                            }
+                            // Charger adresses sauvegardées
+                            const token = localStorage.getItem("auth_token");
+                            if (token) {
+                                fetch("/api/auth/addresses", {
+                                    headers: {
+                                        Authorization: "Bearer " + token,
+                                    },
+                                })
+                                    .then((r) => r.json())
+                                    .then((j) => {
+                                        if (j.data) {
+                                            this.savedAddresses = j.data;
+                                            // Pré-sélectionner l'adresse par défaut
+                                            const def = j.data.find(
+                                                (a) => a.is_default,
+                                            );
+                                            if (def) {
+                                                this.selectedAddressId = def.id;
+                                                this.checkoutAddress =
+                                                    def.address;
+                                                this.addrMode = "saved";
+                                            }
+                                        }
+                                    })
+                                    .catch(() => {});
+                            }
+                        } else {
+                            // Invité : charger la dernière adresse depuis localStorage
+                            const lastAddr = localStorage.getItem(
+                                "last_delivery_address",
+                            );
+                            if (lastAddr) {
+                                this.checkoutAddress = lastAddr;
+                                this.checkoutCity =
+                                    localStorage.getItem(
+                                        "last_delivery_city",
+                                    ) || "";
+                            }
+                        }
 
-          // Calculer frais livraison
-          this.deliveryFee = this.calcDeliveryFee();
+                        // Init Stripe
+                        if (
+                            settingsData.stripe_pk_public &&
+                            typeof Stripe !== "undefined"
+                        ) {
+                            this.stripeInstance = Stripe(
+                                settingsData.stripe_pk_public,
+                            );
+                        }
 
-          // Charger utilisateur connecté
-          const userData = localStorage.getItem('auth_user');
-          if (userData) {
-            this.authUser = JSON.parse(userData);
-            if (this.authUser.phone) {
-              const p = this.detectDialCode(this.authUser.phone);
-              this.checkoutDialCode = p.code;
-              this.checkoutPhoneRaw = p.raw;
-              this.checkoutPhone    = this.authUser.phone;
+                        // Service Worker
+                        if ("serviceWorker" in navigator) {
+                            navigator.serviceWorker
+                                .register("/sw.js")
+                                .catch(() => {});
+                        }
+                    },
+
+                    calcDeliveryFee() {
+                        const freeAbove = parseFloat(
+                            this.settings.delivery_free_above || 0,
+                        );
+                        if (
+                            freeAbove > 0 &&
+                            this.$store.cart.subtotal >= freeAbove
+                        )
+                            return 0;
+                        return 3.5; // Valeur par défaut avant chargement depuis backend
+                    },
+
+                    // ===== FICHE PLAT =====
+                    openProduct(product) {
+                        if (!product.options || product.options.length === 0) {
+                            this.quickAdd(product);
+                            return;
+                        }
+                        this.selectedProduct = product;
+                        this.modalQty = 1;
+                        this.selectedOptions = [];
+                        const opts = product.options || [];
+                        const groups = {};
+                        opts.forEach((o) => {
+                            if (!groups[o.group_name])
+                                groups[o.group_name] = {
+                                    name: o.group_name,
+                                    options: [],
+                                };
+                            groups[o.group_name].options.push(o);
+                            if (o.is_default == 1) this.selectedOptions.push(o);
+                        });
+                        this.optionGroups = Object.values(groups);
+                    },
+
+                    isOptionSelected(opt) {
+                        return this.selectedOptions.some(
+                            (o) => o.id === opt.id,
+                        );
+                    },
+
+                    toggleOption(group, opt) {
+                        if (this.isOptionSelected(opt)) {
+                            this.selectedOptions = this.selectedOptions.filter(
+                                (o) => o.id !== opt.id,
+                            );
+                        } else {
+                            // Comportement radio si le groupe a un is_default (ex: Riz)
+                            if (group.options.some((o) => o.is_default == 1)) {
+                                this.selectedOptions =
+                                    this.selectedOptions.filter(
+                                        (o) =>
+                                            !group.options.some(
+                                                (go) => go.id === o.id,
+                                            ),
+                                    );
+                            }
+                            this.selectedOptions.push(opt);
+                        }
+                    },
+
+                    quickAdd(product) {
+                        const defaults = (product.options || []).filter(
+                            (o) => o.is_default == 1,
+                        );
+                        this.$store.cart.addItem(product, defaults, 1);
+                    },
+
+                    addToCart() {
+                        this.$store.cart.addItem(
+                            this.selectedProduct,
+                            this.selectedOptions,
+                            this.modalQty,
+                        );
+                        this.selectedProduct = null;
+                        this.cartOpen = true;
+                    },
+
+                    // ===== CHECKOUT =====
+                    openCheckout() {
+                        this.checkoutStep = 1;
+                        this.stripeCard = null;
+                        this.stripeReady = false;
+                        this.stripeError = "";
+                        this.addrError = "";
+                        this.addrMode = this.selectedAddressId
+                            ? "saved"
+                            : "manual";
+                        this.checkoutOpen = true;
+                    },
+
+                    // ── Adresses ──
+                    addrEmoji(label) {
+                        const map = {
+                            Maison: "🏠",
+                            Travail: "💼",
+                            Famille: "👨‍👩‍👧",
+                            Autre: "📍",
+                        };
+                        return map[label] || "📍";
+                    },
+
+                    selectSavedAddress(a) {
+                        this.selectedAddressId = a.id;
+                        this.checkoutAddress = a.address;
+                        this.checkoutCity = "";
+                        this.addrMode = "saved";
+                        this.addrError = "";
+                    },
+
+                    canProceedAddress() {
+                        if (this.selectedAddressId) return true;
+                        return this.checkoutAddress.trim().length > 3;
+                    },
+
+                    async useGPS() {
+                        if (!navigator.geolocation) {
+                            this.addrError = "Géolocalisation non disponible";
+                            return;
+                        }
+                        this.gpsLoading = true;
+                        this.addrError = "";
+                        this.selectedAddressId = null;
+                        navigator.geolocation.getCurrentPosition(
+                            async (pos) => {
+                                try {
+                                    const { latitude: lat, longitude: lon } =
+                                        pos.coords;
+                                    const r = await fetch(
+                                        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
+                                        {
+                                            headers: {
+                                                "Accept-Language": "fr",
+                                            },
+                                        },
+                                    );
+                                    const data = await r.json();
+                                    const a = data.address || {};
+                                    const road = a.road || a.pedestrian || "";
+                                    const number = a.house_number || "";
+                                    const city =
+                                        a.city ||
+                                        a.town ||
+                                        a.village ||
+                                        a.municipality ||
+                                        "";
+                                    this.checkoutAddress =
+                                        [number, road]
+                                            .filter(Boolean)
+                                            .join(" ") ||
+                                        data.display_name.split(",")[0];
+                                    this.checkoutCity = city;
+                                } catch {
+                                    this.checkoutAddress = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+                                    this.checkoutCity = "";
+                                }
+                                this.addrMode = "manual";
+                                this.gpsLoading = false;
+                            },
+                            (err) => {
+                                this.addrError =
+                                    "Position refusée. Veuillez saisir manuellement.";
+                                this.addrMode = "manual";
+                                this.gpsLoading = false;
+                            },
+                            { timeout: 8000 },
+                        );
+                    },
+
+                    async proceedAddress() {
+                        this.addrError = "";
+                        const finalAddress = this.selectedAddressId
+                            ? this.checkoutAddress
+                            : [
+                                  this.checkoutAddress.trim(),
+                                  this.checkoutCity.trim(),
+                              ]
+                                  .filter(Boolean)
+                                  .join(", ");
+
+                        if (!finalAddress) {
+                            this.addrError = "Veuillez renseigner une adresse";
+                            return;
+                        }
+
+                        // Sauvegarder en localStorage (invité ou connecté)
+                        localStorage.setItem(
+                            "last_delivery_address",
+                            this.checkoutAddress.trim(),
+                        );
+                        if (this.checkoutCity)
+                            localStorage.setItem(
+                                "last_delivery_city",
+                                this.checkoutCity.trim(),
+                            );
+
+                        // Sauvegarder dans le profil si demandé
+                        if (
+                            this.authUser &&
+                            this.saveAddressCheck &&
+                            this.checkoutAddress.trim() &&
+                            this.saveAddressLabel.trim()
+                        ) {
+                            const token = localStorage.getItem("auth_token");
+                            fetch("/api/auth/addresses", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: "Bearer " + token,
+                                },
+                                body: JSON.stringify({
+                                    label: this.saveAddressLabel.trim(),
+                                    address: finalAddress,
+                                    is_default: 0,
+                                }),
+                            })
+                                .then((r) => r.json())
+                                .then((j) => {
+                                    if (j.data)
+                                        this.savedAddresses.unshift(j.data);
+                                })
+                                .catch(() => {});
+                        }
+
+                        this.checkoutAddress = finalAddress;
+                        this.checkoutCity = "";
+                        this.checkoutStep = 4;
+                        this.initStripe();
+                    },
+
+                    initStripe() {
+                        if (!this.stripeInstance || this.stripeCard) return;
+                        this.$nextTick(() => {
+                            const elements = this.stripeInstance.elements();
+                            this.stripeCard = elements.create("card", {
+                                style: {
+                                    base: {
+                                        fontSize: "16px",
+                                        color: "#111",
+                                        "::placeholder": { color: "#aaa" },
+                                    },
+                                },
+                            });
+                            this.stripeCard.mount("#stripe-card-element");
+                            this.stripeCard.on("ready", () => {
+                                this.stripeReady = true;
+                            });
+                            this.stripeCard.on("change", (e) => {
+                                this.stripeError = e.error
+                                    ? e.error.message
+                                    : "";
+                            });
+                        });
+                    },
+
+                    async submitPayment() {
+                        if (this.payLoading) return; // ← double protection
+                        if (!this.stripeInstance) {
+                            this.stripeError =
+                                "Stripe non configuré. Contactez le restaurant.";
+                            return;
+                        }
+                        this.payLoading = true;
+                        this.stripeError = "";
+
+                        try {
+                            const address =
+                                this.mode === "delivery"
+                                    ? this.checkoutAddress.trim()
+                                    : null;
+
+                            const result = await api.createIntent({
+                                items: this.$store.cart.items.map((i) => ({
+                                    id: i.id,
+                                    qty: i.qty,
+                                    options: i.options,
+                                })),
+                                phone:
+                                    this.buildPhone(
+                                        this.checkoutDialCode,
+                                        this.checkoutPhoneRaw,
+                                    ) || this.checkoutPhone,
+                                type:
+                                    this.mode === "pickup"
+                                        ? "pickup"
+                                        : "delivery",
+                                delivery_address: address,
+                            });
+
+                            this.pendingOrderToken = result.order_token;
+                            this.deliveryFee = result.delivery_fee || 0;
+
+                            const { error, paymentIntent } =
+                                await this.stripeInstance.confirmCardPayment(
+                                    result.client_secret,
+                                    {
+                                        payment_method: {
+                                            card: this.stripeCard,
+                                        },
+                                    },
+                                );
+
+                            if (error) {
+                                this.stripeError = error.message;
+                            } else if (paymentIntent.status === "succeeded") {
+                                this.checkoutOpen = false;
+                                // Si connecté avec un nom déjà renseigné → pas de popup
+                                if (this.authUser?.name) {
+                                    this.customerName = this.authUser.name;
+                                    await this.finalizeOrder();
+                                } else {
+                                    this.postPaymentOpen = true;
+                                }
+                            }
+                        } catch (err) {
+                            this.stripeError = err.message;
+                        } finally {
+                            this.payLoading = false;
+                        }
+                    },
+
+                    async finalizeOrder() {
+                        if (this.pendingOrderToken) {
+                            await fetch(
+                                "/api/orders/" +
+                                    this.pendingOrderToken +
+                                    "/confirm",
+                                {
+                                    method: "PATCH",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                },
+                            ).catch(() => {});
+
+                            const name = this.customerName.trim();
+                            if (name) {
+                                // Sauvegarder le nom sur la commande
+                                await fetch(
+                                    "/api/orders/" +
+                                        this.pendingOrderToken +
+                                        "/name",
+                                    {
+                                        method: "PATCH",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            customer_name: name,
+                                        }),
+                                    },
+                                ).catch(() => {});
+
+                                // Si connecté et pas encore de nom → sauvegarder dans le profil
+                                if (this.authUser && !this.authUser.name) {
+                                    const token =
+                                        localStorage.getItem("auth_token");
+                                    const res = await fetch(
+                                        "/api/auth/profile",
+                                        {
+                                            method: "PATCH",
+                                            headers: {
+                                                "Content-Type":
+                                                    "application/json",
+                                                Authorization:
+                                                    "Bearer " + token,
+                                            },
+                                            body: JSON.stringify({ name }),
+                                        },
+                                    ).catch(() => null);
+                                    if (res?.ok) {
+                                        const updated = await res
+                                            .json()
+                                            .catch(() => null);
+                                        if (updated?.data) {
+                                            this.authUser = {
+                                                ...this.authUser,
+                                                name,
+                                            };
+                                            localStorage.setItem(
+                                                "auth_user",
+                                                JSON.stringify(this.authUser),
+                                            );
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        this.$store.cart.clear();
+                        this.postPaymentOpen = false;
+                        window.location.href =
+                            "/track.html?token=" + this.pendingOrderToken;
+                    },
+                };
             }
-            // Charger adresses sauvegardées
-            const token = localStorage.getItem('auth_token');
-            if (token) {
-              fetch('/api/auth/addresses', { headers: { 'Authorization': 'Bearer ' + token } })
-                .then(r => r.json()).then(j => {
-                  if (j.data) {
-                    this.savedAddresses = j.data;
-                    // Pré-sélectionner l'adresse par défaut
-                    const def = j.data.find(a => a.is_default);
-                    if (def) { this.selectedAddressId = def.id; this.checkoutAddress = def.address; this.addrMode = 'saved'; }
-                  }
-                }).catch(() => {});
-            }
-          } else {
-            // Invité : charger la dernière adresse depuis localStorage
-            const lastAddr = localStorage.getItem('last_delivery_address');
-            if (lastAddr) { this.checkoutAddress = lastAddr; this.checkoutCity = localStorage.getItem('last_delivery_city') || ''; }
-          }
-
-          // Init Stripe
-          if (settingsData.stripe_pk_public && typeof Stripe !== 'undefined') {
-            this.stripeInstance = Stripe(settingsData.stripe_pk_public);
-          }
-
-          // Service Worker
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
-          }
-        },
-
-        calcDeliveryFee() {
-          const freeAbove = parseFloat(this.settings.delivery_free_above || 0);
-          if (freeAbove > 0 && this.$store.cart.subtotal >= freeAbove) return 0;
-          return 3.50; // Valeur par défaut avant chargement depuis backend
-        },
-
-        // ===== FICHE PLAT =====
-        openProduct(product) {
-          if (!product.options || product.options.length === 0) {
-            this.quickAdd(product);
-            return;
-          }
-          this.selectedProduct = product;
-          this.modalQty = 1;
-          this.selectedOptions = [];
-          const opts = product.options || [];
-          const groups = {};
-          opts.forEach(o => {
-            if (!groups[o.group_name]) groups[o.group_name] = { name: o.group_name, options: [] };
-            groups[o.group_name].options.push(o);
-            if (o.is_default == 1) this.selectedOptions.push(o);
-          });
-          this.optionGroups = Object.values(groups);
-        },
-
-        isOptionSelected(opt) {
-          return this.selectedOptions.some(o => o.id === opt.id);
-        },
-
-        toggleOption(group, opt) {
-          if (this.isOptionSelected(opt)) {
-            this.selectedOptions = this.selectedOptions.filter(o => o.id !== opt.id);
-          } else {
-            // Comportement radio si le groupe a un is_default (ex: Riz)
-            if (group.options.some(o => o.is_default == 1)) {
-              this.selectedOptions = this.selectedOptions.filter(
-                o => !group.options.some(go => go.id === o.id)
-              );
-            }
-            this.selectedOptions.push(opt);
-          }
-        },
-
-        quickAdd(product) {
-          const defaults = (product.options || []).filter(o => o.is_default == 1);
-          this.$store.cart.addItem(product, defaults, 1);
-        },
-
-        addToCart() {
-          this.$store.cart.addItem(this.selectedProduct, this.selectedOptions, this.modalQty);
-          this.selectedProduct = null;
-          this.cartOpen = true;
-        },
-
-        // ===== CHECKOUT =====
-        openCheckout() {
-          this.checkoutStep = 1;
-          this.stripeCard = null;
-          this.stripeReady = false;
-          this.stripeError = '';
-          this.addrError = '';
-          this.addrMode = this.selectedAddressId ? 'saved' : 'manual';
-          this.checkoutOpen = true;
-        },
-
-        // ── Adresses ──
-        addrEmoji(label) {
-          const map = { 'Maison':'🏠','Travail':'💼','Famille':'👨‍👩‍👧','Autre':'📍' };
-          return map[label] || '📍';
-        },
-
-        selectSavedAddress(a) {
-          this.selectedAddressId = a.id;
-          this.checkoutAddress   = a.address;
-          this.checkoutCity      = '';
-          this.addrMode          = 'saved';
-          this.addrError         = '';
-        },
-
-        canProceedAddress() {
-          if (this.selectedAddressId) return true;
-          return this.checkoutAddress.trim().length > 3;
-        },
-
-        async useGPS() {
-          if (!navigator.geolocation) { this.addrError = 'Géolocalisation non disponible'; return; }
-          this.gpsLoading = true;
-          this.addrError  = '';
-          this.selectedAddressId = null;
-          navigator.geolocation.getCurrentPosition(
-            async (pos) => {
-              try {
-                const { latitude: lat, longitude: lon } = pos.coords;
-                const r = await fetch(
-                  `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-                  { headers: { 'Accept-Language': 'fr' } }
-                );
-                const data = await r.json();
-                const a = data.address || {};
-                const road    = a.road || a.pedestrian || '';
-                const number  = a.house_number || '';
-                const city    = a.city || a.town || a.village || a.municipality || '';
-                this.checkoutAddress = [number, road].filter(Boolean).join(' ') || data.display_name.split(',')[0];
-                this.checkoutCity    = city;
-              } catch {
-                this.checkoutAddress = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-                this.checkoutCity    = '';
-              }
-              this.addrMode   = 'manual';
-              this.gpsLoading = false;
-            },
-            (err) => {
-              this.addrError  = 'Position refusée. Veuillez saisir manuellement.';
-              this.addrMode   = 'manual';
-              this.gpsLoading = false;
-            },
-            { timeout: 8000 }
-          );
-        },
-
-        async proceedAddress() {
-          this.addrError = '';
-          const finalAddress = this.selectedAddressId
-            ? this.checkoutAddress
-            : [this.checkoutAddress.trim(), this.checkoutCity.trim()].filter(Boolean).join(', ');
-
-          if (!finalAddress) { this.addrError = 'Veuillez renseigner une adresse'; return; }
-
-          // Sauvegarder en localStorage (invité ou connecté)
-          localStorage.setItem('last_delivery_address', this.checkoutAddress.trim());
-          if (this.checkoutCity) localStorage.setItem('last_delivery_city', this.checkoutCity.trim());
-
-          // Sauvegarder dans le profil si demandé
-          if (this.authUser && this.saveAddressCheck && this.checkoutAddress.trim() && this.saveAddressLabel.trim()) {
-            const token = localStorage.getItem('auth_token');
-            fetch('/api/auth/addresses', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-              body: JSON.stringify({ label: this.saveAddressLabel.trim(), address: finalAddress, is_default: 0 }),
-            }).then(r => r.json()).then(j => {
-              if (j.data) this.savedAddresses.unshift(j.data);
-            }).catch(() => {});
-          }
-
-          this.checkoutAddress = finalAddress;
-          this.checkoutCity    = '';
-          this.checkoutStep    = 4;
-          this.initStripe();
-        },
-
-        initStripe() {
-          if (!this.stripeInstance || this.stripeCard) return;
-          this.$nextTick(() => {
-            const elements = this.stripeInstance.elements();
-            this.stripeCard = elements.create('card', {
-              style: {
-                base: { fontSize: '16px', color: '#111', '::placeholder': { color: '#aaa' } },
-              },
-            });
-            this.stripeCard.mount('#stripe-card-element');
-            this.stripeCard.on('ready', () => { this.stripeReady = true; });
-            this.stripeCard.on('change', (e) => { this.stripeError = e.error ? e.error.message : ''; });
-          });
-        },
-
-        async submitPayment() {
-          if (!this.stripeInstance) {
-            this.stripeError = 'Stripe non configuré. Contactez le restaurant.';
-            return;
-          }
-          this.payLoading = true;
-          this.stripeError = '';
-
-          try {
-            const address = this.mode === 'delivery'
-              ? this.checkoutAddress.trim()
-              : null;
-
-            const result = await api.createIntent({
-              items: this.$store.cart.items.map(i => ({
-                id:      i.id,
-                qty:     i.qty,
-                options: i.options,
-              })),
-              phone:            this.buildPhone(this.checkoutDialCode, this.checkoutPhoneRaw) || this.checkoutPhone,
-              type:             this.mode === 'pickup' ? 'pickup' : 'delivery',
-              delivery_address: address,
-            });
-
-            this.pendingOrderToken = result.order_token;
-            this.deliveryFee = result.delivery_fee || 0;
-
-            const { error, paymentIntent } = await this.stripeInstance.confirmCardPayment(
-              result.client_secret,
-              { payment_method: { card: this.stripeCard } }
-            );
-
-            if (error) {
-              this.stripeError = error.message;
-            } else if (paymentIntent.status === 'succeeded') {
-              this.checkoutOpen = false;
-              // Si connecté avec un nom déjà renseigné → pas de popup
-              if (this.authUser?.name) {
-                this.customerName = this.authUser.name;
-                await this.finalizeOrder();
-              } else {
-                this.postPaymentOpen = true;
-              }
-            }
-          } catch (err) {
-            this.stripeError = err.message;
-          } finally {
-            this.payLoading = false;
-          }
-        },
-
-        async finalizeOrder() {
-          if (this.pendingOrderToken) {
-            await fetch('/api/orders/' + this.pendingOrderToken + '/confirm', {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-            }).catch(() => {});
-
-            const name = this.customerName.trim();
-            if (name) {
-              // Sauvegarder le nom sur la commande
-              await fetch('/api/orders/' + this.pendingOrderToken + '/name', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ customer_name: name }),
-              }).catch(() => {});
-
-              // Si connecté et pas encore de nom → sauvegarder dans le profil
-              if (this.authUser && !this.authUser.name) {
-                const token = localStorage.getItem('auth_token');
-                const res = await fetch('/api/auth/profile', {
-                  method: 'PATCH',
-                  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                  body: JSON.stringify({ name }),
-                }).catch(() => null);
-                if (res?.ok) {
-                  const updated = await res.json().catch(() => null);
-                  if (updated?.data) {
-                    this.authUser = { ...this.authUser, name };
-                    localStorage.setItem('auth_user', JSON.stringify(this.authUser));
-                  }
-                }
-              }
-            }
-          }
-          this.$store.cart.clear();
-          this.postPaymentOpen = false;
-          window.location.href = '/track.html?token=' + this.pendingOrderToken;
-        },
-      };
-    }
-  </script>
-</body>
+        </script>
+    </body>
 </html>

@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS restaurant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE restaurant;
+-- CREATE DATABASE IF NOT EXISTS restaurant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- USE restaurant;
 
 -- Configuration et thème restaurant
 CREATE TABLE settings (

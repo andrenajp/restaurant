@@ -312,6 +312,8 @@ function kitchenApp() {
       try {
         const phone = this.dialCode + this.phoneRaw.trim().replace(/^0+/, '');
         const res = await api.login({ phone, password: this.password });
+
+        console.log(res)
         if (res.user.role !== 'admin' && res.user.role !== 'kitchen') {
           throw new Error('Accès réservé à la cuisine et aux administrateurs.');
         }
@@ -341,7 +343,7 @@ function kitchenApp() {
     async loadOrders() {
       try {
         // Récupérer les commandes actives (pas delivered ni cancelled)
-        const all = await apiFetch('/admin/orders');
+        const all = await apiFetch('/kitchen/orders');
         const active = all.filter(o =>
           !['delivered','cancelled'].includes(o.status)
         );
@@ -363,7 +365,7 @@ function kitchenApp() {
 
     async setStatus(id, status) {
       try {
-        await apiFetch('/admin/orders/' + id, {
+        await apiFetch('/kitchen/orders/' + id, {
           method: 'PATCH',
           body: JSON.stringify({ status }),
         });
