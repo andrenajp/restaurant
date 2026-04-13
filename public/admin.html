@@ -621,8 +621,12 @@
             }
         </style>
     </head>
-
-    <body x-data="adminApp()" x-init="init()">
+    <body
+        x-data="adminApp()"
+        x-init="init()"
+        @click.once="unlockAudio()"
+        @keydown.once="unlockAudio()"
+    >
         <!-- ══════════ LOGIN ══════════ -->
         <div class="login-wrap" x-show="!authed" x-cloak>
             <div class="login-box">
@@ -681,7 +685,6 @@
 
         <!-- ══════════ ADMIN LAYOUT ══════════ -->
         <div class="admin-layout" x-show="authed" x-cloak>
-            <!-- Sidebar -->
             <aside class="sidebar">
                 <div class="sidebar-brand">
                     P.R.T
@@ -797,6 +800,24 @@
                     </div>
                     <div
                         class="nav-item"
+                        :class="tab==='hours' ? 'active' : ''"
+                        @click="tab='hours'; loadOpeningHours()"
+                    >
+                        <svg
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <span>Horaires</span>
+                    </div>
+                    <div
+                        class="nav-item"
                         :class="tab==='options' ? 'active' : ''"
                         @click="tab='options'"
                     >
@@ -879,6 +900,64 @@
 
             <!-- Main -->
             <main class="main-content">
+                <!-- Toast notification -->
+                <div
+                    x-show="showToast"
+                    x-transition.duration.300ms
+                    style="
+                        position: fixed;
+                        bottom: 20px;
+                        right: 20px;
+                        z-index: 1001;
+                    "
+                    x-cloak
+                >
+                    <div
+                        class="card-dark"
+                        :style="toastType === 'success' ? 'border-left: 4px solid #22c55e' : 'border-left: 4px solid #fbbf24'"
+                    >
+                        <div
+                            style="
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                            "
+                        >
+                            <span
+                                x-show="toastType === 'success'"
+                                style="font-size: 20px"
+                                >✅</span
+                            >
+                            <span
+                                x-show="toastType === 'info'"
+                                style="font-size: 20px"
+                                >🔔</span
+                            >
+                            <span
+                                x-show="toastType === 'error'"
+                                style="font-size: 20px"
+                                >❌</span
+                            >
+                            <span
+                                x-show="toastType === 'warning'"
+                                style="font-size: 20px"
+                                >⚠️</span
+                            >
+                            <span x-text="toastMessage"></span>
+                            <button
+                                @click="showToast=false"
+                                style="
+                                    background: none;
+                                    border: none;
+                                    color: var(--sub);
+                                    cursor: pointer;
+                                "
+                            >
+                                ✖
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <!-- ══ COMMANDES ══ -->
                 <div x-show="tab === 'orders'">
                     <div class="section-title">
@@ -895,7 +974,7 @@
                         >
                         <button
                             class="btn-outline btn-sm"
-                            @click="loadOrders()"
+                            @click="loadOrders(true)"
                         >
                             ↻ Actualiser
                         </button>
@@ -953,10 +1032,61 @@
                             <button
                                 class="btn-outline btn-sm"
                                 :style="orderFilter===s ? 'border-color:var(--red);color:white;background:rgba(204,0,0,.15)' : ''"
-                                @click="orderFilter=s; loadOrders()"
+                                @click="orderFilter=s; loadOrders(true)"
                                 x-text="s==='' ? 'Toutes' : statusLabel(s)"
                             ></button>
                         </template>
+                    </div>
+
+                    <!-- Filtres avancés -->
+                    <div
+                        style="
+                            display: flex;
+                            gap: 10px;
+                            margin-bottom: 16px;
+                            flex-wrap: wrap;
+                        "
+                    >
+                        <select
+                            class="f-select"
+                            style="width: auto"
+                            x-model="orderTypeFilter"
+                            @change="loadOrders(true)"
+                        >
+                            <option value="">Tous types</option>
+                            <option value="pickup">🏠 Récupérer</option>
+                            <option value="delivery">🛵 Livraison</option>
+                        </select>
+                        <input
+                            type="date"
+                            class="f-input"
+                            style="width: auto"
+                            x-model="orderDateFrom"
+                            @change="loadOrders(true)"
+                            placeholder="Du"
+                        />
+                        <input
+                            type="date"
+                            class="f-input"
+                            style="width: auto"
+                            x-model="orderDateTo"
+                            @change="loadOrders(true)"
+                            placeholder="Au"
+                        />
+                        <input
+                            type="text"
+                            class="f-input"
+                            style="width: 220px"
+                            x-model="orderSearch"
+                            @input="loadOrders(true)"
+                            placeholder="🔍 Rechercher par téléphone ou ID"
+                        />
+                        <button
+                            class="btn-outline btn-sm"
+                            @click="orderTypeFilter=''; orderDateFrom=''; orderDateTo=''; orderSearch=''; loadOrders(true)"
+                        >
+                            ✖ Réinitialiser
+                        </button>
                     </div>
 
                     <div x-show="ordersLoading" class="empty-state">
@@ -970,160 +1100,151 @@
                         Aucune commande.
                     </div>
 
-                    <template x-if="!ordersLoading">
-                        <div>
-                            <template x-for="order in orders" :key="order.id">
-                                <div
-                                    class="order-card"
-                                    :style="order.status === 'delivered' ? 'border-color:#166534; background:#0a2e1a;' : ''"
-                                >
-                                    <div class="order-card-top">
-                                        <div>
-                                            <span class="order-id"
-                                                >#<span x-text="order.id"></span
-                                            ></span>
-                                            <span
-                                                :class="'badge-status badge-' + order.status"
-                                                style="
-                                                    margin-left: 8px;
-                                                    display: inline-block;
-                                                    padding: 2px 9px;
-                                                    border-radius: 20px;
-                                                    font-size: 11px;
-                                                    font-weight: 700;
-                                                "
-                                                x-text="statusLabel(order.status)"
-                                            ></span>
-                                            <span
-                                                class="order-type-badge"
-                                                style="margin-left: 6px"
-                                                x-text="order.type==='pickup' ? '🏠 Récupérer' : '🛵 Livraison'"
-                                            ></span>
-                                        </div>
-                                        <div style="text-align: right">
-                                            <div
-                                                style="
-                                                    font-weight: 800;
-                                                    font-size: 16px;
-                                                "
-                                                x-text="parseFloat(order.total).toFixed(2) + ' €'"
-                                            ></div>
-                                            <div
-                                                class="order-meta"
-                                                x-text="order.phone"
-                                            ></div>
-                                        </div>
-                                    </div>
+                    <template x-for="order in orders" :key="order.id">
+                        <div
+                            class="order-card"
+                            :style="order.status === 'delivered' ? 'border-color:#166534; background:#0a2e1a;' : ''"
+                        >
+                            <div class="order-card-top">
+                                <div>
+                                    <span class="order-id"
+                                        >#<span x-text="order.id"></span
+                                    ></span>
+                                    <span
+                                        :class="'badge-status badge-' + order.status"
+                                        style="
+                                            margin-left: 8px;
+                                            display: inline-block;
+                                            padding: 2px 9px;
+                                            border-radius: 20px;
+                                            font-size: 11px;
+                                            font-weight: 700;
+                                        "
+                                        x-text="statusLabel(order.status)"
+                                    ></span>
+                                    <span
+                                        class="order-type-badge"
+                                        style="margin-left: 6px"
+                                        x-text="order.type==='pickup' ? '🏠 Récupérer' : '🛵 Livraison'"
+                                    ></span>
+                                </div>
+                                <div style="text-align: right">
+                                    <div
+                                        style="
+                                            font-weight: 800;
+                                            font-size: 16px;
+                                        "
+                                        x-text="parseFloat(order.total).toFixed(2) + ' €'"
+                                    ></div>
                                     <div
                                         class="order-meta"
-                                        style="margin-bottom: 6px"
-                                    >
-                                        <span
-                                            x-text="formatDate(order.created_at)"
-                                        ></span>
-                                        <span
-                                            x-show="order.delivery_address"
-                                            style="margin-left: 10px"
-                                        >
-                                            📍
-                                            <span
-                                                x-text="order.delivery_address"
-                                            ></span>
-                                        </span>
-                                    </div>
-
-                                    <!-- Dispatch livreur (livraisons uniquement) -->
-                                    <div
-                                        x-show="order.type === 'delivery'"
-                                        style="margin-bottom: 10px"
-                                    >
-                                        <div
-                                            x-show="order.driver_name"
-                                            style="
-                                                font-size: 12px;
-                                                color: #4ade80;
-                                                margin-bottom: 6px;
-                                            "
-                                        >
-                                            🛵 Livreur :
-                                            <strong
-                                                x-text="order.driver_name"
-                                            ></strong>
-                                        </div>
-                                        <div
-                                            x-show="order.status !== 'delivered' && order.status !== 'cancelled'"
-                                            style="
-                                                display: flex;
-                                                gap: 6px;
-                                                align-items: center;
-                                            "
-                                        >
-                                            <select
-                                                x-model="order._driverId"
-                                                style="
-                                                    flex: 1;
-                                                    background: #242424;
-                                                    border: 1px solid #333;
-                                                    border-radius: 6px;
-                                                    padding: 6px 8px;
-                                                    color: #f0f0f0;
-                                                    font-size: 13px;
-                                                    outline: none;
-                                                "
-                                            >
-                                                <option value="">
-                                                    — Assigner un livreur —
-                                                </option>
-                                                <template
-                                                    x-for="d in drivers"
-                                                    :key="d.id"
-                                                >
-                                                    <option
-                                                        :value="d.id"
-                                                        x-text="d.name || d.phone"
-                                                    ></option>
-                                                </template>
-                                            </select>
-                                            <button
-                                                @click="assignDriver(order)"
-                                                style="
-                                                    background: #3b82f6;
-                                                    color: white;
-                                                    border: none;
-                                                    border-radius: 6px;
-                                                    padding: 6px 12px;
-                                                    font-size: 13px;
-                                                    font-weight: 700;
-                                                    cursor: pointer;
-                                                    white-space: nowrap;
-                                                "
-                                            >
-                                                Dispatcher
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div class="order-actions">
-                                        <template
-                                            x-for="next in nextStatuses(order.status)"
-                                            :key="next"
-                                        >
-                                            <button
-                                                :class="'status-btn btn-' + next"
-                                                @click="updateOrderStatus(order.id, next)"
-                                                x-text="'→ ' + statusLabel(next)"
-                                            ></button>
-                                        </template>
-                                        <button
-                                            class="status-btn btn-cancelled"
-                                            x-show="order.status !== 'delivered' && order.status !== 'cancelled'"
-                                            @click="updateOrderStatus(order.id, 'cancelled')"
-                                        >
-                                            Annuler
-                                        </button>
-                                    </div>
+                                        x-text="order.phone"
+                                    ></div>
                                 </div>
-                            </template>
+                            </div>
+                            <div class="order-meta" style="margin-bottom: 6px">
+                                <span
+                                    x-text="formatDate(order.created_at)"
+                                ></span>
+                                <span
+                                    x-show="order.delivery_address"
+                                    style="margin-left: 10px"
+                                >
+                                    📍
+                                    <span
+                                        x-text="order.delivery_address"
+                                    ></span>
+                                </span>
+                            </div>
+
+                            <!-- Dispatch livreur (livraisons uniquement) -->
+                            <div
+                                x-show="order.type === 'delivery'"
+                                style="margin-bottom: 10px"
+                            >
+                                <div
+                                    x-show="order.driver_name"
+                                    style="
+                                        font-size: 12px;
+                                        color: #4ade80;
+                                        margin-bottom: 6px;
+                                    "
+                                >
+                                    🛵 Livreur :
+                                    <strong x-text="order.driver_name"></strong>
+                                </div>
+                                <div
+                                    x-show="order.status !== 'delivered' && order.status !== 'cancelled'"
+                                    style="
+                                        display: flex;
+                                        gap: 6px;
+                                        align-items: center;
+                                    "
+                                >
+                                    <select
+                                        x-model="order._driverId"
+                                        style="
+                                            flex: 1;
+                                            background: #242424;
+                                            border: 1px solid #333;
+                                            border-radius: 6px;
+                                            padding: 6px 8px;
+                                            color: #f0f0f0;
+                                            font-size: 13px;
+                                            outline: none;
+                                        "
+                                    >
+                                        <option value="">
+                                            — Assigner un livreur —
+                                        </option>
+                                        <template
+                                            x-for="d in drivers"
+                                            :key="d.id"
+                                        >
+                                            <option
+                                                :value="d.id"
+                                                x-text="d.name || d.phone"
+                                            ></option>
+                                        </template>
+                                    </select>
+                                    <button
+                                        @click="assignDriver(order)"
+                                        style="
+                                            background: #3b82f6;
+                                            color: white;
+                                            border: none;
+                                            border-radius: 6px;
+                                            padding: 6px 12px;
+                                            font-size: 13px;
+                                            font-weight: 700;
+                                            cursor: pointer;
+                                            white-space: nowrap;
+                                        "
+                                    >
+                                        Dispatcher
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="order-actions">
+                                <template
+                                    x-for="next in nextStatuses(order.status)"
+                                    :key="next"
+                                >
+                                    <button
+                                        :class="'status-btn btn-' + next"
+                                        @click="updateOrderStatus(order.id, next)"
+                                        x-text="'→ ' + statusLabel(next)"
+                                    ></button>
+                                </template>
+                                <button
+                                    class="status-btn btn-cancelled"
+                                    x-show="order.status !== 'delivered' && order.status !== 'cancelled'"
+                                    @click="updateOrderStatusWithReason(order.id, 'cancelled')"
+                                >
+                                    Annuler
+                                </button>
+                            </div>
                         </div>
                     </template>
                 </div>
@@ -1229,7 +1350,7 @@
                                             </button>
                                             <button
                                                 class="btn-danger"
-                                                @click="deleteProduct(p)"
+                                                @click="openDeleteModal(p, 'product', p.name)"
                                             >
                                                 Suppr.
                                             </button>
@@ -1335,7 +1456,7 @@
                                             </button>
                                             <button
                                                 class="btn-danger"
-                                                @click="deleteCategory(c)"
+                                                @click="openDeleteModal(c, 'category', c.name)"
                                             >
                                                 Suppr.
                                             </button>
@@ -1432,7 +1553,7 @@
                                             </button>
                                             <button
                                                 class="btn-danger"
-                                                @click="deleteFee(f)"
+                                                @click="openDeleteModal(f, 'fee', f.zone_name)"
                                             >
                                                 Suppr.
                                             </button>
@@ -1453,6 +1574,101 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- ══ HORAIRES ══ -->
+                <div x-show="tab === 'hours'">
+                    <div class="section-title">Horaires d'ouverture</div>
+
+                    <div class="card-dark" style="max-width: 560px">
+                        <div x-show="openingHoursLoading" class="empty-state">
+                            Chargement...
+                        </div>
+                        <template
+                            x-for="(hour, idx) in openingHours"
+                            :key="hour.day_of_week"
+                        >
+                            <div
+                                style="
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 14px;
+                                    padding: 10px 0;
+                                    border-bottom: 1px solid var(--border);
+                                    flex-wrap: wrap;
+                                "
+                            >
+                                <!-- Nom du jour -->
+                                <div
+                                    style="
+                                        width: 90px;
+                                        font-weight: 600;
+                                        font-size: 14px;
+                                        flex-shrink: 0;
+                                    "
+                                    x-text="['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'][hour.day_of_week]"
+                                ></div>
+
+                                <!-- Toggle : cocher = OUVERT -->
+                                <label class="toggle" style="margin: 0">
+                                    <input
+                                        type="checkbox"
+                                        :checked="hour.is_closed == 0"
+                                        @change="hour.is_closed = $event.target.checked ? 0 : 1"
+                                    />
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span
+                                    style="
+                                        font-size: 13px;
+                                        font-weight: 600;
+                                        width: 52px;
+                                    "
+                                    :style="hour.is_closed == 1 ? 'color:#f87171' : 'color:#4ade80'"
+                                    x-text="hour.is_closed == 1 ? 'Fermé' : 'Ouvert'"
+                                ></span>
+                                <div
+                                    x-show="hour.is_closed == 0"
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 8px;
+                                    "
+                                >
+                                    <input
+                                        type="time"
+                                        class="f-input"
+                                        style="width: 110px"
+                                        x-model="hour.open_time"
+                                    />
+                                    <span style="color: var(--sub)">→</span>
+                                    <input
+                                        type="time"
+                                        class="f-input"
+                                        style="width: 110px"
+                                        x-model="hour.close_time"
+                                    />
+                                </div>
+                            </div>
+                        </template>
+
+                        <div
+                            x-show="!openingHoursLoading && openingHours.length === 0"
+                            class="empty-state"
+                            style="padding: 20px 0"
+                        >
+                            Aucun horaire configuré.
+                        </div>
+
+                        <button
+                            class="btn-red"
+                            @click="saveOpeningHours()"
+                            style="margin-top: 20px"
+                            x-show="openingHours.length > 0"
+                        >
+                            Enregistrer les horaires
+                        </button>
                     </div>
                 </div>
 
@@ -1978,7 +2194,7 @@
                                                             </button>
                                                             <button
                                                                 class="btn-danger"
-                                                                @click="deleteOption(opt)"
+                                                                @click="openDeleteModal(opt, 'option', opt.option_name)"
                                                             >
                                                                 Suppr.
                                                             </button>
@@ -2258,97 +2474,15 @@
                     <div class="section-title">Utilisateurs</div>
 
                     <!-- Formulaire nouvel utilisateur -->
-                    <div class="card-dark" style="margin-bottom: 16px">
-                        <div
-                            style="
-                                font-weight: 700;
-                                font-size: 14px;
-                                margin-bottom: 14px;
-                            "
-                        >
-                            Ajouter un utilisateur
-                        </div>
-                        <div
-                            x-show="newUserError"
-                            class="alert-err"
-                            x-text="newUserError"
-                        ></div>
-                        <div
-                            x-show="newUserSuccess"
-                            style="
-                                background: #0a2e00;
-                                border: 1px solid #166534;
-                                color: #86efac;
-                                border-radius: 8px;
-                                padding: 10px 14px;
-                                font-size: 13px;
-                                margin-bottom: 14px;
-                            "
-                            x-text="newUserSuccess"
-                        ></div>
-                        <div class="f-row col2">
-                            <div class="f-group">
-                                <label class="f-label">Prénom</label>
-                                <input
-                                    class="f-input"
-                                    type="text"
-                                    x-model="newUser.name"
-                                    placeholder="Jean"
-                                />
-                            </div>
-                            <div class="f-group">
-                                <label class="f-label">Téléphone *</label>
-                                <div class="phone-group">
-                                    <select
-                                        class="dial-select"
-                                        x-model="newUserDialCode"
-                                    >
-                                        <template
-                                            x-for="dc in DIAL_CODES"
-                                            :key="dc.code"
-                                        >
-                                            <option
-                                                :value="dc.code"
-                                                x-text="dc.code"
-                                            ></option>
-                                        </template>
-                                    </select>
-                                    <input
-                                        class="f-input"
-                                        type="tel"
-                                        x-model="newUserPhoneRaw"
-                                        placeholder="694000000"
-                                    />
-                                </div>
-                            </div>
-                            <div class="f-group">
-                                <label class="f-label">Mot de passe *</label>
-                                <input
-                                    class="f-input"
-                                    type="password"
-                                    x-model="newUser.password"
-                                    placeholder="••••••••"
-                                />
-                            </div>
-                            <div class="f-group">
-                                <label class="f-label">Rôle *</label>
-                                <select class="f-input" x-model="newUser.role">
-                                    <option value="client">client</option>
-                                    <option value="kitchen">kitchen</option>
-                                    <option value="delivery">delivery</option>
-                                    <option value="admin">admin</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button
-                            class="btn-red"
-                            style="width: auto; padding: 10px 24px"
-                            @click="createUser()"
-                            :disabled="newUserLoading"
-                        >
-                            <span
-                                x-text="newUserLoading ? 'Création...' : '+ Créer l\'utilisateur'"
-                            ></span>
+                    <div
+                        style="
+                            display: flex;
+                            justify-content: flex-end;
+                            margin-bottom: 16px;
+                        "
+                    >
+                        <button class="btn-red" @click="openUserModal()">
+                            + Ajouter un utilisateur
                         </button>
                     </div>
 
@@ -2360,7 +2494,7 @@
                                     <th>Rôle</th>
                                     <th>Inscrit le</th>
                                     <th>Changer rôle</th>
-                                    <th></th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -2423,12 +2557,19 @@
                                                 </option>
                                             </select>
                                         </td>
-                                        <td>
+                                        <td style="white-space: nowrap">
                                             <button
-                                                class="btn-danger"
-                                                @click="deleteUser(u)"
+                                                class="btn-outline btn-sm"
+                                                @click="openUserModal(u)"
+                                                style="margin-right: 6px"
                                             >
-                                                Suppr.
+                                                ✏️ Éditer
+                                            </button>
+                                            <button
+                                                class="btn-danger btn-sm"
+                                                @click="openDeleteModal(u, 'user', u.name || u.phone)"
+                                            >
+                                                🗑️ Suppr.
                                             </button>
                                         </td>
                                     </tr>
@@ -2820,6 +2961,266 @@
                     </button>
                 </div>
             </div>
+
+            <!-- ══ MODALE ANNULATION ══ -->
+            <div
+                class="modal-overlay"
+                x-show="showCancelModal"
+                x-cloak
+                @click.self="showCancelModal=false"
+            >
+                <div class="modal-box" style="max-width: 450px">
+                    <div class="modal-title">Annuler la commande</div>
+                    <div class="f-group">
+                        <label class="f-label">Motif d'annulation *</label>
+                        <select class="f-select" x-model="cancelReason">
+                            <option value="">
+                                -- Sélectionnez un motif --
+                            </option>
+                            <option value="Client annule">Client annule</option>
+                            <option value="Erreur dans la commande">
+                                Erreur dans la commande
+                            </option>
+                            <option value="Délai trop long">
+                                Délai trop long
+                            </option>
+                            <option value="Produit indisponible">
+                                Produit indisponible
+                            </option>
+                            <option value="Problème de paiement">
+                                Problème de paiement
+                            </option>
+                            <option value="Adresse invalide">
+                                Adresse invalide
+                            </option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="f-group" x-show="cancelReason === 'Autre'">
+                        <label class="f-label">Précisez le motif</label>
+                        <input
+                            type="text"
+                            class="f-input"
+                            x-model="cancelReasonOther"
+                            placeholder="Votre motif..."
+                        />
+                    </div>
+                    <div class="modal-actions">
+                        <button
+                            class="btn-outline"
+                            @click="showCancelModal=false"
+                        >
+                            Annuler
+                        </button>
+                        <button class="btn-danger" @click="confirmCancel()">
+                            Confirmer l'annulation
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ MODALE ÉDITION UTILISATEUR ══ -->
+        <div
+            class="modal-overlay"
+            x-show="showUserModal"
+            x-cloak
+            @click.self="showUserModal=false"
+        >
+            <div class="modal-box" style="max-width: 500px">
+                <div
+                    class="modal-title"
+                    x-text="userForm.id ? 'Modifier l\'utilisateur' : 'Nouvel utilisateur'"
+                ></div>
+
+                <!-- Nom -->
+                <div class="f-group">
+                    <label class="f-label">Nom complet</label>
+                    <input
+                        type="text"
+                        class="f-input"
+                        x-model="userForm.name"
+                        placeholder="Jean Dupont"
+                    />
+                </div>
+
+                <!-- Téléphone -->
+                <div class="f-group">
+                    <label class="f-label">Téléphone *</label>
+                    <div class="phone-group">
+                        <select class="dial-select" x-model="userForm.dialCode">
+                            <option value="+33">+33 (France)</option>
+                            <option value="+594">+594 (Guyane)</option>
+                            <option value="+596">+596 (Martinique)</option>
+                            <option value="+590">+590 (Guadeloupe)</option>
+                            <option value="+262">+262 (Réunion)</option>
+                            <option value="+32">+32 (Belgique)</option>
+                            <option value="+41">+41 (Suisse)</option>
+                        </select>
+                        <input
+                            type="tel"
+                            class="f-input"
+                            x-model="userForm.phoneRaw"
+                            placeholder="612345678"
+                        />
+                    </div>
+                </div>
+
+                <!-- Rôle -->
+                <div class="f-group">
+                    <label class="f-label">Rôle</label>
+                    <select class="f-select" x-model="userForm.role">
+                        <option value="client">👤 Client</option>
+                        <option value="kitchen">🍳 Cuisine</option>
+                        <option value="delivery">🛵 Livreur</option>
+                        <option value="admin">👑 Administrateur</option>
+                    </select>
+                </div>
+
+                <!-- Mot de passe -->
+                <div class="f-group">
+                    <label class="f-label">
+                        Mot de passe
+                        <span
+                            x-show="userForm.id"
+                            style="font-size: 11px; color: var(--sub)"
+                            >(laisser vide pour ne pas modifier)</span
+                        >
+                        <span
+                            x-show="!userForm.id"
+                            style="font-size: 11px; color: var(--red)"
+                            >* requis</span
+                        >
+                    </label>
+                    <div style="display: flex; gap: 8px">
+                        <input
+                            type="text"
+                            class="f-input"
+                            x-model="userForm.password"
+                            placeholder="••••••••"
+                            style="flex: 1"
+                        />
+                        <button
+                            class="btn-outline"
+                            @click="userForm.password = Math.random().toString(36).slice(-8)"
+                            style="white-space: nowrap"
+                        >
+                            🎲 Générer
+                        </button>
+                    </div>
+                    <div
+                        style="
+                            font-size: 11px;
+                            color: var(--sub);
+                            margin-top: 4px;
+                        "
+                    >
+                        Minimum 4 caractères
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="modal-actions">
+                    <button class="btn-outline" @click="showUserModal=false">
+                        Annuler
+                    </button>
+                    <button class="btn-red" @click="saveUser()">
+                        Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ MODALE CONFIRMATION SUPPRESSION ══ -->
+        <div
+            class="modal-overlay"
+            x-show="showDeleteModal"
+            x-cloak
+            @click.self="showDeleteModal=false"
+        >
+            <div class="modal-box" style="max-width: 400px; text-align: center">
+                <div style="font-size: 48px; margin-bottom: 16px">⚠️</div>
+                <div class="modal-title" style="font-size: 20px">
+                    Confirmer la suppression
+                </div>
+
+                <div style="margin: 20px 0; color: var(--text)">
+                    Êtes-vous sûr de vouloir supprimer
+                    <strong
+                        style="
+                            color: var(--red);
+                            display: block;
+                            margin-top: 8px;
+                            font-size: 18px;
+                        "
+                        x-text="deleteItemName"
+                    ></strong>
+                    <span
+                        style="
+                            display: block;
+                            margin-top: 8px;
+                            font-size: 13px;
+                            color: var(--sub);
+                        "
+                    >
+                        Cette action est <strong>irréversible</strong>.
+                    </span>
+                </div>
+
+                <div
+                    class="modal-actions"
+                    style="justify-content: center; gap: 12px"
+                >
+                    <button class="btn-outline" @click="showDeleteModal=false">
+                        Annuler
+                    </button>
+                    <button
+                        class="btn-danger"
+                        @click="confirmDelete()"
+                        style="background: #991b1b"
+                    >
+                        Supprimer définitivement
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ MODALE ACTIVATION SON ══ -->
+        <div
+            class="modal-overlay"
+            x-show="showSoundModal"
+            x-cloak
+            style="z-index: 2000"
+        >
+            <div class="modal-box" style="max-width: 400px; text-align: center">
+                <div style="font-size: 52px; margin-bottom: 16px">🔔</div>
+                <div
+                    class="modal-title"
+                    style="font-size: 20px; justify-content: center"
+                >
+                    Activer les notifications sonores
+                </div>
+                <p
+                    style="
+                        color: var(--sub);
+                        font-size: 14px;
+                        margin: 12px 0 24px;
+                    "
+                >
+                    Les nouvelles commandes seront notifiées avec un son.<br />
+                    Cliquez <strong style="color: var(--text)">OK</strong> pour
+                    activer le son.
+                </p>
+                <div class="modal-actions" style="justify-content: center">
+                    <button
+                        class="btn-red"
+                        style="padding: 12px 36px; font-size: 15px"
+                        @click="confirmSoundUnlock()"
+                    >
+                        OK, activer le son
+                    </button>
+                </div>
+            </div>
         </div>
 
         <script src="/assets/js/api.js"></script>
@@ -2903,6 +3304,59 @@
 
                     refreshTimer: null,
 
+                    // Variables manquantes pour les options
+                    newOptionLines: [],
+                    newOptionGroup: "",
+                    optionSaving: false,
+
+                    // Filtres avancés
+                    orderTypeFilter: "",
+                    orderDateFrom: "",
+                    orderDateTo: "",
+                    orderSearch: "",
+
+                    // Toast notification
+                    showToast: false,
+                    toastMessage: "",
+                    toastType: "success",
+
+                    // Modale d'annulation
+                    showCancelModal: false,
+                    cancelOrderId: null,
+                    cancelReason: "",
+                    cancelReasonOther: "",
+
+                    // Horaires
+                    openingHours: [],
+                    openingHoursLoading: false,
+
+                    // Logs
+                    adminLogs: [],
+
+                    // ===== MODALE SUPPRESSION =====
+                    showDeleteModal: false,
+                    deleteItem: null,
+                    deleteType: "",
+                    deleteItemName: "",
+
+                    // ===== MODALE UTILISATEUR =====
+                    showUserModal: false,
+                    editingUser: null,
+                    userForm: {
+                        id: null,
+                        name: "",
+                        phone: "",
+                        dialCode: "+33",
+                        phoneRaw: "",
+                        role: "client",
+                        password: "",
+                    },
+
+                    // ===== AUDIO / NOTIFICATIONS =====
+                    audioUnlocked: false,
+                    notificationTimer: null,
+                    showSoundModal: false,
+
                     // ── Computed ──
                     get pendingCount() {
                         return this.orders.filter(
@@ -2934,8 +3388,20 @@
                         if (token && user?.role === "admin") {
                             this.authed = true;
                             await this.loadAll();
-                            this.startRefresh();
+                            this.startNotificationTimer();
+                            await this.checkAudioAndShowModal();
                         }
+                    },
+
+                    startNotificationTimer() {
+                        // Un seul timer — checkNewOrders() appelle déjà loadOrders() en interne
+                        this.notificationTimer = setInterval(() => {
+                            if (this.authed) {
+                                if (this.tab === "orders") {
+                                    this.checkNewOrders();
+                                }
+                            }
+                        }, 15000); // toutes les 15s
                     },
 
                     async loadAll() {
@@ -2950,9 +3416,7 @@
                     },
 
                     startRefresh() {
-                        this.refreshTimer = setInterval(() => {
-                            if (this.tab === "orders") this.loadOrders();
-                        }, 30000);
+                        // Fusionné dans startNotificationTimer()
                     },
 
                     // ── Auth ──
@@ -2978,7 +3442,8 @@
                             );
                             this.authed = true;
                             await this.loadAll();
-                            this.startRefresh();
+                            this.startNotificationTimer();
+                            await this.checkAudioAndShowModal();
                         } catch (e) {
                             this.loginError =
                                 e.message || "Identifiants incorrects.";
@@ -2989,25 +3454,305 @@
 
                     doLogout() {
                         clearInterval(this.refreshTimer);
+                        clearInterval(this.notificationTimer);
                         localStorage.removeItem("auth_token");
                         localStorage.removeItem("auth_user");
                         this.authed = false;
                     },
 
                     // ── Orders ──
-                    async loadOrders() {
-                        this.ordersLoading = true;
+                    async loadOrders(forceReplace = false) {
+                        // Spinner seulement au 1er chargement ou action manuelle
+                        if (forceReplace || this.orders.length === 0) {
+                            this.ordersLoading = true;
+                        }
                         try {
-                            const params = this.orderFilter
-                                ? "?status=" + this.orderFilter
-                                : "";
-                            this.orders = await apiFetch(
-                                "/admin/orders" + params,
-                            );
-                        } catch {
-                            this.orders = [];
+                            const params = {};
+                            if (this.orderFilter)
+                                params.status = this.orderFilter;
+                            if (this.orderTypeFilter)
+                                params.type = this.orderTypeFilter;
+                            if (this.orderDateFrom)
+                                params.date_from = this.orderDateFrom;
+                            if (this.orderDateTo)
+                                params.date_to = this.orderDateTo;
+                            if (this.orderSearch)
+                                params.search = this.orderSearch;
+
+                            const fresh = await api.getAdminOrders(params);
+
+                            if (forceReplace || this.orders.length === 0) {
+                                // Premier chargement ou filtre changé → remplacer
+                                this.orders = fresh;
+                                this.orders.forEach((o) => {
+                                    o._driverId = o.delivery_driver_id;
+                                });
+                            } else {
+                                // Refresh silencieux → merger sans toucher au DOM
+                                const freshMap = new Map(
+                                    fresh.map((o) => [o.id, o]),
+                                );
+                                const existingIds = new Set(
+                                    this.orders.map((o) => o.id),
+                                );
+
+                                // 1. Mettre à jour les champs modifiés des commandes existantes
+                                for (const existing of this.orders) {
+                                    const updated = freshMap.get(existing.id);
+                                    if (!updated) continue;
+                                    for (const key of Object.keys(updated)) {
+                                        if (existing[key] !== updated[key]) {
+                                            existing[key] = updated[key];
+                                        }
+                                    }
+                                }
+
+                                // 2. Retirer les commandes qui ne sont plus dans les résultats
+                                this.orders = this.orders.filter((o) =>
+                                    freshMap.has(o.id),
+                                );
+
+                                // 3. Ajouter les nouvelles commandes en tête
+                                for (const o of fresh) {
+                                    if (!existingIds.has(o.id)) {
+                                        o._driverId = o.delivery_driver_id;
+                                        this.orders.unshift(o);
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.error(e);
+                            if (this.orders.length === 0) this.orders = [];
                         } finally {
                             this.ordersLoading = false;
+                        }
+                    },
+
+                    // Vérifie si le navigateur autorise déjà l'audio, sinon affiche le modal
+                    async checkAudioAndShowModal() {
+                        if (this.audioUnlocked) return;
+                        try {
+                            const ctx = new (
+                                window.AudioContext || window.webkitAudioContext
+                            )();
+                            if (ctx.state === "suspended") {
+                                ctx.close();
+                                this.showSoundModal = true;
+                            } else {
+                                ctx.close();
+                                this.audioUnlocked = true;
+                            }
+                        } catch (e) {
+                            this.showSoundModal = true;
+                        }
+                    },
+
+                    // Appelé quand l'utilisateur clique OK dans le modal son
+                    confirmSoundUnlock() {
+                        this.unlockAudio();
+                        this.showSoundModal = false;
+                    },
+
+                    // Débloquer l'audio au premier clic utilisateur
+                    unlockAudio() {
+                        if (this.audioUnlocked) return;
+                        try {
+                            const ctx = new (
+                                window.AudioContext || window.webkitAudioContext
+                            )();
+                            const buf = ctx.createBuffer(1, 1, 22050);
+                            const src = ctx.createBufferSource();
+                            src.buffer = buf;
+                            src.connect(ctx.destination);
+                            src.start(0);
+                            ctx.close();
+                        } catch (e) {}
+                        this.audioUnlocked = true;
+                    },
+
+                    playNotificationSound() {
+                        if (!this.audioUnlocked) return;
+                        try {
+                            const audio = new Audio(
+                                "/assets/sounds/notification.wav",
+                            );
+                            audio.volume = 1.0;
+                            const p = audio.play();
+                            if (p)
+                                p.catch((e) =>
+                                    console.warn("Audio bloqué :", e.message),
+                                );
+                        } catch (e) {
+                            console.warn("Erreur audio :", e.message);
+                        }
+                    },
+
+                    async checkNewOrders() {
+                        if (this.tab !== "orders") return;
+
+                        const oldIds = new Set(this.orders.map((o) => o.id));
+                        const oldPendingCount = this.pendingCount;
+
+                        await this.loadOrders();
+
+                        const newOrders = this.orders.filter(
+                            (o) => !oldIds.has(o.id),
+                        );
+                        const newPendingCount = this.pendingCount;
+
+                        if (newOrders.length > 0) {
+                            // Son
+                            this.playNotificationSound();
+
+                            // Notification desktop
+                            if (typeof Notification !== "undefined") {
+                                if (Notification.permission === "granted") {
+                                    try {
+                                        new Notification(
+                                            "🍽️ Nouvelle commande !",
+                                            {
+                                                body: `${newOrders.length} nouvelle(s) commande(s) reçue(s)`,
+                                                icon: "/assets/img/logo.png",
+                                                tag: "new-order-" + Date.now(),
+                                                requireInteraction: false,
+                                            },
+                                        );
+                                    } catch (e) {
+                                        console.warn(
+                                            "Notification:",
+                                            e.message,
+                                        );
+                                    }
+                                } else if (
+                                    Notification.permission === "default"
+                                ) {
+                                    Notification.requestPermission();
+                                }
+                            }
+
+                            // Toast
+                            this.toastMessage = `🍽️ ${newOrders.length} nouvelle(s) commande(s) !`;
+                            this.toastType = "success";
+                            this.showToast = true;
+                            setTimeout(() => (this.showToast = false), 5000);
+                        } else if (newPendingCount > oldPendingCount) {
+                            // Une commande existante a changé de statut vers pending/received
+                            this.toastMessage =
+                                "Une commande a été mise à jour !";
+                            this.toastType = "info";
+                            this.showToast = true;
+                            setTimeout(() => (this.showToast = false), 3000);
+                        }
+                    },
+
+                    async updateOrderStatusWithReason(orderId, status) {
+                        if (status === "cancelled") {
+                            this.cancelOrderId = orderId;
+                            this.cancelReason = "";
+                            this.showCancelModal = true;
+                            return;
+                        }
+                        await this.updateOrderStatus(orderId, status);
+                    },
+
+                    async confirmCancel() {
+                        if (!this.cancelReason.trim()) {
+                            alert("Veuillez indiquer un motif d'annulation");
+                            return;
+                        }
+                        try {
+                            await api.updateOrderStatus(
+                                this.cancelOrderId,
+                                "cancelled",
+                                this.cancelReason,
+                            );
+                            const order = this.orders.find(
+                                (o) => o.id === this.cancelOrderId,
+                            );
+                            if (order) order.status = "cancelled";
+                            this.showCancelModal = false;
+                            this.cancelOrderId = null;
+                            this.cancelReason = "";
+                            this.toastMessage = "Commande annulée";
+                            this.toastType = "warning";
+                            this.showToast = true;
+                            setTimeout(() => (this.showToast = false), 3000);
+                        } catch (e) {
+                            alert("Erreur : " + e.message);
+                        }
+                    },
+
+                    async resetPassword(user) {
+                        if (
+                            !confirm(
+                                `Réinitialiser le mot de passe de ${user.name || user.phone} ?\nUn nouveau mot de passe sera généré.`,
+                            )
+                        )
+                            return;
+                        try {
+                            const res = await api.resetUserPassword(user.id);
+                            alert(
+                                `✅ Mot de passe réinitialisé !\n\nUtilisateur : ${res.user_name || res.user_phone}\nNouveau mot de passe : ${res.new_password}\n\nÀ communiquer immédiatement à l'utilisateur.`,
+                            );
+                            this.toastMessage = "Mot de passe réinitialisé";
+                            this.toastType = "success";
+                            this.showToast = true;
+                            setTimeout(() => (this.showToast = false), 3000);
+                        } catch (e) {
+                            alert("Erreur : " + e.message);
+                        }
+                    },
+
+                    async loadOpeningHours() {
+                        this.openingHoursLoading = true;
+                        try {
+                            const data = await api.getOpeningHours();
+                            if (data && data.length > 0) {
+                                this.openingHours = data;
+                            } else {
+                                this.openingHours = [0, 1, 2, 3, 4, 5, 6].map(
+                                    (d) => ({
+                                        day_of_week: d,
+                                        open_time: "11:00",
+                                        close_time: "22:00",
+                                        is_closed: 0,
+                                    }),
+                                );
+                            }
+                        } catch (e) {
+                            console.warn(
+                                "API horaires indisponible, initialisation par défaut",
+                            );
+                            this.openingHours = [0, 1, 2, 3, 4, 5, 6].map(
+                                (d) => ({
+                                    day_of_week: d,
+                                    open_time: "11:00",
+                                    close_time: "22:00",
+                                    is_closed: d === 6 ? 1 : 0,
+                                }),
+                            );
+                        } finally {
+                            this.openingHoursLoading = false;
+                        }
+                    },
+
+                    async saveOpeningHours() {
+                        try {
+                            await apiFetch("/admin/opening-hours", {
+                                method: "PUT",
+                                body: JSON.stringify({
+                                    hours: this.openingHours,
+                                }),
+                            });
+                            this.toastMessage = "Horaires enregistrés ✓";
+                            this.toastType = "success";
+                            this.showToast = true;
+                            setTimeout(() => (this.showToast = false), 3000);
+                        } catch (e) {
+                            this.toastMessage = "Erreur : " + e.message;
+                            this.toastType = "error";
+                            this.showToast = true;
+                            setTimeout(() => (this.showToast = false), 4000);
                         }
                     },
 
@@ -3641,18 +4386,188 @@
                         }
                     },
 
-                    async deleteUser(u) {
-                        if (!confirm("Supprimer " + (u.name || u.phone) + " ?"))
+                    // Ouvrir la modale pour créer/modifier un utilisateur
+                    openUserModal(user = null) {
+                        if (user) {
+                            // Extraire l'indicatif et le numéro du téléphone complet
+                            let dialCode = "+33";
+                            let phoneRaw = user.phone || "";
+
+                            // Chercher l'indicatif dans la liste des codes disponibles
+                            const codes = [
+                                "+33",
+                                "+594",
+                                "+596",
+                                "+590",
+                                "+262",
+                                "+32",
+                                "+41",
+                                "+1",
+                            ];
+                            for (const code of codes) {
+                                if (phoneRaw.startsWith(code)) {
+                                    dialCode = code;
+                                    phoneRaw = phoneRaw.substring(code.length);
+                                    break;
+                                }
+                            }
+
+                            this.userForm = {
+                                id: user.id,
+                                name: user.name || "",
+                                phone: user.phone,
+                                dialCode: dialCode,
+                                phoneRaw: phoneRaw,
+                                role: user.role,
+                                password: "",
+                            };
+                        } else {
+                            // Nouvel utilisateur
+                            this.userForm = {
+                                id: null,
+                                name: "",
+                                phone: "",
+                                dialCode: "+33",
+                                phoneRaw: "",
+                                role: "client",
+                                password: "",
+                            };
+                        }
+                        this.showUserModal = true;
+                    },
+
+                    // Construire le numéro complet
+                    buildUserPhone() {
+                        // Nettoyer le numéro : enlever les espaces, tirets, points
+                        let raw = this.userForm.phoneRaw.replace(
+                            /[\s\-\.]/g,
+                            "",
+                        );
+                        // Enlever les éventuels '0' au début (mais garder si c'est un 06...)
+                        if (raw.startsWith("0") && raw.length > 1) {
+                            raw = raw.substring(1);
+                        }
+                        return this.userForm.dialCode + raw;
+                    },
+
+                    // Sauvegarder l'utilisateur (création ou modification)
+                    async saveUser() {
+                        // Validation
+                        if (!this.userForm.password && !this.userForm.id) {
+                            alert(
+                                "Le mot de passe est requis pour un nouvel utilisateur",
+                            );
                             return;
+                        }
+                        if (
+                            this.userForm.password &&
+                            this.userForm.password.length < 4
+                        ) {
+                            alert(
+                                "Le mot de passe doit faire au moins 4 caractères",
+                            );
+                            return;
+                        }
+
+                        const phone = this.buildUserPhone();
+
+                        // Validation du numéro de téléphone
+                        if (!phone || phone.length < 10) {
+                            alert(
+                                "Numéro de téléphone invalide. Format attendu: +33612345678",
+                            );
+                            return;
+                        }
+
+                        // Vérifier que le numéro n'est pas déjà utilisé par un autre utilisateur
+                        if (this.userForm.id) {
+                            const existingUser = this.users.find(
+                                (u) =>
+                                    u.phone === phone &&
+                                    u.id !== this.userForm.id,
+                            );
+                            if (existingUser) {
+                                alert(
+                                    `Ce numéro ${phone} est déjà utilisé par ${existingUser.name || existingUser.phone}`,
+                                );
+                                return;
+                            }
+                        } else {
+                            const existingUser = this.users.find(
+                                (u) => u.phone === phone,
+                            );
+                            if (existingUser) {
+                                alert(`Ce numéro ${phone} est déjà utilisé`);
+                                return;
+                            }
+                        }
+
                         try {
-                            await apiFetch("/admin/users/" + u.id, {
+                            const data = {
+                                name: this.userForm.name || null,
+                                phone: phone,
+                                role: this.userForm.role,
+                            };
+
+                            if (this.userForm.password) {
+                                data.password = this.userForm.password;
+                            }
+
+                            if (this.userForm.id) {
+                                // Modification
+                                await apiFetch(
+                                    `/admin/users/${this.userForm.id}`,
+                                    {
+                                        method: "PUT",
+                                        body: JSON.stringify(data),
+                                    },
+                                );
+                                this.toastMessage = `Utilisateur modifié avec succès`;
+                            } else {
+                                // Création
+                                await apiFetch("/admin/users", {
+                                    method: "POST",
+                                    body: JSON.stringify(data),
+                                });
+                                this.toastMessage = `Utilisateur créé avec succès`;
+                            }
+
+                            this.toastType = "success";
+                            this.showToast = true;
+                            setTimeout(() => (this.showToast = false), 3000);
+
+                            // Fermer la modale et rafraîchir
+                            this.showUserModal = false;
+                            await this.loadUsers();
+                            await this.loadDrivers();
+                        } catch (e) {
+                            alert("Erreur : " + e.message);
+                        }
+                    },
+
+                    // Supprimer un utilisateur (avec confirmation)
+                    async deleteUser(user) {
+                        if (
+                            !confirm(
+                                `Supprimer définitivement ${user.name || user.phone} ?\nCette action est irréversible.`,
+                            )
+                        )
+                            return;
+
+                        try {
+                            await apiFetch(`/admin/users/${user.id}`, {
                                 method: "DELETE",
                             });
                             this.users = this.users.filter(
-                                (x) => x.id !== u.id,
+                                (u) => u.id !== user.id,
                             );
+                            this.toastMessage = `Utilisateur supprimé`;
+                            this.toastType = "warning";
+                            this.showToast = true;
+                            setTimeout(() => (this.showToast = false), 3000);
+                            await this.loadDrivers(); // Rafraîchir les livreurs
                         } catch (e) {
-                            alert(e.message);
+                            alert("Erreur : " + e.message);
                         }
                     },
 
@@ -3695,6 +4610,88 @@
                             this.newUserError = e.message;
                         } finally {
                             this.newUserLoading = false;
+                        }
+                    },
+
+                    // Ouvrir la modale de confirmation suppression
+                    openDeleteModal(item, type, itemName) {
+                        this.deleteItem = item;
+                        this.deleteType = type;
+                        this.deleteItemName = itemName;
+                        this.showDeleteModal = true;
+                    },
+
+                    // Confirmer la suppression
+                    async confirmDelete() {
+                        try {
+                            switch (this.deleteType) {
+                                case "user":
+                                    await apiFetch(
+                                        `/admin/users/${this.deleteItem.id}`,
+                                        { method: "DELETE" },
+                                    );
+                                    this.users = this.users.filter(
+                                        (u) => u.id !== this.deleteItem.id,
+                                    );
+                                    await this.loadDrivers();
+                                    break;
+
+                                case "product":
+                                    await apiFetch(
+                                        `/admin/products/${this.deleteItem.id}`,
+                                        { method: "DELETE" },
+                                    );
+                                    this.products = this.products.filter(
+                                        (p) => p.id !== this.deleteItem.id,
+                                    );
+                                    break;
+
+                                case "category":
+                                    await apiFetch(
+                                        `/admin/categories/${this.deleteItem.id}`,
+                                        { method: "DELETE" },
+                                    );
+                                    this.categories = this.categories.filter(
+                                        (c) => c.id !== this.deleteItem.id,
+                                    );
+                                    break;
+
+                                case "fee":
+                                    await apiFetch(
+                                        `/admin/delivery-fees/${this.deleteItem.id}`,
+                                        { method: "DELETE" },
+                                    );
+                                    this.deliveryFees =
+                                        this.deliveryFees.filter(
+                                            (f) => f.id !== this.deleteItem.id,
+                                        );
+                                    break;
+
+                                case "option":
+                                    await apiFetch(
+                                        `/admin/options/${this.deleteItem.id}`,
+                                        { method: "DELETE" },
+                                    );
+                                    this.productOptions =
+                                        this.productOptions.filter(
+                                            (o) => o.id !== this.deleteItem.id,
+                                        );
+                                    break;
+                            }
+
+                            // Toast de succès
+                            this.toastMessage = `${this.deleteItemName} a été supprimé(e)`;
+                            this.toastType = "success";
+                            this.showToast = true;
+                            setTimeout(() => (this.showToast = false), 3000);
+                        } catch (e) {
+                            this.toastMessage = `Erreur : ${e.message}`;
+                            this.toastType = "error";
+                            this.showToast = true;
+                            setTimeout(() => (this.showToast = false), 3000);
+                        } finally {
+                            this.showDeleteModal = false;
+                            this.deleteItem = null;
                         }
                     },
                 };

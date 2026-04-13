@@ -1,122 +1,146 @@
 <?php
 // POST /api/payment/create-intent
-// Valide le panier côté serveur, crée une commande pending et un PaymentIntent Stripe
-// Retourne {client_secret, order_token, total, delivery_fee}
+require_once __DIR__ . '/../config/env.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../helpers/Response.php';
+require_once __DIR__ . '/../helpers/Validator.php';
+require_once __DIR__ . '/../middleware/Auth.php';
 
-validate_required($body, ['items', 'phone', 'type']);
+// Lire le body
+$raw_input = file_get_contents('php://input');
+$body = json_decode($raw_input, true) ?? [];
 
-if (!is_array($body['items']) || count($body['items']) === 0) {
-    json_error('Panier vide', 422);
+// Validation
+if (empty($body['items']) || empty($body['phone'])) {
+    json_error('Données manquantes: items et phone requis', 422);
+}
+if (!in_array($body['type'] ?? '', ['pickup', 'delivery'])) {
+    json_error('Type invalide : pickup ou delivery', 422);
+}
+if (($body['type'] === 'delivery') && empty($body['delivery_address'])) {
+    json_error('Adresse requise pour une livraison', 422);
 }
 
-$valid_types = ['pickup', 'delivery'];
-if (!in_array($body['type'], $valid_types)) {
-    json_error('Type invalide', 422);
+// customer_name : facultatif, nettoyé et tronqué
+$customer_name = isset($body['customer_name']) ? trim($body['customer_name']) : null;
+if ($customer_name !== null) {
+    $customer_name = mb_substr($customer_name, 0, 150);
+    if ($customer_name === '') $customer_name = null;
 }
-if ($body['type'] === 'delivery' && empty(trim($body['delivery_address'] ?? ''))) {
-    json_error('Adresse de livraison requise', 422);
-}
 
-// Calculer le total côté serveur
-$product_ids = array_unique(array_map(fn($i) => (int)($i['id'] ?? 0), $body['items']));
-$product_ids = array_filter($product_ids);
-if (empty($product_ids)) json_error('Produits invalides', 422);
+// Calcul du total depuis la DB (prix réels, pas ceux du client)
+$total = 0.0;
+$items_validated = [];
 
-$placeholders = implode(',', array_fill(0, count($product_ids), '?'));
-$stmt = db()->prepare("SELECT * FROM products WHERE id IN ($placeholders) AND is_available=1");
-$stmt->execute(array_values($product_ids));
-$db_products = [];
-foreach ($stmt->fetchAll() as $p) $db_products[$p['id']] = $p;
-
-$total = 0;
-$line_items = [];
 foreach ($body['items'] as $item) {
-    $pid = (int)($item['id'] ?? 0);
-    if (!isset($db_products[$pid])) json_error("Produit $pid introuvable ou indisponible", 422);
-    $qty = min(99, max(1, (int)($item['qty'] ?? 1)));
-    $unit_price = (float)$db_products[$pid]['price'];
+    if (empty($item['id'])) json_error('Item invalide dans le panier', 422);
 
-    $options_validated = [];
-    if (!empty($item['options']) && is_array($item['options'])) {
-        $opt_ids = array_filter(array_unique(array_map(fn($o) => (int)($o['id'] ?? 0), $item['options'])));
-        if ($opt_ids) {
-            $op = implode(',', array_fill(0, count($opt_ids), '?'));
-            $ostmt = db()->prepare("SELECT * FROM product_options WHERE id IN ($op) AND product_id = ?");
-            $ostmt->execute(array_merge(array_values($opt_ids), [$pid]));
-            foreach ($ostmt->fetchAll() as $opt) {
-                $unit_price += (float)$opt['extra_price'];
-                $options_validated[] = $opt;
-            }
+    $stmt = db()->prepare('SELECT id, price FROM products WHERE id = ? AND is_available = 1');
+    $stmt->execute([(int) $item['id']]);
+    $product = $stmt->fetch();
+    if (!$product) json_error('Produit introuvable : ' . $item['id'], 422);
+
+    $unit_price = (float) $product['price'];
+
+    if (!empty($item['options'])) {
+        foreach ($item['options'] as $opt) {
+            $opt_id = is_array($opt) ? (int)($opt['id'] ?? 0) : (int)$opt;
+            if (!$opt_id) continue;
+            $stmt2 = db()->prepare('SELECT extra_price FROM product_options WHERE id = ? AND product_id = ?');
+            $stmt2->execute([$opt_id, (int)$item['id']]);
+            $opt_row = $stmt2->fetch();
+            if ($opt_row) $unit_price += (float) $opt_row['extra_price'];
         }
     }
 
+    $qty = min(99, max(1, (int)($item['qty'] ?? 1)));
     $total += $unit_price * $qty;
-    $line_items[] = ['pid' => $pid, 'qty' => $qty, 'unit_price' => $unit_price, 'options' => $options_validated];
+    $items_validated[] = [
+        'product_id' => (int) $product['id'],
+        'quantity'   => $qty,
+        'unit_price' => $unit_price,
+        'options'    => $item['options'] ?? [],
+    ];
 }
 
 // Frais de livraison
-$delivery_fee = 0;
+$delivery_fee = 0.0;
 if ($body['type'] === 'delivery') {
-    $settings = db()->query('SELECT delivery_free_above FROM settings LIMIT 1')->fetch();
-    $free_above = (float)($settings['delivery_free_above'] ?? 0);
-    $fee_row = db()->query('SELECT fee FROM delivery_fees WHERE is_active=1 ORDER BY id LIMIT 1')->fetch();
-    if ($fee_row) {
-        $delivery_fee = ($free_above > 0 && $total >= $free_above) ? 0.0 : (float)$fee_row['fee'];
+    $settings   = db()->query('SELECT delivery_free_above FROM settings LIMIT 1')->fetch();
+    $free_above = (float) ($settings['delivery_free_above'] ?? 25);
+    if ($total < $free_above) {
+        $fee_row = db()->query('SELECT fee FROM delivery_fees WHERE is_active = 1 LIMIT 1')->fetch();
+        $delivery_fee = $fee_row ? (float) $fee_row['fee'] : 3.50;
     }
-    $total += $delivery_fee;
 }
+$total += $delivery_fee;
 
-// Créer la commande en DB (statut 'pending' avant confirmation paiement)
-$order_token = bin2hex(random_bytes(16));
+// Utilisateur connecté (facultatif — la commande fonctionne sans compte)
 $user_id = null;
-require_once __DIR__ . '/../middleware/Auth.php';
 $payload = auth_get_payload();
-if ($payload) $user_id = $payload['sub'];
+if ($payload && isset($payload['sub'])) {
+    $user_id = (int) $payload['sub'];
 
-$stmt = db()->prepare(
-    'INSERT INTO orders (user_id, phone, type, delivery_address, status, total, delivery_fee, tracking_token, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())'
-);
-$stmt->execute([
-    $user_id,
-    $body['phone'],
-    $body['type'],
-    $body['delivery_address'] ?? null,
-    'pending',
-    round($total, 2),
-    round($delivery_fee, 2),
-    $order_token,
-]);
-$order_id = (int)db()->lastInsertId();
-
-foreach ($line_items as $li) {
-    $stmt2 = db()->prepare(
-        'INSERT INTO order_items (order_id, product_id, quantity, unit_price, options_json)
-         VALUES (?, ?, ?, ?, ?)'
-    );
-    $stmt2->execute([
-        $order_id,
-        $li['pid'],
-        $li['qty'],
-        $li['unit_price'],
-        json_encode($li['options']),
-    ]);
+    // Récupérer le nom depuis la DB — priorité sur ce que le client envoie
+    $user_row = db()->prepare('SELECT name FROM users WHERE id = ? LIMIT 1');
+    $user_row->execute([$user_id]);
+    $user_data = $user_row->fetch();
+    if ($user_data && !empty($user_data['name'])) {
+        $customer_name = $user_data['name'];
+    }
 }
 
-// Créer le PaymentIntent Stripe via cURL
-$stripe_sk = env('STRIPE_SK');
-// Mock si clé absente ou placeholder (contient '...')
-if (!$stripe_sk || str_contains($stripe_sk, '...')) {
-    // Pas de clé Stripe → retourner un mock pour développement
+// Token de suivi (utilisé après confirmation par le webhook)
+$order_token = bin2hex(random_bytes(16));
+
+// Clé Stripe
+$stripe_sk = env('STRIPE_SK', '');
+
+// ── Helper : INSERT dans pending_intents ─────────────────────────────────────
+$insert_pending = function (string $pi_id) use (
+    $order_token,
+    $user_id,
+    $customer_name,
+    $body,
+    $total,
+    $delivery_fee,
+    $items_validated
+) {
+    db()->prepare('
+        INSERT INTO pending_intents
+            (payment_intent_id, order_token, user_id, customer_name,
+             phone, type, delivery_address, total, delivery_fee, items_json, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    ')->execute([
+        $pi_id,
+        $order_token,
+        $user_id,
+        $customer_name,
+        $body['phone'],
+        $body['type'],
+        $body['delivery_address'] ?? null,
+        round($total, 2),
+        round($delivery_fee, 2),
+        json_encode($items_validated),
+    ]);
+};
+
+// ── Mode mock (pas de clé Stripe configurée) ─────────────────────────────────
+if (empty($stripe_sk) || (!str_starts_with($stripe_sk, 'sk_test_') && !str_starts_with($stripe_sk, 'sk_live_'))) {
+    $mock_pi_id = 'mock_' . bin2hex(random_bytes(16));
+    $insert_pending($mock_pi_id);
+
     json_success([
-        'client_secret' => 'test_secret_no_stripe_configured',
+        'client_secret' => 'mock_secret_' . $mock_pi_id,
         'order_token'   => $order_token,
         'total'         => round($total, 2),
         'delivery_fee'  => round($delivery_fee, 2),
+        'mock_mode'     => true,
     ]);
 }
 
-$amount_cents = (int)round($total * 100);
+// ── Mode réel Stripe : créer UNIQUEMENT le PaymentIntent ─────────────────────
+$amount_cents = (int) round($total * 100);
 
 $ch = curl_init('https://api.stripe.com/v1/payment_intents');
 curl_setopt_array($ch, [
@@ -126,25 +150,34 @@ curl_setopt_array($ch, [
     CURLOPT_POSTFIELDS     => http_build_query([
         'amount'                => $amount_cents,
         'currency'              => 'eur',
-        'metadata[order_id]'    => $order_id,
         'metadata[order_token]' => $order_token,
     ]),
+    CURLOPT_TIMEOUT        => 30,
+    CURLOPT_SSL_VERIFYPEER => false,
+    CURLOPT_SSL_VERIFYHOST => 2,
 ]);
-$stripe_response = curl_exec($ch);
-$http_code       = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+$response   = curl_exec($ch);
+$http_code  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curl_error = curl_error($ch);
 curl_close($ch);
 
-$stripe_data = json_decode($stripe_response, true);
+if ($curl_error) json_error('Erreur cURL: ' . $curl_error, 502);
 
-if ($http_code !== 200 || empty($stripe_data['client_secret'])) {
-    // Nettoyer la commande si Stripe échoue
-    db()->prepare('DELETE FROM order_items WHERE order_id=?')->execute([$order_id]);
-    db()->prepare('DELETE FROM orders WHERE id=?')->execute([$order_id]);
-    json_error('Erreur Stripe : ' . ($stripe_data['error']['message'] ?? 'inconnue'), 502);
+if ($http_code !== 200) {
+    $stripe_data = json_decode($response, true);
+    json_error('Stripe: ' . ($stripe_data['error']['message'] ?? 'Erreur inconnue'), 502);
 }
 
-db()->prepare('UPDATE orders SET stripe_payment_id=? WHERE id=?')
-    ->execute([$stripe_data['id'], $order_id]);
+$stripe_data       = json_decode($response, true);
+$payment_intent_id = $stripe_data['id'];
+
+// Stocker le panier — la commande sera créée par le webhook après confirmation
+try {
+    $insert_pending($payment_intent_id);
+} catch (Exception $e) {
+    json_error('Erreur base de données: ' . $e->getMessage(), 500);
+}
 
 json_success([
     'client_secret' => $stripe_data['client_secret'],

@@ -1,277 +1,883 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Livreur — P.R.T</title>
-  <style>
-    :root { --red:#CC0000; --green:#22c55e; --orange:#f97316; --blue:#3b82f6; }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:'Segoe UI',system-ui,sans-serif; background:#111; color:#f0f0f0; min-height:100vh; }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Livreur — P.R.T</title>
+        <style>
+            :root {
+                --red: #cc0000;
+                --green: #22c55e;
+                --orange: #f97316;
+                --blue: #3b82f6;
+            }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                font-family: "Segoe UI", system-ui, sans-serif;
+                background: #111;
+                color: #f0f0f0;
+                min-height: 100vh;
+            }
 
-    /* Login */
-    .login-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
-    .login-box  { background:#1a1a1a; border:1px solid #2e2e2e; border-radius:16px; padding:36px 28px; width:100%; max-width:360px; }
-    .login-title { font-size:22px; font-weight:800; color:var(--red); text-align:center; margin-bottom:6px; }
-    .login-sub { font-size:13px; color:#666; text-align:center; margin-bottom:24px; }
+            /* Login */
+            .login-wrap {
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+            .login-box {
+                background: #1a1a1a;
+                border: 1px solid #2e2e2e;
+                border-radius: 16px;
+                padding: 36px 28px;
+                width: 100%;
+                max-width: 360px;
+            }
+            .login-title {
+                font-size: 22px;
+                font-weight: 800;
+                color: var(--red);
+                text-align: center;
+                margin-bottom: 6px;
+            }
+            .login-sub {
+                font-size: 13px;
+                color: #666;
+                text-align: center;
+                margin-bottom: 24px;
+            }
 
-    /* Header */
-    .app-header { background:#0a0a0a; border-bottom:1px solid #2e2e2e; padding:14px 18px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
-    .brand { font-weight:900; font-size:17px; color:var(--red); letter-spacing:2px; }
-    .brand span { font-weight:400; font-size:12px; color:#666; margin-left:8px; }
-    .header-right { display:flex; align-items:center; gap:12px; }
-    .driver-name { font-size:13px; color:#888; }
-    .refresh-dot { width:8px; height:8px; border-radius:50%; background:#555; }
-    .refresh-dot.active { background:var(--green); animation:pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+            /* Header */
+            .app-header {
+                background: #0a0a0a;
+                border-bottom: 1px solid #2e2e2e;
+                padding: 14px 18px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }
+            .brand {
+                font-weight: 900;
+                font-size: 17px;
+                color: var(--red);
+                letter-spacing: 2px;
+            }
+            .brand span {
+                font-weight: 400;
+                font-size: 12px;
+                color: #666;
+                margin-left: 8px;
+            }
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .driver-name {
+                font-size: 13px;
+                color: #888;
+            }
+            .refresh-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #555;
+            }
+            .refresh-dot.active {
+                background: var(--green);
+                animation: pulse 2s infinite;
+            }
+            @keyframes pulse {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.4;
+                }
+            }
 
-    /* Contenu */
-    .page { padding:16px; max-width:600px; margin:0 auto; }
-    .section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#555; margin-bottom:10px; margin-top:20px; }
+            /* Contenu */
+            .page {
+                padding: 16px;
+                max-width: 600px;
+                margin: 0 auto;
+            }
+            .section-label {
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                color: #555;
+                margin-bottom: 10px;
+                margin-top: 20px;
+            }
 
-    /* Carte commande */
-    .delivery-card { background:#1a1a1a; border:1px solid #2e2e2e; border-radius:14px; padding:16px; margin-bottom:12px; }
-    .delivery-card.en-route { border-color:#1d4ed8; background:#0d1a2e; }
-    .card-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
-    .card-id { font-weight:900; font-size:18px; }
-    .card-badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
-    .badge-ready    { background:#1a2e00; color:#86efac; }
-    .badge-en_route { background:#1e3a5f; color:#93c5fd; }
-    .card-address { font-size:14px; color:#ccc; margin-bottom:8px; }
-    .card-address svg { vertical-align:middle; margin-right:5px; }
-    .card-phone { font-size:13px; color:#666; margin-bottom:12px; }
-    .card-items { border-top:1px solid #2e2e2e; padding-top:10px; margin-bottom:12px; }
-    .card-item { font-size:13px; color:#aaa; padding:2px 0; }
-    .card-item strong { color:white; }
-    .card-total { font-size:15px; font-weight:700; margin-bottom:12px; }
+            /* Carte commande */
+            .delivery-card {
+                background: #1a1a1a;
+                border: 1px solid #2e2e2e;
+                border-radius: 14px;
+                padding: 16px;
+                margin-bottom: 12px;
+            }
+            .delivery-card.en-route {
+                border-color: #1d4ed8;
+                background: #0d1a2e;
+            }
+            .card-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 10px;
+            }
+            .card-id {
+                font-weight: 900;
+                font-size: 18px;
+            }
+            .card-badge {
+                font-size: 11px;
+                font-weight: 700;
+                padding: 3px 10px;
+                border-radius: 20px;
+            }
+            .badge-ready {
+                background: #1a2e00;
+                color: #86efac;
+            }
+            .badge-en_route {
+                background: #1e3a5f;
+                color: #93c5fd;
+            }
+            .card-address {
+                font-size: 14px;
+                color: #ccc;
+                margin-bottom: 8px;
+            }
+            .card-address svg {
+                vertical-align: middle;
+                margin-right: 5px;
+            }
+            .card-phone {
+                font-size: 13px;
+                color: #666;
+                margin-bottom: 12px;
+            }
+            .card-items {
+                border-top: 1px solid #2e2e2e;
+                padding-top: 10px;
+                margin-bottom: 12px;
+            }
+            .card-item {
+                font-size: 13px;
+                color: #aaa;
+                padding: 2px 0;
+            }
+            .card-item strong {
+                color: white;
+            }
+            .card-total {
+                font-size: 15px;
+                font-weight: 700;
+                margin-bottom: 12px;
+            }
 
-    .card-actions { display:flex; gap:8px; }
-    .action-btn { flex:1; border:none; border-radius:10px; padding:12px; font-size:14px; font-weight:700; cursor:pointer; transition:opacity .15s; }
-    .action-btn:active { opacity:.7; }
-    .btn-en-route  { background:var(--blue); color:white; }
-    .btn-delivered { background:var(--green); color:#111; }
+            .card-actions {
+                display: flex;
+                gap: 8px;
+            }
+            .action-btn {
+                flex: 1;
+                border: none;
+                border-radius: 10px;
+                padding: 12px;
+                font-size: 14px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: opacity 0.15s;
+            }
+            .action-btn:active {
+                opacity: 0.7;
+            }
+            .btn-en-route {
+                background: var(--blue);
+                color: white;
+            }
+            .btn-delivered {
+                background: var(--green);
+                color: #111;
+            }
 
-    /* États vides */
-    .empty-state { text-align:center; padding:60px 20px; color:#444; }
-    .empty-icon { font-size:48px; margin-bottom:12px; }
+            /* États vides */
+            .empty-state {
+                text-align: center;
+                padding: 60px 20px;
+                color: #444;
+            }
+            .empty-icon {
+                font-size: 48px;
+                margin-bottom: 12px;
+            }
 
-    /* Forms */
-    .f-label { font-size:12px; color:#888; font-weight:600; text-transform:uppercase; display:block; margin-bottom:5px; }
-    .f-input  { width:100%; background:#242424; border:1px solid #333; border-radius:8px; padding:11px 13px; color:#f0f0f0; font-size:15px; outline:none; margin-bottom:14px; }
-    .f-input:focus { border-color:var(--red); }
-    .phone-group { display:flex; gap:6px; margin-bottom:14px; }
-    .phone-group .dial-select { flex-shrink:0; width:85px; background:#242424; border:1px solid #333; border-radius:8px; padding:11px 6px; color:#f0f0f0; font-size:13px; cursor:pointer; }
-    .phone-group .dial-select:focus { border-color:var(--red); outline:none; }
-    .phone-group .f-input { flex:1; min-width:0; margin-bottom:0; }
-    .btn-red { background:var(--red); color:white; border:none; border-radius:8px; padding:13px; width:100%; font-size:15px; font-weight:700; cursor:pointer; }
-    .btn-red:disabled { opacity:.6; }
-    .alert-err { background:#2e0a0a; border:1px solid #991b1b; color:#f87171; border-radius:8px; padding:10px 14px; font-size:13px; margin-bottom:14px; }
+            /* Forms */
+            .f-label {
+                font-size: 12px;
+                color: #888;
+                font-weight: 600;
+                text-transform: uppercase;
+                display: block;
+                margin-bottom: 5px;
+            }
+            .f-input {
+                width: 100%;
+                background: #242424;
+                border: 1px solid #333;
+                border-radius: 8px;
+                padding: 11px 13px;
+                color: #f0f0f0;
+                font-size: 15px;
+                outline: none;
+                margin-bottom: 14px;
+            }
+            .f-input:focus {
+                border-color: var(--red);
+            }
+            .phone-group {
+                display: flex;
+                gap: 6px;
+                margin-bottom: 14px;
+            }
+            .phone-group .dial-select {
+                flex-shrink: 0;
+                width: 85px;
+                background: #242424;
+                border: 1px solid #333;
+                border-radius: 8px;
+                padding: 11px 6px;
+                color: #f0f0f0;
+                font-size: 13px;
+                cursor: pointer;
+            }
+            .phone-group .dial-select:focus {
+                border-color: var(--red);
+                outline: none;
+            }
+            .phone-group .f-input {
+                flex: 1;
+                min-width: 0;
+                margin-bottom: 0;
+            }
+            .btn-red {
+                background: var(--red);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 13px;
+                width: 100%;
+                font-size: 15px;
+                font-weight: 700;
+                cursor: pointer;
+            }
+            .btn-red:disabled {
+                opacity: 0.6;
+            }
+            .alert-err {
+                background: #2e0a0a;
+                border: 1px solid #991b1b;
+                color: #f87171;
+                border-radius: 8px;
+                padding: 10px 14px;
+                font-size: 13px;
+                margin-bottom: 14px;
+            }
 
-    /* Logout */
-    .logout-btn { background:transparent; border:1px solid #333; color:#666; border-radius:7px; padding:6px 12px; font-size:12px; cursor:pointer; }
-    .logout-btn:hover { border-color:#e55; color:#e55; }
+            /* Logout */
+            .logout-btn {
+                background: transparent;
+                border: 1px solid #333;
+                color: #666;
+                border-radius: 7px;
+                padding: 6px 12px;
+                font-size: 12px;
+                cursor: pointer;
+            }
+            .logout-btn:hover {
+                border-color: #e55;
+                color: #e55;
+            }
 
-    [x-cloak] { display:none !important; }
-  </style>
-</head>
-<body x-data="deliveryApp()" x-init="init()">
+            /* Toast */
+            .toast {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #0d1a2e;
+                border: 1px solid #93c5fd;
+                color: #93c5fd;
+                border-radius: 10px;
+                padding: 12px 20px;
+                font-size: 14px;
+                font-weight: 700;
+                z-index: 999;
+                white-space: nowrap;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+                animation: slideUp 0.25s ease;
+            }
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0);
+                }
+            }
 
-<!-- LOGIN -->
-<div class="login-wrap" x-show="!authed" x-cloak>
-  <div class="login-box">
-    <div class="login-title">P.R.T</div>
-    <div class="login-sub">Espace livreur</div>
-    <div x-show="loginError" class="alert-err" x-text="loginError"></div>
-    <label class="f-label">Téléphone</label>
-    <div class="phone-group">
-      <select class="dial-select" x-model="dialCode">
-        <template x-for="dc in DIAL_CODES" :key="dc"><option :value="dc" x-text="dc"></option></template>
-      </select>
-      <input class="f-input" type="tel" x-model="phoneRaw" placeholder="694000000" @keyup.enter="doLogin()">
-    </div>
-    <label class="f-label">Mot de passe</label>
-    <input class="f-input" type="password" x-model="password" @keyup.enter="doLogin()">
-    <button class="btn-red" @click="doLogin()" :disabled="loading">
-      <span x-text="loading ? 'Connexion...' : 'Se connecter'"></span>
-    </button>
-  </div>
-</div>
+            /* Sound modal */
+            .modal-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.75);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+            .modal-box {
+                background: #1a1a1a;
+                border: 1px solid #2e2e2e;
+                border-radius: 16px;
+                padding: 32px 28px;
+                max-width: 360px;
+                width: 100%;
+                text-align: center;
+            }
 
-<!-- LIVREUR APP -->
-<div x-show="authed" x-cloak>
-  <div class="app-header">
-    <div class="brand">P.R.T <span>Livreur</span></div>
-    <div class="header-right">
-      <div class="driver-name" x-text="driverName"></div>
-      <div class="refresh-dot" :class="polling ? 'active' : ''"></div>
-      <button class="logout-btn" @click="doLogout()">Déco.</button>
-    </div>
-  </div>
-
-  <div class="page">
-
-    <!-- En route -->
-    <div x-show="enRoute.length > 0">
-      <div class="section-label">En cours de livraison (<span x-text="enRoute.length"></span>)</div>
-      <template x-for="o in enRoute" :key="o.id">
-        <div class="delivery-card en-route">
-          <div class="card-head">
-            <span class="card-id">#<span x-text="o.id"></span></span>
-            <span class="card-badge badge-en_route">En route</span>
-          </div>
-          <div class="card-address">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span x-text="o.delivery_address || 'Adresse non renseignée'"></span>
-          </div>
-          <div class="card-phone" x-text="o.customer_name ? o.customer_name + ' · ' + o.phone : o.phone"></div>
-          <div class="card-items">
-            <template x-for="item in o.items" :key="item.product_name">
-              <div class="card-item"><strong x-text="item.quantity + '×'"></strong> <span x-text="item.product_name"></span></div>
-            </template>
-          </div>
-          <div class="card-total" x-text="parseFloat(o.total).toFixed(2) + ' €'"></div>
-          <div class="card-actions">
-            <a class="action-btn btn-en-route"
-               :href="'https://maps.google.com/?q=' + encodeURIComponent(o.delivery_address)"
-               target="_blank"
-               style="display:flex;align-items:center;justify-content:center;text-decoration:none;">
-              📍 Naviguer
-            </a>
-            <button class="action-btn btn-delivered" @click="markDelivered(o)">✓ Livré</button>
-          </div>
+            [x-cloak] {
+                display: none !important;
+            }
+        </style>
+    </head>
+    <body x-data="deliveryApp()" x-init="init()">
+        <!-- LOGIN -->
+        <div class="login-wrap" x-show="!authed" x-cloak>
+            <div class="login-box">
+                <div class="login-title">P.R.T</div>
+                <div class="login-sub">Espace livreur</div>
+                <div
+                    x-show="loginError"
+                    class="alert-err"
+                    x-text="loginError"
+                ></div>
+                <label class="f-label">Téléphone</label>
+                <div class="phone-group">
+                    <select class="dial-select" x-model="dialCode">
+                        <template x-for="dc in DIAL_CODES" :key="dc"
+                            ><option :value="dc" x-text="dc"></option
+                        ></template>
+                    </select>
+                    <input
+                        class="f-input"
+                        type="tel"
+                        x-model="phoneRaw"
+                        placeholder="694000000"
+                        @keyup.enter="doLogin()"
+                    />
+                </div>
+                <label class="f-label">Mot de passe</label>
+                <input
+                    class="f-input"
+                    type="password"
+                    x-model="password"
+                    @keyup.enter="doLogin()"
+                />
+                <button class="btn-red" @click="doLogin()" :disabled="loading">
+                    <span
+                        x-text="loading ? 'Connexion...' : 'Se connecter'"
+                    ></span>
+                </button>
+            </div>
         </div>
-      </template>
-    </div>
 
-    <!-- Prêtes à partir -->
-    <div x-show="ready.length > 0">
-      <div class="section-label">Prêtes à récupérer (<span x-text="ready.length"></span>)</div>
-      <template x-for="o in ready" :key="o.id">
-        <div class="delivery-card">
-          <div class="card-head">
-            <span class="card-id">#<span x-text="o.id"></span></span>
-            <span class="card-badge badge-ready">Prête</span>
-          </div>
-          <div class="card-address">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span x-text="o.delivery_address || 'Adresse non renseignée'"></span>
-          </div>
-          <div class="card-phone" x-text="o.customer_name ? o.customer_name + ' · ' + o.phone : o.phone"></div>
-          <div class="card-items">
-            <template x-for="item in o.items" :key="item.product_name">
-              <div class="card-item"><strong x-text="item.quantity + '×'"></strong> <span x-text="item.product_name"></span></div>
-            </template>
-          </div>
-          <div class="card-total" x-text="parseFloat(o.total).toFixed(2) + ' € · dont ' + parseFloat(o.delivery_fee).toFixed(2) + ' € livraison'"></div>
-          <div class="card-actions">
-            <button class="action-btn btn-en-route" @click="markEnRoute(o)">🛵 Prendre en charge</button>
-          </div>
+        <!-- LIVREUR APP -->
+        <div x-show="authed" x-cloak>
+            <div class="app-header">
+                <div class="brand">P.R.T <span>Livreur</span></div>
+                <div class="header-right">
+                    <div class="driver-name" x-text="driverName"></div>
+                    <div
+                        class="refresh-dot"
+                        :class="polling ? 'active' : ''"
+                    ></div>
+                    <button class="logout-btn" @click="doLogout()">
+                        Déco.
+                    </button>
+                </div>
+            </div>
+
+            <div class="page">
+                <!-- En route -->
+                <div x-show="enRoute.length > 0">
+                    <div class="section-label">
+                        En cours de livraison (<span
+                            x-text="enRoute.length"
+                        ></span
+                        >)
+                    </div>
+                    <template x-for="o in enRoute" :key="o.id">
+                        <div class="delivery-card en-route">
+                            <div class="card-head">
+                                <span class="card-id"
+                                    >#<span x-text="o.id"></span
+                                ></span>
+                                <span class="card-badge badge-en_route"
+                                    >En route</span
+                                >
+                            </div>
+                            <div class="card-address">
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
+                                    />
+                                    <circle cx="12" cy="10" r="3" />
+                                </svg>
+                                <span
+                                    x-text="o.delivery_address || 'Adresse non renseignée'"
+                                ></span>
+                            </div>
+                            <div
+                                class="card-phone"
+                                x-text="o.customer_name ? o.customer_name + ' · ' + o.phone : o.phone"
+                            ></div>
+                            <div class="card-items">
+                                <template
+                                    x-for="item in o.items"
+                                    :key="item.product_name"
+                                >
+                                    <div class="card-item">
+                                        <strong
+                                            x-text="item.quantity + '×'"
+                                        ></strong>
+                                        <span x-text="item.product_name"></span>
+                                    </div>
+                                </template>
+                            </div>
+                            <div
+                                class="card-total"
+                                x-text="parseFloat(o.total).toFixed(2) + ' €'"
+                            ></div>
+                            <div class="card-actions">
+                                <a
+                                    class="action-btn btn-en-route"
+                                    :href="'https://maps.google.com/?q=' + encodeURIComponent(o.delivery_address)"
+                                    target="_blank"
+                                    style="
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        text-decoration: none;
+                                    "
+                                >
+                                    📍 Naviguer
+                                </a>
+                                <button
+                                    class="action-btn btn-delivered"
+                                    @click="markDelivered(o)"
+                                >
+                                    ✓ Livré
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Prêtes à partir -->
+                <div x-show="ready.length > 0">
+                    <div class="section-label">
+                        Prêtes à récupérer (<span x-text="ready.length"></span>)
+                    </div>
+                    <template x-for="o in ready" :key="o.id">
+                        <div class="delivery-card">
+                            <div class="card-head">
+                                <span class="card-id"
+                                    >#<span x-text="o.id"></span
+                                ></span>
+                                <span class="card-badge badge-ready"
+                                    >Prête</span
+                                >
+                            </div>
+                            <div class="card-address">
+                                <svg
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <path
+                                        d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
+                                    />
+                                    <circle cx="12" cy="10" r="3" />
+                                </svg>
+                                <span
+                                    x-text="o.delivery_address || 'Adresse non renseignée'"
+                                ></span>
+                            </div>
+                            <div
+                                class="card-phone"
+                                x-text="o.customer_name ? o.customer_name + ' · ' + o.phone : o.phone"
+                            ></div>
+                            <div class="card-items">
+                                <template
+                                    x-for="item in o.items"
+                                    :key="item.product_name"
+                                >
+                                    <div class="card-item">
+                                        <strong
+                                            x-text="item.quantity + '×'"
+                                        ></strong>
+                                        <span x-text="item.product_name"></span>
+                                    </div>
+                                </template>
+                            </div>
+                            <div
+                                class="card-total"
+                                x-text="parseFloat(o.total).toFixed(2) + ' € · dont ' + parseFloat(o.delivery_fee).toFixed(2) + ' € livraison'"
+                            ></div>
+                            <div class="card-actions">
+                                <button
+                                    class="action-btn btn-en-route"
+                                    @click="markEnRoute(o)"
+                                >
+                                    🛵 Prendre en charge
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Vide -->
+                <div x-show="orders.length === 0" class="empty-state" x-cloak>
+                    <div class="empty-icon">🛵</div>
+                    <div>Aucune livraison assignée</div>
+                    <div style="font-size: 13px; margin-top: 6px; color: #555">
+                        Les nouvelles commandes apparaîtront ici
+                    </div>
+                </div>
+            </div>
         </div>
-      </template>
-    </div>
 
-    <!-- Vide -->
-    <div x-show="orders.length === 0" class="empty-state" x-cloak>
-      <div class="empty-icon">🛵</div>
-      <div>Aucune livraison assignée</div>
-      <div style="font-size:13px;margin-top:6px;color:#555;">Les nouvelles commandes apparaîtront ici</div>
-    </div>
+        <!-- TOAST -->
+        <div
+            x-show="showToast"
+            x-cloak
+            class="toast"
+            x-text="toastMessage"
+        ></div>
 
-  </div>
-</div>
+        <!-- SOUND MODAL -->
+        <div class="modal-overlay" x-show="showSoundModal" x-cloak>
+            <div class="modal-box">
+                <div style="font-size: 52px; margin-bottom: 16px">🔔</div>
+                <div
+                    style="
+                        font-size: 18px;
+                        font-weight: 800;
+                        margin-bottom: 10px;
+                    "
+                >
+                    Activer les notifications sonores
+                </div>
+                <div style="font-size: 14px; color: #888; margin-bottom: 24px">
+                    Les nouvelles livraisons assignées seront signalées par un
+                    son.<br />Cliquez
+                    <strong style="color: #f0f0f0">OK</strong> pour activer.
+                </div>
+                <button class="btn-red" @click="confirmSoundUnlock()">
+                    OK, activer le son
+                </button>
+            </div>
+        </div>
 
-<script src="/assets/js/api.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
-<script>
-function deliveryApp() {
-  return {
-    authed: false,
-    DIAL_CODES: ['+594','+596','+590','+262','+33','+32','+41','+1'],
-    dialCode: '+594', phoneRaw: '',
-    password: '', loginError: '', loading: false,
-    driverName: '',
-    orders: [],
-    polling: false,
-    timer: null,
+        <script src="/assets/js/api.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"
+            defer
+        ></script>
+        <script>
+            function deliveryApp() {
+                return {
+                    authed: false,
+                    DIAL_CODES: [
+                        "+594",
+                        "+596",
+                        "+590",
+                        "+262",
+                        "+33",
+                        "+32",
+                        "+41",
+                        "+1",
+                    ],
+                    dialCode: "+594",
+                    phoneRaw: "",
+                    password: "",
+                    loginError: "",
+                    loading: false,
+                    driverName: "",
+                    orders: [],
+                    polling: false,
+                    timer: null,
+                    knownIds: new Set(),
 
-    get ready()   { return this.orders.filter(o => o.status === 'ready'); },
-    get enRoute() { return this.orders.filter(o => o.status === 'en_route'); },
+                    // Audio / notifications
+                    audioUnlocked: false,
+                    showSoundModal: false,
+                    showToast: false,
+                    toastMessage: "",
+                    toastTimer: null,
 
-    async init() {
-      const token = localStorage.getItem('auth_token');
-      const user  = JSON.parse(localStorage.getItem('auth_user') || 'null');
-      if (token && (user?.role === 'delivery' || user?.role === 'admin')) {
-        this.authed    = true;
-        this.driverName = user.name || user.phone;
-        await this.loadOrders();
-        this.startPolling();
-      }
-    },
+                    get ready() {
+                        return this.orders.filter((o) => o.status === "ready");
+                    },
+                    get enRoute() {
+                        return this.orders.filter(
+                            (o) => o.status === "en_route",
+                        );
+                    },
 
-    async doLogin() {
-      this.loginError = '';
-      this.loading    = true;
-      try {
-        const phone = this.dialCode + this.phoneRaw.trim().replace(/^0+/, '');
-        const res = await api.login({ phone, password: this.password });
-        if (res.user.role !== 'delivery' && res.user.role !== 'admin') {
-          throw new Error('Accès réservé aux livreurs.');
-        }
-        localStorage.setItem('auth_token', res.token);
-        localStorage.setItem('auth_user', JSON.stringify(res.user));
-        this.authed     = true;
-        this.driverName = res.user.name || res.user.phone;
-        await this.loadOrders();
-        this.startPolling();
-      } catch (e) {
-        this.loginError = e.message;
-      } finally {
-        this.loading = false;
-      }
-    },
+                    async init() {
+                        const token = localStorage.getItem("auth_token");
+                        const user = JSON.parse(
+                            localStorage.getItem("auth_user") || "null",
+                        );
+                        if (
+                            token &&
+                            (user?.role === "delivery" ||
+                                user?.role === "admin")
+                        ) {
+                            this.authed = true;
+                            this.driverName = user.name || user.phone;
+                            await this.loadOrders();
+                            this.knownIds = new Set(
+                                this.orders.map((o) => o.id),
+                            );
+                            this.startPolling();
+                            this.checkAudioAndShowModal();
+                        }
+                    },
 
-    doLogout() {
-      clearInterval(this.timer);
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
-      this.authed = false;
-    },
+                    async doLogin() {
+                        this.loginError = "";
+                        this.loading = true;
+                        try {
+                            const phone =
+                                this.dialCode +
+                                this.phoneRaw.trim().replace(/^0+/, "");
+                            const res = await api.login({
+                                phone,
+                                password: this.password,
+                            });
+                            if (
+                                res.user.role !== "delivery" &&
+                                res.user.role !== "admin"
+                            ) {
+                                throw new Error("Accès réservé aux livreurs.");
+                            }
+                            localStorage.setItem("auth_token", res.token);
+                            localStorage.setItem(
+                                "auth_user",
+                                JSON.stringify(res.user),
+                            );
+                            this.authed = true;
+                            this.driverName = res.user.name || res.user.phone;
+                            await this.loadOrders();
+                            this.knownIds = new Set(
+                                this.orders.map((o) => o.id),
+                            );
+                            this.startPolling();
+                            this.checkAudioAndShowModal();
+                        } catch (e) {
+                            this.loginError = e.message;
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
 
-    startPolling() {
-      this.polling = true;
-      this.timer   = setInterval(() => this.loadOrders(), 30000);
-    },
+                    doLogout() {
+                        clearInterval(this.timer);
+                        localStorage.removeItem("auth_token");
+                        localStorage.removeItem("auth_user");
+                        this.authed = false;
+                    },
 
-    async loadOrders() {
-      try {
-        this.orders = await apiFetch('/delivery/orders');
-      } catch (e) {
-        console.error('Erreur chargement:', e);
-      }
-    },
+                    startPolling() {
+                        this.polling = true;
+                        this.timer = setInterval(
+                            () => this.checkNewOrders(),
+                            30000,
+                        );
+                    },
 
-    async markEnRoute(o) {
-      try {
-        await apiFetch('/delivery/orders/' + o.id, {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'en_route' }),
-        });
-        o.status = 'en_route';
-      } catch (e) { alert(e.message); }
-    },
+                    async checkNewOrders() {
+                        const oldIds = new Set(this.knownIds);
+                        await this.loadOrders();
+                        const newOrders = this.orders.filter(
+                            (o) => o.status === "ready" && !oldIds.has(o.id),
+                        );
+                        this.knownIds = new Set(this.orders.map((o) => o.id));
+                        if (newOrders.length > 0) {
+                            this.playNotificationSound();
+                            this.showToastMsg(
+                                `🛵 ${newOrders.length} nouvelle(s) livraison(s) à récupérer !`,
+                            );
+                            if (typeof Notification !== "undefined") {
+                                if (Notification.permission === "granted") {
+                                    try {
+                                        new Notification(
+                                            "🛵 Nouvelle livraison !",
+                                            {
+                                                body: `${newOrders.length} commande(s) prête(s) à récupérer`,
+                                                icon: "/assets/img/logo.png",
+                                            },
+                                        );
+                                    } catch (e) {}
+                                } else if (
+                                    Notification.permission === "default"
+                                ) {
+                                    Notification.requestPermission();
+                                }
+                            }
+                        }
+                    },
 
-    async markDelivered(o) {
-      if (!confirm('Confirmer la livraison de la commande #' + o.id + ' ?')) return;
-      try {
-        await apiFetch('/delivery/orders/' + o.id, {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'delivered' }),
-        });
-        this.orders = this.orders.filter(x => x.id !== o.id);
-      } catch (e) { alert(e.message); }
-    },
-  };
-}
-</script>
-</body>
+                    showToastMsg(msg) {
+                        this.toastMessage = msg;
+                        this.showToast = true;
+                        clearTimeout(this.toastTimer);
+                        this.toastTimer = setTimeout(() => {
+                            this.showToast = false;
+                        }, 5000);
+                    },
+
+                    checkAudioAndShowModal() {
+                        if (this.audioUnlocked) return;
+                        try {
+                            const ctx = new (
+                                window.AudioContext || window.webkitAudioContext
+                            )();
+                            if (ctx.state === "suspended") {
+                                ctx.close();
+                                this.showSoundModal = true;
+                            } else {
+                                ctx.close();
+                                this.audioUnlocked = true;
+                            }
+                        } catch (e) {
+                            this.showSoundModal = true;
+                        }
+                    },
+
+                    confirmSoundUnlock() {
+                        this.unlockAudio();
+                        this.showSoundModal = false;
+                    },
+
+                    unlockAudio() {
+                        if (this.audioUnlocked) return;
+                        try {
+                            const ctx = new (
+                                window.AudioContext || window.webkitAudioContext
+                            )();
+                            const buf = ctx.createBuffer(1, 1, 22050);
+                            const src = ctx.createBufferSource();
+                            src.buffer = buf;
+                            src.connect(ctx.destination);
+                            src.start(0);
+                            ctx.close();
+                        } catch (e) {}
+                        this.audioUnlocked = true;
+                    },
+
+                    playNotificationSound() {
+                        if (!this.audioUnlocked) return;
+                        try {
+                            const audio = new Audio(
+                                "/assets/sounds/notification.wav",
+                            );
+                            audio.volume = 1.0;
+                            const p = audio.play();
+                            if (p)
+                                p.catch((e) =>
+                                    console.warn("Audio bloqué :", e.message),
+                                );
+                        } catch (e) {
+                            console.warn("Erreur audio :", e.message);
+                        }
+                    },
+
+                    async loadOrders() {
+                        try {
+                            this.orders = await apiFetch("/delivery/orders");
+                        } catch (e) {
+                            console.error("Erreur chargement:", e);
+                        }
+                    },
+
+                    async markEnRoute(o) {
+                        try {
+                            await apiFetch("/delivery/orders/" + o.id, {
+                                method: "PATCH",
+                                body: JSON.stringify({ status: "en_route" }),
+                            });
+                            o.status = "en_route";
+                        } catch (e) {
+                            alert(e.message);
+                        }
+                    },
+
+                    async markDelivered(o) {
+                        if (
+                            !confirm(
+                                "Confirmer la livraison de la commande #" +
+                                    o.id +
+                                    " ?",
+                            )
+                        )
+                            return;
+                        try {
+                            await apiFetch("/delivery/orders/" + o.id, {
+                                method: "PATCH",
+                                body: JSON.stringify({ status: "delivered" }),
+                            });
+                            this.orders = this.orders.filter(
+                                (x) => x.id !== o.id,
+                            );
+                        } catch (e) {
+                            alert(e.message);
+                        }
+                    },
+                };
+            }
+        </script>
+    </body>
 </html>

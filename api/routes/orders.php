@@ -13,17 +13,7 @@ if ($method === 'GET' && $uri === '/orders/mine') {
     json_success($stmt->fetchAll());
 }
 
-// PATCH /api/orders/{token}/confirm — passer de pending à received
-if ($method === 'PATCH' && preg_match('#^/orders/([a-f0-9\-]{32,64})/confirm$#', $uri, $m)) {
-    $token = $m[1];
-    $stmt = db()->prepare(
-        "UPDATE orders SET status='received' WHERE tracking_token=? AND status='pending'"
-    );
-    $stmt->execute([$token]);
-    json_success(['confirmed' => true]);
-}
-
-// PATCH /api/orders/{token}/name — enregistrer le prénom (facultatif)
+// PATCH /api/orders/{token}/name — enregistrer le prénom (facultatif, appelé après paiement)
 if ($method === 'PATCH' && preg_match('#^/orders/([a-f0-9\-]{32,64})/name$#', $uri, $m)) {
     $token = $m[1];
     $name  = trim($body['customer_name'] ?? '');
@@ -45,7 +35,15 @@ if ($method === 'GET' && preg_match('#^/orders/([a-f0-9\-]{32,64})$#', $uri, $m)
     $stmt->execute([$token]);
     $order = $stmt->fetch();
 
-    if (!$order) json_error('Commande introuvable', 404);
+    if (!$order) {
+        // Peut-être que le paiement n'est pas encore confirmé par le webhook
+        $pi_check = db()->prepare('SELECT order_token FROM pending_intents WHERE order_token = ? LIMIT 1');
+        $pi_check->execute([$token]);
+        if ($pi_check->fetch()) {
+            json_error('Paiement en cours de confirmation…', 202);
+        }
+        json_error('Commande introuvable', 404);
+    }
 
     // Lien de suivi expiré 7 jours après livraison ou annulation
     $terminal = ['delivered', 'cancelled'];
@@ -65,12 +63,10 @@ if ($method === 'GET' && preg_match('#^/orders/([a-f0-9\-]{32,64})$#', $uri, $m)
     $stmt2->execute([$order['id']]);
     $items = $stmt2->fetchAll();
 
-    // Résoudre les IDs d'options en noms
     $items_out = [];
     foreach ($items as $r) {
         $raw_opts = json_decode($r['options_json'] ?? '[]', true) ?? [];
-        // Normaliser : accepte soit des IDs entiers, soit des objets {id:...}
-        $opt_ids = array_values(array_filter(array_map(
+        $opt_ids  = array_values(array_filter(array_map(
             fn($o) => is_array($o) ? (int)($o['id'] ?? 0) : (int)$o,
             $raw_opts
         )));

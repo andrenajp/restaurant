@@ -1493,17 +1493,17 @@
 
                     async finalizeOrder() {
                         if (this.pendingOrderToken) {
-                            await fetch(
-                                "/api/orders/" +
-                                    this.pendingOrderToken +
-                                    "/confirm",
-                                {
-                                    method: "PATCH",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                },
-                            ).catch(() => {});
+                            // await fetch(
+                            //     "/api/orders/" +
+                            //         this.pendingOrderToken +
+                            //         "/confirm",
+                            //     {
+                            //         method: "PATCH",
+                            //         headers: {
+                            //             "Content-Type": "application/json",
+                            //         },
+                            //     },
+                            // ).catch(() => {});
 
                             const name = this.customerName.trim();
                             if (name) {
@@ -1566,5 +1566,6 @@
                 };
             }
         </script>
+        <script src="/assets/js/pwa-install.js" defer></script>
     </body>
 </html>

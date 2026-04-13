@@ -64,7 +64,7 @@ if ($uri === '/settings' && $method === 'GET') {
 // Routes admin (préfixe /admin)
 elseif (str_starts_with($uri, '/admin')) {
     require_once __DIR__ . '/middleware/Auth.php';
-    auth_require_role(['admin', 'kitchen']);
+    auth_require_role(['admin']);
     $admin_uri = preg_replace('#^/admin#', '', $uri);
     if ($admin_uri === '/orders/drivers' && $method === 'GET') require __DIR__ . '/routes/admin/orders.php';
     elseif (str_starts_with($admin_uri, '/orders'))    require __DIR__ . '/routes/admin/orders.php';
@@ -76,7 +76,19 @@ elseif (str_starts_with($uri, '/admin')) {
     elseif ($admin_uri === '/upload') require __DIR__ . '/routes/admin/upload.php';
     elseif ($admin_uri === '/stats') require __DIR__ . '/routes/admin/stats.php';
     elseif (str_starts_with($admin_uri, '/users')) require __DIR__ . '/routes/admin/users.php';
-    else json_error('Route admin non trouvée', 404);
+    elseif (preg_match('#/admin/users/(\d+)/reset-password$#', $uri) && $method === 'POST') {
+        require __DIR__ . '/routes/admin/users_reset.php';
+    }
+    // Routes admin opening hours
+    elseif ($admin_uri === '/opening-hours' && $method === 'GET') {
+        require __DIR__ . '/routes/admin/opening_hours.php';
+    } elseif ($admin_uri === '/opening-hours' && $method === 'PUT') {
+        require __DIR__ . '/routes/admin/opening_hours.php';
+    }
+    // Routes admin logs
+    elseif ($admin_uri === '/logs' && $method === 'GET') {
+        require __DIR__ . '/routes/admin/logs.php';
+    } else json_error('Route admin non trouvée', 404);
 }
 // Routes livreur
 elseif (str_starts_with($uri, '/delivery/orders')) {
