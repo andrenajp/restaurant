@@ -1,22 +1,35 @@
 RewriteEngine On
+Options -Indexes
 
-# API (toutes les routes API, y compris les nouvelles /admin/users/*/password, etc.)
+# ==================== REDIRECT .html → route propre ====================
+RewriteRule ^account\.html$ /account [R=301,L]
+RewriteRule ^admin\.html$ /admin [R=301,L]
+RewriteRule ^delivery\.html$ /delivery [R=301,L]
+RewriteRule ^kitchen\.html$ /kitchen [R=301,L]
+RewriteRule ^track\.html$ /track [R=301,L]
+
+# ==================== API ====================
 RewriteRule ^api(/.*)?$ api/index.php [QSA,L]
 
-# Routes HTML spécifiques
+# ==================== FAVICON ====================
+RewriteCond %{REQUEST_URI} ^/favicon\.ico$
+RewriteRule ^ /public/favicon.ico [L]
+
+# ==================== ROBOTS.TXT ====================
+RewriteCond %{REQUEST_URI} ^/robots\.txt$
+RewriteRule ^ /public/robots.txt [L]
+
+# ==================== ASSETS STATIQUES ====================
+RewriteRule ^(assets/.+)$ public/$1 [L]
+
+# ==================== PAGES HTML ====================
+RewriteRule ^track.*$ public/track.html [L]
 RewriteRule ^account$ public/account.html [L]
-RewriteRule ^admin$ public/admin.html [L]          # ← Votre admin
+RewriteRule ^admin$ public/admin.html [L]
 RewriteRule ^delivery$ public/delivery.html [L]
 RewriteRule ^kitchen$ public/kitchen.html [L]
-RewriteRule ^track$ public/track.html [L]
 
-# Assets statiques
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(assets/.+|manifest\.json|sw\.js|.*\.html)$ public/$1 [L]
-
-# SPA fallback pour les autres routes
-RewriteRule ^$ public/index.html [L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+# ==================== SPA FALLBACK ====================
+RewriteRule ^manifest\.json$ public/manifest.json [L]
+RewriteRule ^sw\.js$ public/sw.js [L]
 RewriteRule ^(.*)$ public/index.html [L]

@@ -28,6 +28,7 @@ if ($method === 'POST') {
 
 if ($method === 'PUT' && $product_id) {
     validate_required($body, ['name', 'price']);
+    validate_required($body, ['name', 'price']);
     validate_lengths($body, ['name' => 150, 'description' => 500, 'image_url' => 500]);
     $stmt = db()->prepare(
         'UPDATE products SET category_id=?, name=?, description=?, price=?, image_url=?, is_available=?, sort_order=? WHERE id=?'
@@ -43,6 +44,26 @@ if ($method === 'PUT' && $product_id) {
         $product_id,
     ]);
     json_success(['updated' => true]);
+}
+
+if ($method === 'PATCH' && $product_id) {
+    try {
+        validate_required($body, ['category_id']);
+
+        $stmt = db()->prepare(
+            'UPDATE products SET category_id = ? WHERE id = ?'
+        );
+
+        $stmt->execute([
+            (int) $body['category_id'],
+            (int) $product_id
+        ]);
+
+        json_success(['updated' => true]);
+
+    } catch (Exception $e) {
+        return "erreur " . $e->getMessage();
+    }
 }
 
 if ($method === 'DELETE' && $product_id) {

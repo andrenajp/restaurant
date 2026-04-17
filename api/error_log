@@ -1,0 +1,590 @@
+[14-Apr-2026 05:52:41 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:2 role:kitchen
+[14-Apr-2026 05:52:51 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 11:49:45 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 11:50:02 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 11:50:08 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 11:51:53 UTC] [AUTH] Login échoué - IP:41.74.208.5 phone:+3360000000
+[14-Apr-2026 11:52:18 UTC] [AUTH] Login échoué - IP:41.74.208.5 phone:+3360000000
+[14-Apr-2026 12:02:31 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:02:37 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:02:38 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:02:42 UTC] [AUTH] Login échoué - IP:41.74.208.5 phone:+3360000000
+[14-Apr-2026 12:03:05 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:16:15 UTC] [AUTH] Login échoué - IP:41.74.208.5 phone:+3360000000
+[14-Apr-2026 12:16:19 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:17:37 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:18:07 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:18:14 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:18:16 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:18:20 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:18:23 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:18:33 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:19:09 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:19:39 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:20:26 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:20:33 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:20:46 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:21:02 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:21:25 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:22:05 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:22:26 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 12:44:18 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 14:25:59 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 14:26:10 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 14:26:12 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 14:26:54 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:2 role:kitchen
+[14-Apr-2026 14:27:11 UTC] [AUTH] Login échoué - IP:41.74.208.5 phone:+3360000000
+[14-Apr-2026 14:27:17 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 14:27:26 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre code P.R.T : 552343 (valable 15 minutes)
+[14-Apr-2026 17:06:31 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 17:11:00 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 17:14:31 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:2 role:kitchen
+[14-Apr-2026 17:36:22 UTC] [SMS] Non configuré — message non envoyé à +594694353577 : Votre commande #18 a bien été reçue ! Suivez-la ici : http://localhost/track?token=60f739126c468354509b05d710d18959
+[14-Apr-2026 17:37:18 UTC] [SMS] Non configuré — message non envoyé à +33744976107 : Votre commande #19 a bien été reçue ! Suivez-la ici : http://localhost/track?token=26d427b66e5fac50426fd53767c93f12
+[14-Apr-2026 17:39:19 UTC] [AUTH] Login échoué - IP:92.142.9.228 phone:+33600000000
+[14-Apr-2026 17:41:08 UTC] [AUTH] Login réussi - IP:92.142.9.228 user_id:1 role:admin
+[14-Apr-2026 17:43:14 UTC] [AUTH] Login réussi - IP:88.164.115.33 user_id:1 role:admin
+[14-Apr-2026 17:44:03 UTC] [SMS] Non configuré — message non envoyé à +33744976107 : Votre commande #19 est prête ! Venez la récupérer au restaurant. Suivi : http://localhost/track?token=26d427b66e5fac50426fd53767c93f12
+[14-Apr-2026 17:44:08 UTC] [SMS] Non configuré — message non envoyé à +594694353577 : Votre commande #18 est prête ! Venez la récupérer au restaurant. Suivi : http://localhost/track?token=60f739126c468354509b05d710d18959
+[14-Apr-2026 17:46:42 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre commande #20 a bien été reçue ! Suivez-la ici : http://localhost/track?token=71add5ed8276ddae430566a5a344b715
+[14-Apr-2026 17:47:16 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre commande #20 est prête et sera bientôt prise en charge par notre livreur. Suivi : http://localhost/track?token=71add5ed8276ddae430566a5a344b715
+[14-Apr-2026 18:18:46 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:9 role:client
+[14-Apr-2026 18:19:01 UTC] [AUTH] Login réussi - IP:41.74.208.5 user_id:1 role:admin
+[14-Apr-2026 18:46:43 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.settings' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php:2
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php(2): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(39): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php on line 2
+[14-Apr-2026 18:46:43 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.settings' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php:2
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php(2): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(39): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php on line 2
+[14-Apr-2026 18:46:43 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.categories' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:6
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(6): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(41): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 6
+[14-Apr-2026 18:46:43 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.categories' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:6
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(6): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(41): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 6
+[14-Apr-2026 18:46:43 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.products' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:32
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(32): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(43): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 32
+[14-Apr-2026 18:46:43 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.products' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:32
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(32): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(43): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 32
+[14-Apr-2026 18:46:44 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.settings' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php:2
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php(2): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(39): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php on line 2
+[14-Apr-2026 18:46:44 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.categories' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:6
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(6): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(41): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 6
+[14-Apr-2026 18:46:44 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.settings' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php:2
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php(2): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(39): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php on line 2
+[14-Apr-2026 18:46:44 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.categories' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:6
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(6): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(41): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 6
+[14-Apr-2026 18:46:44 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.products' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:32
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(32): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(43): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 32
+[14-Apr-2026 18:46:44 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.products' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:32
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(32): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(43): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 32
+[14-Apr-2026 18:46:46 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.products' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:32
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(32): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(43): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 32
+[14-Apr-2026 18:46:46 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.categories' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:6
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(6): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(41): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 6
+[14-Apr-2026 18:46:46 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.settings' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php:2
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php(2): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(39): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php on line 2
+[14-Apr-2026 18:46:47 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.products' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:32
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(32): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(43): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 32
+[14-Apr-2026 18:46:47 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.categories' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:6
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(6): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(41): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 6
+[14-Apr-2026 18:46:47 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.settings' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php:2
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php(2): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(39): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php on line 2
+[14-Apr-2026 18:46:53 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.settings' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php:2
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php(2): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(39): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php on line 2
+[14-Apr-2026 18:46:53 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.settings' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php:2
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php(2): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(39): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/settings.php on line 2
+[14-Apr-2026 18:46:53 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.categories' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:6
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(6): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(41): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 6
+[14-Apr-2026 18:46:53 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.categories' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:6
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(6): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(41): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 6
+[14-Apr-2026 18:46:53 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.products' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:32
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(32): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(43): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 32
+[14-Apr-2026 18:46:53 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.products' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php:32
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php(32): PDO->query()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(43): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/menu.php on line 32
+[14-Apr-2026 20:30:24 UTC] [AUTH] Login échoué - IP:92.142.9.228 phone:+594600000000
+[14-Apr-2026 20:30:41 UTC] [AUTH] Login réussi - IP:92.142.9.228 user_id:1 role:admin
+[14-Apr-2026 20:32:13 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:32:16 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:32:18 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:32:59 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:33:01 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:33:04 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:33:07 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:33:09 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:33:12 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:33:15 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:34:31 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:34:52 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:35:55 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:36:13 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:36:16 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:36:19 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[14-Apr-2026 20:36:22 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 04:55:51 UTC] [AUTH] Login réussi - IP:41.74.211.231 user_id:1 role:admin
+[15-Apr-2026 04:56:33 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 04:56:40 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 04:56:51 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 04:57:06 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 04:57:40 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 04:57:53 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 04:58:34 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 04:59:05 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 06:24:43 UTC] [AUTH] Login échoué - IP:45.14.71.10 phone:+594600000000
+[15-Apr-2026 06:24:48 UTC] [AUTH] Login réussi - IP:45.14.71.10 user_id:1 role:admin
+[15-Apr-2026 06:24:56 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 06:25:13 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 06:28:12 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 06:28:42 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 06:28:49 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 06:29:26 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 06:33:05 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 06:33:13 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 06:37:18 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 07:07:01 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `fk_products_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 07:18:39 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`products`, CONSTRAINT `fk_products_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php:29
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php(29): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(72): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/categories.php on line 29
+[15-Apr-2026 07:19:37 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 07:20:08 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 07:22:32 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 07:23:01 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 07:24:52 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 07:30:39 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 07:30:47 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 07:32:12 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`vlvs0170_grangouapp`.`order_items`, CONSTRAINT `fk_orderitems_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE) in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:50
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(50): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 50
+[15-Apr-2026 08:01:23 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:01:23 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:01:38 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:01:38 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:01:53 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:01:53 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:02:08 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:02:08 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:02:23 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:02:23 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:02:38 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:02:38 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:02:53 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:02:53 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.orders' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:03:08 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vlvs0170_grangouapp.users' doesn't exist in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php:48
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php(48): PDO->prepare()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(70): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/orders.php on line 48
+[15-Apr-2026 08:20:48 UTC] [SMS] Non configuré — message non envoyé à +33600000070 : Votre commande #22 est prête ! Venez la récupérer au restaurant. Suivi : http://localhost/track?token=73bb783855679bd00f0dcf150d296f10
+[15-Apr-2026 08:20:50 UTC] [SMS] Non configuré — message non envoyé à +33600000070 : Votre commande #22 est en route ! Elle arrive bientôt. Suivi : http://localhost/track?token=73bb783855679bd00f0dcf150d296f10
+[15-Apr-2026 13:22:24 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY093]: Invalid parameter number in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:54
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(54): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 54
+[15-Apr-2026 13:22:44 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[HY093]: Invalid parameter number in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:54
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php(54): PDOStatement->execute()
+#1 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require('/home/vlvs0170/...')
+#2 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 54
+[15-Apr-2026 13:24:52 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "message" in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:60
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require()
+#1 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 60
+[15-Apr-2026 13:26:49 UTC] PHP Fatal error:  Uncaught Error: Cannot access protected property PDOException::$message in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php:60
+Stack trace:
+#0 /home/vlvs0170/grangouapp.totiprint.fr/api/index.php(71): require()
+#1 {main}
+  thrown in /home/vlvs0170/grangouapp.totiprint.fr/api/routes/admin/products.php on line 60
+[17-Apr-2026 05:43:53 UTC] [AUTH] Login réussi - IP:175.110.114.170 user_id:1 role:admin
+[17-Apr-2026 06:41:13 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre commande #1 a bien été reçue ! Suivez-la ici : http://localhost/track?token=4485704f580071bd3b4a166f120da252
+[17-Apr-2026 07:38:55 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre commande #2 a bien été reçue ! Suivez-la ici : http://localhost/track?token=2d304d428b1e7600acd600de26a500ac
+[17-Apr-2026 13:51:05 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre commande #3 a bien été reçue ! Suivez-la ici : http://localhost/track?token=d7a079b8af7ce0593ba828edf2ca93c4
+[17-Apr-2026 13:52:38 UTC] [AUTH] Login réussi - IP:41.74.208.33 user_id:1 role:admin
+[17-Apr-2026 13:53:45 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre commande #3 est prête ! Venez la récupérer au restaurant. Suivi : http://localhost/track?token=d7a079b8af7ce0593ba828edf2ca93c4
+[17-Apr-2026 13:55:15 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre commande #3 est en route ! Elle arrive bientôt. Suivi : http://localhost/track?token=d7a079b8af7ce0593ba828edf2ca93c4
+[17-Apr-2026 15:45:38 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre commande #4 a bien été reçue ! Suivez-la ici : http://localhost/track?token=dfa6a195dfec5948af0e2adc46e33db4
+[17-Apr-2026 16:12:20 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre commande #4 est prête et sera bientôt prise en charge par notre livreur. Suivi : http://localhost/track?token=dfa6a195dfec5948af0e2adc46e33db4
+[17-Apr-2026 16:12:22 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre commande #4 est en route ! Elle arrive bientôt. Suivi : http://localhost/track?token=dfa6a195dfec5948af0e2adc46e33db4
+[17-Apr-2026 19:36:29 UTC] [SMS] Non configuré — message non envoyé à +33600000000 : Votre commande #5 a bien été reçue ! Suivez-la ici : http://localhost/track?token=8d0e0766435b40b7b0050e66389eb32a

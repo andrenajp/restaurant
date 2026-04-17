@@ -3,136 +3,675 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Suivi commande — P.R.T</title>
+  <title>Suivi commande — [titre app]</title>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#CC0000">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/prt.css">
+
   <style>
-    body { background: #f5f5f5; font-family: 'Segoe UI', sans-serif; }
-    .order-card {
-      background: white;
-      border-radius: 16px;
-      padding: 16px;
-      margin-top: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    :root {
+      --color-primary: #CC0000;
+      --color-secondary: #ff6b35;
+      --color-confirm: #059669;
+      --bg: #fffef2;
+      --surface: #ffffff;
+      --surface2: #e5e8ff;
+      --border: rgba(255,255,255,0.08);
+      --text: #121229;
+      --text-muted: #717171;
+      --radius: 20px;
+      --radius-sm: 12px;
+      --font: 'Bricolage Grotesque', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
-    .order-card h2 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
-    .item-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
-    .item-row:last-child { border-bottom: none; }
-    .item-name { flex: 1; }
-    .item-price { font-weight: 600; white-space: nowrap; margin-left: 12px; }
-    .item-options { font-size: 12px; color: #888; margin-top: 2px; }
-    .order-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 16px; padding: 12px 0 0; margin-top: 8px; border-top: 2px solid #f0f0f0; }
-    .delivery-fee-row { display: flex; justify-content: space-between; font-size: 13px; color: #666; padding: 4px 0; }
-    .search-box { background: white; border-radius: 16px; padding: 20px; margin-top: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
-    .search-box input { border-radius: 12px; border: 2px solid #eee; padding: 12px 16px; font-size: 15px; }
-    .search-box input:focus { border-color: var(--color-primary); outline: none; box-shadow: none; }
-    .btn-track { background: var(--color-primary); color: white; border: none; border-radius: 12px; padding: 12px 24px; font-weight: 700; font-size: 15px; width: 100%; }
-    .badge-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
-    .badge-pending        { background: #fff3cd; color: #856404; }
-    .badge-received       { background: #cfe2ff; color: #0c63e4; }
-    .badge-in_preparation { background: #fff3cd; color: #856404; }
-    .badge-ready          { background: #d1e7dd; color: #0f5132; }
-    .badge-en_route       { background: #d1e7dd; color: #0f5132; }
-    .badge-delivered      { background: #059669; color: white; }
-    .badge-cancelled      { background: #f8d7da; color: #842029; }
-    .timeline-dot.active.step-delivered  { background: #059669; animation-name: pulse-green; }
-    .timeline-dot.done.step-delivered    { background: #059669; }
-    .timeline-line.done.step-delivered   { background: #059669; }
-    .timeline-label.step-delivered-done  { color: #059669; }
-    @keyframes pulse-green {
-      0%,100% { box-shadow: 0 0 0 0 rgba(5,150,105,.4); }
-      50%      { box-shadow: 0 0 0 8px rgba(5,150,105,0); }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100dvh;
+      overflow-x: hidden;
     }
-    .type-badge { display: inline-block; background: #f0f0f0; padding: 2px 10px; border-radius: 20px; font-size: 12px; margin-left: 8px; }
-    .error-msg { color: #dc3545; font-size: 14px; margin-top: 8px; }
-    .spinner-border-sm { width: 1rem; height: 1rem; }
-    .back-link { display: inline-flex; align-items: center; gap: 6px; color: white; opacity: .9; font-size: 14px; text-decoration: none; margin-bottom: 8px; }
-    .back-link:hover { opacity: 1; color: white; }
+
+    /* ── Background ambient ── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -40%;
+      left: -20%;
+      width: 80vw;
+      height: 80vw;
+      background: radial-gradient(circle, rgba(204,0,0,0.08) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Header ── */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #ffffff;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: env(safe-area-inset-top, 0) 0 0;
+      box-shadow: 0px 3px 14px -6px #00000050;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 16px;
+      flex-shrink: 0;
+      transition: background .2s, transform .15s;
+    }
+    .back-btn:hover { background: var(--surface2); transform: scale(1.05); }
+    .back-btn:active { transform: scale(.95); }
+
+    .header-title {
+      flex: 1;
+      min-width: 0;
+    }
+    .header-title .app-name {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .header-title h1 {
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-order-num {
+      font-family: var(--font-mono);
+      font-size: 30px;
+      font-weight: 600;
+      color: var(--color-primary);
+      background: rgba(204,0,0,0.12);
+      border: 1px solid rgba(204,0,0,0.25);
+      padding: 10px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    /* ── Live indicator ── */
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      display: inline-block;
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,.5); }
+      50% { opacity: .6; box-shadow: 0 0 0 5px rgba(34,197,94,0); }
+    }
+
+    /* ── Page layout ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      padding: 16px 16px 40px;
+      max-width: 480px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── Card base ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      animation: slideUp .35s cubic-bezier(.16,1,.3,1) both;
+      box-shadow: 0px 3px 14px -6px #00000050;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card:nth-child(1) { animation-delay: .05s; }
+    .card:nth-child(2) { animation-delay: .10s; }
+    .card:nth-child(3) { animation-delay: .15s; }
+    .card:nth-child(4) { animation-delay: .20s; }
+
+    /* ── Search card ── */
+    .search-card {
+      padding: 24px 20px;
+    }
+    .search-card .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      margin-bottom: 6px;
+    }
+    .search-card h2 {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .search-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .input-wrap {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .input-wrap input {
+      width: 100%;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      font-size: 15px;
+      font-family: var(--font-mono);
+      color: var(--text);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .input-wrap input::placeholder { color: #555; }
+    .input-wrap input:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(204,0,0,.12);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: var(--color-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: var(--font);
+      cursor: pointer;
+      transition: transform .15s, box-shadow .2s, opacity .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0);
+      transition: background .2s;
+    }
+    .btn-primary:hover::after { background: rgba(255,255,255,0.1); }
+    .btn-primary:active { transform: scale(.98); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .btn-confirm {
+      background: var(--color-confirm);
+    }
+
+    .error-msg {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(220,38,38,0.1);
+      border: 1px solid rgba(220,38,38,0.25);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #fca5a5;
+      margin-top: 12px;
+    }
+
+    /* ── Initial loader ── */
+    .initial-loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px;
+      gap: 16px;
+    }
+    .spinner-ring {
+      width: 44px; height: 44px;
+      border: 3px solid var(--border);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Status banner ── */
+    .status-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+    }
+    .status-banner.delivered {
+      background: rgba(5,150,105,0.12);
+      border-color: rgba(5,150,105,0.3);
+    }
+    .status-banner.cancelled {
+      background: rgba(220,38,38,0.08);
+      border-color: rgba(220,38,38,0.2);
+    }
+
+    .status-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+    .badge-pending        { background: rgba(234,179,8,0.15);  color: #fbbf24; border: 1px solid rgba(234,179,8,0.25); }
+    .badge-received       { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
+    .badge-in_preparation { background: rgba(234,179,8,0.15);  color: #fbbf24; border: 1px solid rgba(234,179,8,0.25); }
+    .badge-ready          { background: rgba(34,197,94,0.12);  color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+    .badge-en_route       { background: rgba(34,197,94,0.12);  color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+    .badge-delivered      { background: rgba(5,150,105,0.15);  color: #34d399; border: 1px solid rgba(5,150,105,0.3); }
+    .badge-cancelled      { background: rgba(220,38,38,0.12);  color: #f87171; border: 1px solid rgba(220,38,38,0.25); }
+
+    .type-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+    }
+
+    .order-date {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    /* ── Timeline ── */
+    .timeline-card h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .timeline { display: flex; flex-direction: column; }
+
+    .timeline-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .tl-icon-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .tl-dot {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      border: 2px solid var(--border);
+      background: var(--surface2);
+      color: var(--text-muted);
+      position: relative;
+      transition: all .3s ease;
+      flex-shrink: 0;
+    }
+    .tl-dot.done {
+      background: rgba(5,150,105,0.15);
+      border-color: rgba(5,150,105,0.4);
+      color: #34d399;
+    }
+    .tl-dot.done::after {
+      content: '✓';
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .tl-dot.active {
+      background: rgba(204,0,0,0.15);
+      border-color: var(--color-primary);
+      color: white;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    .tl-dot.active-delivered {
+      background: rgba(5,150,105,0.2);
+      border-color: #059669;
+      animation: pulse-green-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { box-shadow: 0 0 0 0 rgba(204,0,0,.3); }
+      50% { box-shadow: 0 0 0 8px rgba(204,0,0,0); }
+    }
+    @keyframes pulse-green-dot {
+      0%,100% { box-shadow: 0 0 0 0 rgba(5,150,105,.3); }
+      50% { box-shadow: 0 0 0 8px rgba(5,150,105,0); }
+    }
+
+    .tl-line {
+      width: 2px;
+      height: 28px;
+      margin: 4px 0;
+      background: var(--border);
+      border-radius: 2px;
+      transition: background .4s ease;
+    }
+    .tl-line.done { background: rgba(5,150,105,0.4); }
+
+    .tl-text {
+      padding-top: 6px;
+      padding-bottom: 24px;
+    }
+    .tl-text .tl-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      transition: color .3s;
+    }
+    .tl-text .tl-label.done,
+    .tl-text .tl-label.active { color: var(--text); }
+    .tl-text .tl-sub {
+      font-size: 12px;
+      color: #555;
+      margin-top: 2px;
+    }
+    .tl-text .tl-sub.active { color: var(--text-muted); }
+
+    /* last step no padding bottom */
+    .timeline-step:last-child .tl-text { padding-bottom: 0; }
+
+    /* ── Items ── */
+    .items-card h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .item-row:last-of-type { border-bottom: none; }
+
+    .item-name {
+      font-size: 14px;
+      font-weight: 500;
+      flex: 1;
+      min-width: 0;
+    }
+    .item-options {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .item-price {
+      font-size: 14px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    .subtotal-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .subtotal-row .amt { font-family: var(--font-mono); }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0 0;
+      margin-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+    .total-row .label { font-size: 15px; font-weight: 700; }
+    .total-row .amount { font-size: 18px; font-weight: 800; font-family: var(--font-mono); color: var(--color-primary); }
+
+    /* ── Special status cards ── */
+    .status-msg-card {
+      text-align: center;
+      padding: 28px 20px;
+    }
+    .status-msg-card .icon { font-size: 44px; margin-bottom: 12px; }
+    .status-msg-card h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .status-msg-card p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+    .card-en-route {
+      background: linear-gradient(135deg, rgba(204,0,0,0.12), rgba(255,107,53,0.08));
+      border-color: rgba(204,0,0,0.25);
+    }
+    .card-delivered {
+      background: linear-gradient(135deg, rgba(5,150,105,0.12), rgba(52,211,153,0.06));
+      border-color: rgba(5,150,105,0.3);
+    }
+    .card-delivered h3 { color: #34d399; }
+    .card-cancelled {
+      background: rgba(220,38,38,0.06);
+      border-color: rgba(220,38,38,0.15);
+    }
+    .card-error {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .btn-ghost {
+      display: inline-block;
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color .2s, background .2s;
+    }
+    .btn-ghost:hover { background: var(--surface2); border-color: rgba(255,255,255,0.2); }
+
+    /* ── Refresh indicator ── */
+    .refresh-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 4px 0 0;
+      font-size: 11px;
+      color: #444;
+    }
+    .refresh-bar a {
+      color: var(--color-primary);
+      text-decoration: none;
+      font-weight: 600;
+      opacity: .8;
+    }
+    .refresh-bar a:hover { opacity: 1; }
+
+    /* ── Transitions for silent polling ── */
+    .order-area {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .order-area > * { transition: opacity .3s ease; }
+    .order-area.updating > * { opacity: .7; }
+
+    /* ── Animations ── */
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    .fade-in { animation: fadeIn .3s ease both; }
+
+    /* ── Mobile spacing ── */
+    @media (max-width: 390px) {
+      .page { padding: 12px 12px 32px; }
+    }
   </style>
 </head>
 <body x-data="trackApp()" x-init="init()">
 
   <!-- Header -->
-  <div class="track-header">
-    <a href="/" class="back-link">← Retour au menu</a>
-    <h1>Suivi de commande</h1>
-    <div class="track-order-num" x-show="order" x-text="'#' + (order?.id || '')"></div>
-  </div>
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="/" class="back-btn" title="Retour">←</a>
+      <div class="header-title">
+        <div class="app-name" x-text="appName || '[titre app]'"></div>
+        <h1>Suivi de commande</h1>
+      </div>
+      
+    </div>
+  </header>
 
-  <div class="track-page">
+  <main class="page">
+      
+    <div style="display:flex;justify-content: center;align-items:center;">
+        <div class="header-order-num" x-show="order">
+            <span x-text="'#' + (order?.id || '')"></span>
+        </div>
+    </div>
 
-    <!-- Formulaire de recherche (si pas de token dans l'URL) -->
-    <div x-show="!tokenFromUrl" class="search-box">
-      <p style="font-size:14px;color:#555;margin-bottom:12px;">Entrez votre token de suivi reçu après la commande.</p>
-      <input
-        type="text"
-        class="form-control mb-3"
-        placeholder="Token de commande..."
-        x-model="searchToken"
-        @keyup.enter="loadOrder(searchToken)"
-      >
-      <button class="btn-track" @click="loadOrder(searchToken)" :disabled="loading">
-        <span x-show="loading" class="spinner-border spinner-border-sm me-2"></span>
-        Rechercher
+    <!-- Formulaire de recherche -->
+    <div x-show="!tokenFromUrl" class="card search-card" x-cloak>
+      <div class="eyebrow">Commande</div>
+      <h2>Suivre ma commande</h2>
+      <p>Entrez votre token de suivi reçu par email ou SMS après la commande.</p>
+      <div class="input-wrap">
+        <input
+          type="text"
+          placeholder="Token de commande…"
+          x-model="searchToken"
+          @keyup.enter="loadOrder(searchToken)"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        >
+      </div>
+      <button class="btn-primary" @click="loadOrder(searchToken)" :disabled="loading">
+        <span x-show="loading">Recherche…</span>
+        <span x-show="!loading">Rechercher →</span>
       </button>
-      <div x-show="errorMsg" class="error-msg" x-text="errorMsg"></div>
+      <div x-show="errorMsg" class="error-msg fade-in">
+        <span>⚠</span>
+        <span x-text="errorMsg"></span>
+      </div>
     </div>
 
-    <!-- Loader initial -->
-    <div x-show="tokenFromUrl && loading" class="text-center py-5">
-      <div class="spinner-border" style="color:var(--color-primary)"></div>
-      <p class="mt-3 text-muted">Chargement…</p>
+    <!-- Loader initial (premier chargement depuis URL) -->
+    <div x-show="tokenFromUrl && loading && !order" class="initial-loader" x-cloak>
+      <div class="spinner-ring"></div>
+      <span style="font-size:13px;color:var(--text-muted)">Chargement de votre commande…</span>
     </div>
 
-    <!-- Erreur -->
-    <div x-show="tokenFromUrl && !loading && errorMsg" class="order-card text-center">
-      <p style="font-size:32px">😕</p>
-      <p class="fw-bold" x-text="errorMsg"></p>
-      <a href="/" class="btn-track d-inline-block mt-2" style="width:auto;padding:10px 24px;text-decoration:none;">Retour au menu</a>
+    <!-- Erreur (token URL mais pas trouvé) -->
+    <div x-show="tokenFromUrl && !loading && errorMsg && !order" class="card card-error" x-cloak>
+      <div style="font-size:44px;margin-bottom:12px">😕</div>
+      <h3 style="font-size:17px;font-weight:800;margin-bottom:8px" x-text="errorMsg"></h3>
+      <a href="/" class="btn-ghost" style="margin-top:16px">← Retour au menu</a>
     </div>
 
-    <!-- Détails commande -->
+    <!-- Zone commande (silent polling — pas de spinner) -->
     <template x-if="order">
-      <div>
+      <div class="order-area" :class="silentUpdating ? 'updating' : ''">
 
-        <!-- Statut + type -->
-        <div class="order-card d-flex align-items-center justify-content-between"
-             :style="order.status === 'delivered' ? 'background:#d1fae5; border:2px solid #059669;' : ''"
-             :class="order.status === 'delivered' ? 'order-card-delivered' : ''">
-          <div>
-            <span :class="'badge-status badge-' + order.status" x-text="statusLabel(order.status)"></span>
-            <span class="type-badge" x-text="order.type === 'pickup' ? '🛍 À emporter' : '🚴 Livraison'"></span>
+        <!-- Statut header -->
+        <div class="card status-banner"
+             :class="order.status === 'delivered' ? 'delivered' : (order.status === 'cancelled' ? 'cancelled' : '')">
+          <div class="status-left">
+            <span :class="'badge badge-' + order.status" x-text="statusLabel(order.status)">
+              <span x-show="!['delivered','cancelled'].includes(order.status)" class="live-dot"></span>
+            </span>
+            <span class="type-chip" x-text="order.type === 'pickup' ? '🛍 À emporter' : '🚴 Livraison'"></span>
           </div>
-          <div style="font-size:12px;color:#999" x-text="formatDate(order.created_at)"></div>
+          <div class="order-date" x-text="formatDate(order.created_at)"></div>
         </div>
 
-        <!-- Timeline -->
-        <div class="order-card">
+        <!-- Timeline progression -->
+        <div class="card timeline-card">
           <h2>Progression</h2>
           <div class="timeline">
             <template x-for="(step, i) in steps" :key="step.key">
-              <div>
-                <div class="timeline-step">
-                  <div :class="'timeline-dot ' + stepClass(step.key) + (step.key === 'delivered' ? ' step-delivered' : '')">
-                    <span x-text="stepIcon(step.key, i)"></span>
+              <div class="timeline-step">
+                <div class="tl-icon-wrap">
+                  <div :class="'tl-dot ' + stepClass(step.key) + (step.key === 'delivered' && stepClass(step.key) === 'active' ? '-delivered' : '')"
+                       x-text="stepClass(step.key) === 'active' ? stepEmoji(step.key) : (stepClass(step.key) === 'done' ? '' : '')">
                   </div>
-                  <div>
-                    <div :class="'timeline-label' + (step.key === 'delivered' && ['active','done'].includes(stepClass(step.key)) ? ' step-delivered-done' : '')"
-                         x-text="step.label"></div>
-                    <div class="timeline-sub" x-text="stepSub(step.key)"></div>
+                  <div x-show="i < steps.length - 1"
+                       :class="'tl-line ' + (isDone(step.key) ? 'done' : '')">
                   </div>
                 </div>
-                <div x-show="i < steps.length - 1" :class="'timeline-line ' + (isDone(step.key) ? 'done' : '') + (step.key === 'delivered' ? ' step-delivered' : '')"></div>
+                <div class="tl-text">
+                  <div :class="'tl-label ' + stepClass(step.key)" x-text="step.label"></div>
+                  <div :class="'tl-sub ' + (stepClass(step.key) === 'active' ? 'active' : '')"
+                       x-text="step.sub"></div>
+                </div>
               </div>
             </template>
           </div>
         </div>
 
-        <!-- Récapitulatif items -->
-        <div class="order-card">
-          <h2>Détail de la commande</h2>
+        <!-- Détail commande -->
+        <div class="card items-card">
+          <h2>Détail commande</h2>
           <template x-for="item in order.items" :key="item.product_name + item.unit_price">
             <div class="item-row">
               <div class="item-name">
@@ -144,65 +683,72 @@
             </div>
           </template>
           <template x-if="order.delivery_fee > 0">
-            <div class="delivery-fee-row">
+            <div class="subtotal-row">
               <span>Frais de livraison</span>
-              <span x-text="order.delivery_fee.toFixed(2) + ' €'"></span>
+              <span class="amt" x-text="order.delivery_fee.toFixed(2) + ' €'"></span>
             </div>
           </template>
-          <div class="order-total">
-            <span>Total</span>
-            <span x-text="order.total.toFixed(2) + ' €'"></span>
+          <div class="total-row">
+            <span class="label">Total</span>
+            <span class="amount" x-text="order.total.toFixed(2) + ' €'"></span>
           </div>
         </div>
 
-        <!-- Bouton confirmer réception (si pickup + ready) -->
+        <!-- Pickup: confirmer récupération -->
         <template x-if="order.type === 'pickup' && order.status === 'ready'">
-          <div class="order-card text-center">
-            <p style="font-size:14px;color:#555;margin-bottom:12px;">Votre commande est prête ! Confirmez la récupération :</p>
-            <button class="btn-track" @click="confirmReceived()" :disabled="confirming">
-              <span x-show="confirming" class="spinner-border spinner-border-sm me-2"></span>
-              ✅ J'ai récupéré ma commande
+          <div class="card status-msg-card" style="border-color:rgba(34,197,94,.25)">
+            <div class="icon">✅</div>
+            <h3>Commande prête !</h3>
+            <p style="margin-bottom:20px">Votre commande vous attend. Confirmez la récupération.</p>
+            <button class="btn-primary btn-confirm" @click="confirmReceived()" :disabled="confirming">
+              <span x-show="confirming">Confirmation…</span>
+              <span x-show="!confirming">J'ai récupéré ma commande</span>
             </button>
           </div>
         </template>
 
-        <!-- Message livraison en route -->
+        <!-- En route -->
         <template x-if="order.type === 'delivery' && order.status === 'en_route'">
-          <div class="order-card text-center" style="background:var(--color-primary);color:white;">
-            <p style="font-size:32px;margin:0">🚴</p>
-            <p style="font-weight:700;margin:8px 0 0">Votre commande est en route !</p>
+          <div class="card status-msg-card card-en-route">
+            <div class="icon">🚴</div>
+            <h3>En route !</h3>
+            <p>Votre commande est en chemin. Plus que quelques minutes !</p>
           </div>
         </template>
 
-        <!-- Message commande livrée -->
+        <!-- Livrée -->
         <template x-if="order.status === 'delivered'">
-          <div class="order-card text-center" style="background:#d1fae5; border:2px solid #059669;">
-            <p style="font-size:40px;margin:0">🎉</p>
-            <p style="font-weight:700;margin:8px 0 4px;color:#064e3b">Commande récupérée / livrée !</p>
-            <p style="font-size:13px;color:#065f46">Merci pour votre confiance. Bonne dégustation !</p>
-            <a href="/" class="btn-track d-inline-block mt-2" style="width:auto;padding:10px 24px;text-decoration:none;background:#059669;">Commander à nouveau</a>
+          <div class="card status-msg-card card-delivered">
+            <div class="icon">🎉</div>
+            <h3>Commande <span x-text="order.type === 'pickup' ? 'récupérée' : 'livrée'"></span> !</h3>
+            <p style="margin-bottom:20px">Merci pour votre confiance. Bonne dégustation !</p>
+            <a href="/" class="btn-primary" style="display:block;text-decoration:none;text-align:center;background:var(--color-confirm)">
+              Commander à nouveau →
+            </a>
           </div>
         </template>
 
-        <!-- Message annulée -->
+        <!-- Annulée -->
         <template x-if="order.status === 'cancelled'">
-          <div class="order-card text-center">
-            <p style="font-size:40px;margin:0">❌</p>
-            <p style="font-weight:700;margin:8px 0 4px">Commande annulée</p>
-            <p style="font-size:13px;color:#666">Veuillez nous contacter si vous avez des questions.</p>
+          <div class="card status-msg-card card-cancelled">
+            <div class="icon">❌</div>
+            <h3>Commande annulée</h3>
+            <p>Veuillez nous contacter si vous avez des questions.</p>
           </div>
         </template>
 
-        <!-- Rafraîchissement auto -->
-        <div class="text-center mt-2 mb-4" style="font-size:12px;color:#aaa">
-          Actualisation automatique toutes les 30 secondes
-          <br><a href="#" @click.prevent="loadOrder(currentToken)" style="color:var(--color-primary)">Actualiser maintenant</a>
+        <!-- Refresh bar -->
+        <div class="refresh-bar" x-show="!['delivered','cancelled'].includes(order?.status)">
+          <span class="live-dot"></span>
+          <span>Actualisation auto toutes les 30s</span>
+          <span>·</span>
+          <a href="#" @click.prevent="silentLoad(currentToken)">Actualiser</a>
         </div>
 
       </div>
     </template>
 
-  </div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
   <script src="/assets/js/api.js"></script>
@@ -214,36 +760,31 @@
   <script>
   function trackApp() {
     return {
-      order:        null,
-      loading:      false,
-      errorMsg:     '',
-      searchToken:  '',
-      tokenFromUrl: false,
-      currentToken: '',
-      confirming:   false,
-      refreshTimer: null,
-
-      steps: [
-        { key: 'received',       label: 'Commande reçue',       sub: 'Votre commande a été enregistrée' },
-        { key: 'in_preparation', label: 'En préparation',        sub: 'Notre équipe prépare votre commande' },
-        { key: 'ready',          label: 'Prête',                 sub: 'Votre commande est prête' },
-        { key: 'en_route',       label: 'En route',              sub: 'Le livreur est en chemin' },
-        { key: 'delivered',      label: 'Livrée / Récupérée',   sub: 'Commande complétée' },
-      ],
-
-      statusOrder: ['pending','received','in_preparation','ready','en_route','delivered'],
+      order:          null,
+      loading:        false,
+      silentUpdating: false,
+      errorMsg:       '',
+      searchToken:    '',
+      tokenFromUrl:   false,
+      currentToken:   '',
+      confirming:     false,
+      refreshTimer:   null,
+      appName:        '',
 
       async init() {
-        // Appliquer le thème
+        // Appliquer le thème + récupérer le nom de l'app
         try {
           const s = await api.getSettings();
           if (s.primary_color)   document.documentElement.style.setProperty('--color-primary',   s.primary_color);
           if (s.secondary_color) document.documentElement.style.setProperty('--color-secondary', s.secondary_color);
           if (s.confirm_color)   document.documentElement.style.setProperty('--color-confirm',   s.confirm_color);
+          if (s.app_name || s.name || s.restaurant_name) {
+            this.appName = s.app_name || s.name || s.restaurant_name || '';
+            document.title = 'Suivi commande — ' + this.appName;
+          }
         } catch {}
 
-        // Lire le token depuis l'URL (?token=xxx ou /track?token=xxx)
-        const params = new URLSearchParams(window.location.search);
+        const params   = new URLSearchParams(window.location.search);
         const urlToken = params.get('token');
         if (urlToken) {
           this.tokenFromUrl = true;
@@ -252,30 +793,42 @@
         }
       },
 
+      // Chargement initial (avec spinner pleine page)
       async loadOrder(token) {
         if (!token || !token.trim()) {
           this.errorMsg = 'Veuillez entrer un token de commande.';
           return;
         }
         token = token.trim();
-        this.loading  = true;
-        this.errorMsg = '';
+        this.loading      = true;
+        this.errorMsg     = '';
         this.currentToken = token;
         try {
           this.order = await api.getOrder(token);
         } catch (e) {
           this.errorMsg = e.message || 'Commande introuvable.';
-          this.order = null;
+          this.order    = null;
         } finally {
           this.loading = false;
         }
       },
 
+      // Polling silencieux (pas de spinner, juste mise à jour des données)
+      async silentLoad(token) {
+        if (!token) return;
+        this.silentUpdating = true;
+        try {
+          const fresh = await api.getOrder(token);
+          if (fresh) this.order = fresh;
+        } catch {}
+        this.silentUpdating = false;
+      },
+
       startAutoRefresh(token) {
         if (this.refreshTimer) clearInterval(this.refreshTimer);
         this.refreshTimer = setInterval(() => {
-          if (this.order && !['delivered','cancelled'].includes(this.order.status)) {
-            this.loadOrder(token);
+          if (this.order && !['delivered', 'cancelled'].includes(this.order.status)) {
+            this.silentLoad(token);
           } else {
             clearInterval(this.refreshTimer);
           }
@@ -286,7 +839,7 @@
         this.confirming = true;
         try {
           await fetch('/api/orders/' + this.currentToken + '/confirm', { method: 'PATCH' });
-          await this.loadOrder(this.currentToken);
+          await this.silentLoad(this.currentToken);
         } catch {}
         this.confirming = false;
       },
@@ -316,15 +869,15 @@
         return '';
       },
 
-      stepIcon(key, i) {
-        const cls = this.stepClass(key);
-        if (cls === 'done')   return '✓';
-        if (cls === 'active') return ['📋','🍳','✅','🚴','🎉'][i] || '●';
-        return '';
-      },
-
-      stepSub(key) {
-        return this.steps.find(s => s.key === key)?.sub || '';
+      stepEmoji(key) {
+        const map = {
+          received:       '📋',
+          in_preparation: '🍳',
+          ready:          '✅',
+          en_route:       '🚴',
+          delivered:      '🎉',
+        };
+        return map[key] || '●';
       },
 
       isDone(key) {
@@ -333,7 +886,8 @@
         return stepIdx < currentIdx;
       },
 
-      // Filtrer les étapes selon le type de commande
+      statusOrder: ['pending','received','in_preparation','ready','en_route','delivered'],
+
       get steps() {
         if (this.order?.type === 'pickup') {
           return [

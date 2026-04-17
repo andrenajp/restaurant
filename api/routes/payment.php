@@ -98,13 +98,8 @@ $stripe_sk = env('STRIPE_SK', '');
 
 // ── Helper : INSERT dans pending_intents ─────────────────────────────────────
 $insert_pending = function (string $pi_id) use (
-    $order_token,
-    $user_id,
-    $customer_name,
-    $body,
-    $total,
-    $delivery_fee,
-    $items_validated
+    $order_token, $user_id, $customer_name,
+    $body, $total, $delivery_fee, $items_validated
 ) {
     db()->prepare('
         INSERT INTO pending_intents

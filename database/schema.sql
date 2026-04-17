@@ -1,8 +1,8 @@
--- CREATE DATABASE IF NOT EXISTS restaurant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
--- USE restaurant;
+CREATE DATABASE IF NOT EXISTS restaurant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE restaurant;
 
 -- Configuration et thème restaurant
-CREATE TABLE IF NOT EXISTS settings (
+CREATE TABLE settings (
   id INT PRIMARY KEY AUTO_INCREMENT,
   restaurant_name VARCHAR(100) NOT NULL DEFAULT 'Mon Restaurant',
   logo_url VARCHAR(255),
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS settings (
 );
 
 -- Catégories (onglets filtres)
-CREATE TABLE IF NOT EXISTS categories (
+CREATE TABLE categories (
   id INT PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(100) NOT NULL,
   emoji VARCHAR(10) DEFAULT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS categories (
 );
 
 -- Plats
-CREATE TABLE IF NOT EXISTS products (
+CREATE TABLE products (
   id INT PRIMARY KEY AUTO_INCREMENT,
   category_id INT NOT NULL,
   name VARCHAR(150) NOT NULL,
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 -- Options par plat (riz, sauces, suppléments)
-CREATE TABLE IF NOT EXISTS product_options (
+CREATE TABLE product_options (
   id INT PRIMARY KEY AUTO_INCREMENT,
   product_id INT NOT NULL,
   group_name VARCHAR(100) NOT NULL,
@@ -52,40 +52,38 @@ CREATE TABLE IF NOT EXISTS product_options (
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
--- Utilisateurs (clients optionnels + admin + cuisine + delivery)
-CREATE TABLE IF NOT EXISTS users (
+-- Utilisateurs (clients optionnels + admin + cuisine)
+CREATE TABLE users (
   id INT PRIMARY KEY AUTO_INCREMENT,
   name VARCHAR(150),
   phone VARCHAR(20) NOT NULL UNIQUE,
   email VARCHAR(150),
   password_hash VARCHAR(255) NOT NULL,
   default_address TEXT,
-  role ENUM('client','kitchen','delivery','admin') NOT NULL DEFAULT 'client',
+  role ENUM('client','kitchen','admin') NOT NULL DEFAULT 'client',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Commandes
-CREATE TABLE IF NOT EXISTS orders (
+CREATE TABLE orders (
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT,
   phone VARCHAR(20) NOT NULL,
   customer_name VARCHAR(150),
   type ENUM('pickup','delivery') NOT NULL,
   delivery_address TEXT,
-  status ENUM('pending','received','in_preparation','ready','en_route','delivered','cancelled') NOT NULL DEFAULT 'pending',
+  status ENUM('received','in_preparation','ready','en_route','delivered','cancelled') NOT NULL DEFAULT 'received',
   total DECIMAL(8,2) NOT NULL,
   delivery_fee DECIMAL(8,2) NOT NULL DEFAULT 0.00,
-  delivery_driver_id INT NULL,
   stripe_payment_id VARCHAR(100),
   tracking_token CHAR(36) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
-  FOREIGN KEY (delivery_driver_id) REFERENCES users(id) ON DELETE SET NULL
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- Lignes de commande
-CREATE TABLE IF NOT EXISTS order_items (
+CREATE TABLE order_items (
   id INT PRIMARY KEY AUTO_INCREMENT,
   order_id INT NOT NULL,
   product_id INT NOT NULL,
@@ -97,61 +95,16 @@ CREATE TABLE IF NOT EXISTS order_items (
 );
 
 -- Frais de livraison par zone
-CREATE TABLE IF NOT EXISTS delivery_fees (
+CREATE TABLE delivery_fees (
   id INT PRIMARY KEY AUTO_INCREMENT,
   zone_name VARCHAR(100) NOT NULL,
   fee DECIMAL(8,2) NOT NULL,
   is_active TINYINT(1) NOT NULL DEFAULT 1
 );
 
--- Reset password (utilisé par auth.php)
-CREATE TABLE IF NOT EXISTS password_resets (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  phone VARCHAR(20) NOT NULL,
-  code VARCHAR(10) NOT NULL,
-  expires_at DATETIME NOT NULL,
-  used TINYINT(1) NOT NULL DEFAULT 0,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_phone_code (phone, code)
-);
-
--- Logs admin
-CREATE TABLE IF NOT EXISTS admin_logs (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  admin_id INT NOT NULL,
-  action VARCHAR(100) NOT NULL,
-  target_type VARCHAR(50),
-  target_id INT,
-  details JSON,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
--- Motifs d'annulation
-CREATE TABLE IF NOT EXISTS order_cancellation_reasons (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  order_id INT NOT NULL,
-  reason VARCHAR(255) NOT NULL,
-  cancelled_by INT NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-  FOREIGN KEY (cancelled_by) REFERENCES users(id)
-);
-
--- Horaires d'ouverture
-CREATE TABLE IF NOT EXISTS opening_hours (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  day_of_week TINYINT NOT NULL,
-  open_time TIME NULL,
-  close_time TIME NULL,
-  is_closed TINYINT(1) DEFAULT 0,
-  UNIQUE KEY idx_day (day_of_week)
-);
-
 -- Données de démo
 INSERT INTO settings (restaurant_name, color_primary, color_accent, color_band_1, color_band_2, color_band_3, color_band_4, delivery_free_above, promo_banner)
-SELECT 'P.R.T', '#CC0000', '#D4A017', '#111111', '#D4A017', '#FFFFFF', '#1A7A1A', 25.00, 'Livraison offerte dès 25€'
-WHERE NOT EXISTS (SELECT 1 FROM settings);
+VALUES ('P.R.T', '#CC0000', '#D4A017', '#111111', '#D4A017', '#FFFFFF', '#1A7A1A', 25.00, 'Livraison offerte dès 25€');
 
 INSERT INTO categories (name, emoji, color, sort_order) VALUES
 ('Indien', '🍛', '#CC0000', 1),
@@ -183,12 +136,6 @@ INSERT INTO delivery_fees (zone_name, fee, is_active) VALUES
 ('Zone standard', 3.50, 1),
 ('Zone éloignée', 6.00, 1);
 
--- Insérer les horaires par défaut (ouverts tous les jours 11h-14h et 18h-22h)
-INSERT INTO opening_hours (day_of_week, open_time, close_time, is_closed) VALUES
-(0, '11:00:00', '14:00:00', 0),
-(1, '11:00:00', '14:00:00', 0),
-(2, '11:00:00', '14:00:00', 0),
-(3, '11:00:00', '14:00:00', 0),
-(4, '11:00:00', '14:00:00', 0),
-(5, '11:00:00', '14:00:00', 0),
-(6, '11:00:00', '14:00:00', 0);
+INSERT INTO users (name, phone, password_hash, role) VALUES
+('Admin', '+33600000000', '$2y$12$placeholder_hash_admin', 'admin'),
+('Cuisine', '+33600000001', '$2y$12$placeholder_hash_kitchen', 'kitchen');

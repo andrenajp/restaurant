@@ -2,73 +2,1255 @@
 <html lang="fr">
     <head>
         <meta charset="UTF-8" />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, viewport-fit=cover"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#CC0000" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta
-            name="apple-mobile-web-app-status-bar-style"
-            content="black-translucent"
-        />
-        <title>P.R.T — Restaurant</title>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <title>... — Restaurant</title>
         <link rel="manifest" href="/manifest.json" />
-        <link
-            rel="stylesheet"
-            href="/assets/vendor/bootstrap/css/bootstrap.min.css"
-        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Quattrocento&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="/assets/vendor/bootstrap/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/assets/css/styles.css" />
         <link rel="stylesheet" href="/assets/css/prt.css" />
+
+        <style>
+            /* ===== RESET & BASE ===== */
+            *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+            :root {
+                --color-primary: #CC0000;
+                --color-accent: #D4A017;
+                --color-band-1: #111111;
+                --color-band-2: #D4A017;
+                --color-band-3: #FFFFFF;
+                --color-band-4: #1A7A1A;
+                --color-bg: #F7F5F2;
+                --color-surface: #FFFFFF;
+                --color-text: #1A1A1A;
+                --color-sub: #6B6B6B;
+                --color-border: #E8E4DF;
+                --radius-sm: 10px;
+                --radius-md: 16px;
+                --radius-lg: 22px;
+                --radius-xl: 28px;
+                --shadow-sm: 0 2px 8px rgba(0,0,0,.06);
+                --shadow-md: 0 4px 20px rgba(0,0,0,.10);
+                --shadow-lg: 0 12px 40px rgba(0,0,0,.16);
+                --font-display: 'Quattrocento', sans-serif;
+                --font-body: 'DM Sans', sans-serif;
+                --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+                --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            [x-cloak] { display: none !important; }
+
+            html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+            body {
+                font-family: var(--font-body);
+                background: var(--color-bg);
+                color: var(--color-text);
+                min-height: 100dvh;
+                -webkit-font-smoothing: antialiased;
+                overflow-x: hidden;
+            }
+
+            /* ===== STICKY TOP BAR ===== */
+            .sticky-top-bar {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                background: var(--color-surface);
+                box-shadow: 0 1px 0 var(--color-border), var(--shadow-sm);
+            }
+
+            /* ===== HEADER ===== */
+            .app-header {
+                display: flex;
+                align-items: center;
+                padding: 14px 18px;
+                padding-top: calc(14px + env(safe-area-inset-top, 0px));
+                gap: 12px;
+                background: var(--color-primary);
+            }
+
+            .app-header-brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex: 1;
+            }
+
+            .app-header-logo {
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+                object-fit: cover;
+                background: rgba(255,255,255,.15);
+                flex-shrink: 0;
+            }
+
+            .app-header-name {
+                font-family: var(--font-display);
+                font-weight: 800;
+                font-size: 20px;
+                color: #fff;
+                letter-spacing: -0.3px;
+            }
+
+            .app-header-center { flex: 1; }
+
+            .app-header-action { flex-shrink: 0; }
+
+            .app-header-account {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 3px;
+                color: rgba(255,255,255,.9);
+                text-decoration: none;
+                padding: 6px 10px;
+                border-radius: var(--radius-sm);
+                transition: background .2s;
+            }
+            .app-header-account:hover { background: rgba(255,255,255,.15); }
+            .app-header-account span {
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.2px;
+            }
+
+            /* ===== SIGNATURE BANDS ===== */
+            .signature-bands {
+                display: flex;
+                height: 4px;
+            }
+            .signature-bands span {
+                flex: 1;
+                transition: background .3s;
+            }
+
+            /* ===== PROMO BANNER ===== */
+            .promo-banner {
+                padding: 9px 18px;
+                text-align: center;
+                font-size: 13px;
+                font-weight: 700;
+                color: #fff;
+                letter-spacing: 0.2px;
+                animation: shimmer 3s ease-in-out infinite;
+            }
+            @keyframes shimmer {
+                0%,100% { opacity: 1; }
+                50% { opacity: .88; }
+            }
+
+            /* ===== CATEGORY TABS ===== */
+            .category-tabs {
+                display: flex;
+                gap: 8px;
+                padding: 12px 16px;
+                overflow-x: auto;
+                scrollbar-width: none;
+                -webkit-overflow-scrolling: touch;
+                background: var(--color-surface);
+            }
+            .category-tabs::-webkit-scrollbar { display: none; }
+
+            .category-tab {
+                flex-shrink: 0;
+                background: #F0EDE8;
+                border: 1.5px solid transparent;
+                border-radius: 50px;
+                padding: 9px 16px;
+                font-family: var(--font-body);
+                font-size: 14px;
+                font-weight: 600;
+                color: var(--color-sub);
+                cursor: pointer;
+                transition: all .2s var(--ease-out);
+                white-space: nowrap;
+                line-height: 1;
+            }
+            .category-tab.active {
+                background: var(--color-primary);
+                border-color: var(--color-primary);
+                color: #fff;
+                transform: scale(1.02);
+            }
+            .category-tab:not(.active):hover {
+                background: #E8E4DE;
+                color: var(--color-text);
+            }
+
+            /* ===== PRODUCTS GRID ===== */
+            .products-grid {
+                padding: 16px 16px 100px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            @media (min-width: 768px) {
+                .products-grid {
+                    grid-template-columns: 1fr 1fr;  /* Changé : reste 2 colonnes */
+                    padding: 24px 24px 100px;
+                    gap: 16px;
+                    max-width: 960px;
+                    margin: 0 auto;
+                }
+            }
+
+            @media (min-width: 768px) {
+                .products-grid {
+                    grid-template-columns: repeat(3, 1fr);
+                    padding: 24px 24px 100px;
+                    gap: 16px;
+                    max-width: 960px;
+                    margin: 0 auto;
+                }
+            }
+
+            /* ===== PRODUCT CARD ===== */
+            .product-card {
+                background: var(--color-surface);
+                border-radius: var(--radius-lg);
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                cursor: pointer;
+                border: 1px solid var(--color-border);
+                transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
+                position: relative;
+                animation: fadeSlideUp .4s var(--ease-out) both;
+            }
+            .product-card:nth-child(1) { animation-delay: .03s; }
+            .product-card:nth-child(2) { animation-delay: .06s; }
+            .product-card:nth-child(3) { animation-delay: .09s; }
+            .product-card:nth-child(4) { animation-delay: .12s; }
+            .product-card:nth-child(5) { animation-delay: .15s; }
+            .product-card:nth-child(6) { animation-delay: .18s; }
+
+            @keyframes fadeSlideUp {
+                from { opacity: 0; transform: translateY(16px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+
+            .product-card:active {
+                transform: scale(.97);
+            }
+            @media (hover: hover) {
+                .product-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: var(--shadow-md);
+                }
+            }
+
+            .product-card > img {
+                width: 100%;
+                height: 160px;
+                object-fit: cover;
+                background: #F0EDE8;
+                transition: transform .4s var(--ease-out);
+                display: block;
+            }
+            @media (hover: hover) {
+                .product-card:hover > img { transform: scale(1.04); }
+            }
+
+            @media (min-width: 480px) {
+                .product-card > img { height: 140px; }
+            }
+
+            .product-info {
+                padding: 14px 0px 12px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .product-name {
+                /*font-family: var(--font-display);*/
+                font-size: 15px;
+                font-weight: 700;
+                color: var(--color-text);
+                line-height: 1.25;
+                margin: 0;
+            }
+
+            .product-desc {
+                font-size: 13px;
+                color: var(--color-sub);
+                line-height: 1.45;
+                margin: 0;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                flex: 1;
+            }
+
+            .product-price {
+                font-size: 16px;
+                font-weight: 800;
+                color: var(--color-primary);
+                margin: 4px 0 0;
+            }
+
+            .product-add-btn {
+                position: absolute;
+                bottom: 14px;
+                right: 14px;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background: var(--color-primary);
+                color: #fff;
+                border: none;
+                font-size: 22px;
+                font-weight: 300;
+                line-height: 1;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 3px 10px rgba(0,0,0,.2);
+                transition: transform .18s var(--ease-spring), background .18s;
+            }
+            .product-add-btn:active {
+                transform: scale(.88);
+            }
+            @media (hover: hover) {
+                .product-add-btn:hover {
+                    transform: scale(1.1);
+                    filter: brightness(1.1);
+                }
+            }
+
+            /* ===== LOADING ===== */
+            .loading-state {
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 60px 20px;
+                color: var(--color-sub);
+                font-size: 15px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 14px;
+            }
+            .loading-spinner {
+                width: 32px;
+                height: 32px;
+                border: 3px solid var(--color-border);
+                border-top-color: var(--color-primary);
+                border-radius: 50%;
+                animation: spin .7s linear infinite;
+            }
+            @keyframes spin { to { transform: rotate(360deg); } }
+
+            /* ===== CART BAR ===== */
+            .cart-bar {
+                position: fixed;
+                bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+                left: 16px;
+                right: 16px;
+                background: var(--color-primary);
+                border-radius: var(--radius-lg);
+                padding: 16px 20px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                cursor: pointer;
+                z-index: 90;
+                box-shadow: var(--shadow-lg);
+                transition: transform .2s var(--ease-spring);
+                max-width: 480px;
+                margin: 0 auto;
+            }
+            .cart-bar:active { transform: scale(.97); }
+
+            .cart-bar-count {
+                background: rgba(255,255,255,.25);
+                color: #fff;
+                font-weight: 700;
+                font-size: 13px;
+                padding: 4px 10px;
+                border-radius: 50px;
+                white-space: nowrap;
+            }
+
+            .cart-bar-label {
+                flex: 1;
+                color: #fff;
+                font-weight: 700;
+                font-size: 15px;
+                text-align: center;
+            }
+
+            .cart-bar-total {
+                color: #fff;
+                font-family: var(--font-display);
+                font-weight: 800;
+                font-size: 17px;
+            }
+
+            /* ===== CART DRAWER ===== */
+            .cart-drawer-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,.45);
+                z-index: 200;
+                backdrop-filter: blur(2px);
+                -webkit-backdrop-filter: blur(2px);
+            }
+
+            .cart-drawer {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: var(--color-surface);
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+                max-height: 92dvh;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+            }
+
+            .cart-drawer-handle {
+                width: 40px;
+                height: 4px;
+                background: #D8D4CF;
+                border-radius: 4px;
+                margin: 14px auto 4px;
+            }
+
+            .cart-drawer-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 20px 16px;
+                font-family: var(--font-display);
+                font-size: 19px;
+                font-weight: 800;
+                color: var(--color-text);
+                border-bottom: 1px solid var(--color-border);
+            }
+
+            .cart-item {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding: 16px 20px;
+                border-bottom: 1px solid var(--color-border);
+                transition: background .2s;
+            }
+
+            .cart-item-name {
+                font-weight: 700;
+                font-size: 15px;
+                color: var(--color-text);
+                line-height: 1.25;
+            }
+
+            .cart-item-options {
+                font-size: 12px;
+                color: var(--color-sub);
+                margin-top: 2px;
+            }
+
+            .cart-item-price {
+                font-family: var(--font-display);
+                font-size: 15px;
+                font-weight: 800;
+                color: var(--color-primary);
+                margin-top: 4px;
+            }
+
+            .cart-item-qty {
+                display: flex;
+                align-items: center;
+                gap: 0;
+                background: #F0EDE8;
+                border-radius: 50px;
+                padding: 4px;
+                flex-shrink: 0;
+            }
+
+            .cart-item-qty button {
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                border: none;
+                background: transparent;
+                font-size: 20px;
+                font-weight: 400;
+                line-height: 1;
+                cursor: pointer;
+                color: var(--color-text);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background .15s;
+            }
+            .cart-item-qty button:hover { background: rgba(0,0,0,.08); }
+            .cart-item-qty button:active { background: rgba(0,0,0,.14); }
+
+            .cart-item-qty span {
+                min-width: 28px;
+                text-align: center;
+                font-weight: 700;
+                font-size: 15px;
+            }
+
+            .cart-total-section {
+                padding: 16px 20px 24px;
+            }
+
+            .cart-total-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 15px;
+                padding: 6px 0;
+                color: var(--color-sub);
+            }
+            .cart-total-row.grand {
+                font-family: var(--font-display);
+                font-size: 20px;
+                font-weight: 800;
+                color: var(--color-text);
+                border-top: 1px solid var(--color-border);
+                margin-top: 8px;
+                padding-top: 14px;
+            }
+
+            /* ===== CHECKOUT BTN ===== */
+            .checkout-btn {
+                width: 100%;
+                background: var(--color-primary);
+                color: #fff;
+                border: none;
+                border-radius: var(--radius-md);
+                padding: 18px 20px;
+                font-family: var(--font-display);
+                font-size: 17px;
+                font-weight: 700;
+                cursor: pointer;
+                margin-top: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                letter-spacing: -0.2px;
+                transition: transform .18s var(--ease-spring), filter .18s;
+            }
+            .checkout-btn:active { transform: scale(.97); }
+            @media (hover: hover) {
+                .checkout-btn:hover { filter: brightness(1.08); }
+            }
+
+            /* ===== PRODUCT MODAL ===== */
+            .product-modal-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,.45);
+                z-index: 300;
+                display: flex;
+                align-items: flex-end;
+                backdrop-filter: blur(2px);
+                -webkit-backdrop-filter: blur(2px);
+            }
+
+            .product-modal {
+                background: var(--color-surface);
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+                width: 100%;
+                max-height: 92dvh;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+                padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            }
+
+            .product-modal-img {
+                width: 100%;
+                height: 240px;
+                object-fit: cover;
+                background: #F0EDE8;
+                display: block;
+            }
+
+            @media (min-width: 480px) {
+                .product-modal-img { height: 280px; }
+            }
+
+            .product-modal-body {
+                padding: 22px 22px 0;
+            }
+
+            .product-modal-name {
+                font-family: var(--font-display);
+                font-size: 24px;
+                font-weight: 800;
+                color: var(--color-text);
+                margin-bottom: 8px;
+                line-height: 1.2;
+            }
+
+            .product-modal-desc {
+                font-size: 15px;
+                color: var(--color-sub);
+                line-height: 1.55;
+                margin-bottom: 20px;
+            }
+
+            /* ===== OPTION GROUPS ===== */
+            .option-group {
+                margin-bottom: 20px;
+            }
+
+            .option-group-title {
+                font-family: var(--font-display);
+                font-size: 15px;
+                font-weight: 700;
+                color: var(--color-text);
+                margin-bottom: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-size: 12px;
+                color: var(--color-sub);
+            }
+
+            .option-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 16px;
+                border-radius: var(--radius-md);
+                border: 2px solid var(--color-border);
+                margin-bottom: 8px;
+                cursor: pointer;
+                transition: border-color .2s, background .2s, transform .15s var(--ease-spring);
+            }
+            .option-item.selected {
+                border-color: var(--color-primary);
+                background: rgba(204,0,0,.05);
+            }
+            .option-item:active { transform: scale(.98); }
+
+            .option-item-label {
+                font-size: 15px;
+                font-weight: 500;
+            }
+            .option-item-price {
+                font-size: 14px;
+                font-weight: 700;
+                color: var(--color-primary);
+            }
+
+            /* ===== QTY SELECTOR ===== */
+            .qty-selector {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0;
+                background: #F0EDE8;
+                border-radius: 50px;
+                padding: 6px;
+                width: fit-content;
+                margin: 0 auto 20px;
+            }
+
+            .qty-btn {
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                border: none;
+                background: transparent;
+                font-size: 24px;
+                font-weight: 300;
+                color: var(--color-text);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background .15s;
+            }
+            .qty-btn:hover { background: rgba(0,0,0,.08); }
+            .qty-btn:active { background: rgba(0,0,0,.14); }
+
+            .qty-value {
+                min-width: 52px;
+                text-align: center;
+                font-family: var(--font-display);
+                font-size: 22px;
+                font-weight: 800;
+            }
+
+            /* ===== CHECKOUT MODAL ===== */
+            .checkout-modal-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,.5);
+                z-index: 400;
+                display: flex;
+                align-items: flex-end;
+                backdrop-filter: blur(3px);
+                -webkit-backdrop-filter: blur(3px);
+            }
+
+            .checkout-modal {
+                background: var(--color-bg);
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+                width: 100%;
+                max-height: 96dvh;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+            }
+
+            .checkout-modal-header {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding: 18px 20px 16px;
+                border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            }
+
+            .checkout-modal-back {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                background: rgba(255,255,255,.25);
+                border: none;
+                color: #fff;
+                font-size: 20px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background .18s;
+                flex-shrink: 0;
+            }
+            .checkout-modal-back:hover { background: rgba(255,255,255,.35); }
+
+            .checkout-modal-header h2 {
+                font-family: var(--font-display);
+                font-size: 18px;
+                font-weight: 800;
+                color: #fff;
+                flex: 1;
+                margin: 0;
+            }
+
+            .step-indicator {
+                display: flex;
+                gap: 6px;
+                align-items: center;
+            }
+
+            .step-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: rgba(255,255,255,.35);
+                transition: all .3s var(--ease-out);
+            }
+            .step-dot.active {
+                background: #fff;
+                width: 22px;
+                border-radius: 4px;
+            }
+            .step-dot.done {
+                background: rgba(255,255,255,.75);
+            }
+
+            .checkout-steps {
+                padding: 22px 20px 28px;
+            }
+
+            /* ===== MODE CHOICE CARDS ===== */
+            .mode-choice-card {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                background: var(--color-surface);
+                border: 2px solid var(--color-border);
+                border-radius: var(--radius-lg);
+                padding: 18px 18px;
+                margin-bottom: 12px;
+                cursor: pointer;
+                transition: border-color .2s, transform .15s var(--ease-spring), box-shadow .2s;
+            }
+            .mode-choice-card:active { transform: scale(.98); }
+            @media (hover: hover) {
+                .mode-choice-card:hover {
+                    border-color: var(--color-primary);
+                    box-shadow: var(--shadow-sm);
+                }
+            }
+
+            .mode-choice-icon {
+                width: 52px;
+                height: 52px;
+                border-radius: var(--radius-md);
+                background: #F0EDE8;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                color: var(--color-primary);
+            }
+
+            .mode-choice-text { flex: 1; }
+
+            .mode-choice-title {
+                font-family: var(--font-display);
+                font-size: 16px;
+                font-weight: 700;
+                color: var(--color-text);
+                margin-bottom: 3px;
+            }
+
+            .mode-choice-sub {
+                font-size: 13px;
+                color: var(--color-sub);
+            }
+
+            .mode-choice-badge {
+                font-size: 12px;
+                font-weight: 700;
+                padding: 5px 12px;
+                border-radius: 50px;
+            }
+            .mode-choice-badge.free {
+                background: #E8F5E9;
+                color: #1B6B1B;
+            }
+
+            .mode-choice-arrow { flex-shrink: 0; }
+
+            /* ===== CHECKOUT INPUTS ===== */
+            .checkout-label {
+                display: block;
+                font-size: 13px;
+                font-weight: 700;
+                color: var(--color-sub);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 10px;
+            }
+
+            .checkout-input {
+                width: 100%;
+                background: var(--color-surface);
+                border: 2px solid var(--color-border);
+                border-radius: var(--radius-md);
+                padding: 16px 16px;
+                font-family: var(--font-body);
+                font-size: 16px;
+                color: var(--color-text);
+                margin-bottom: 12px;
+                outline: none;
+                transition: border-color .2s;
+                -webkit-appearance: none;
+            }
+            .checkout-input:focus {
+                border-color: var(--color-primary);
+            }
+
+            .checkout-phone-group {
+                display: flex;
+                gap: 10px;
+                margin-bottom: 12px;
+            }
+
+            .dial-select {
+                background: var(--color-surface);
+                border: 2px solid var(--color-border);
+                border-radius: var(--radius-md);
+                padding: 14px 12px;
+                font-family: var(--font-body);
+                font-size: 15px;
+                font-weight: 600;
+                color: var(--color-text);
+                cursor: pointer;
+                outline: none;
+                flex-shrink: 0;
+                -webkit-appearance: none;
+                transition: border-color .2s;
+            }
+            .dial-select:focus { border-color: var(--color-primary); }
+
+            .checkout-next-btn {
+                width: 100%;
+                background: var(--color-primary);
+                color: #fff;
+                border: none;
+                border-radius: var(--radius-md);
+                padding: 18px 20px;
+                font-family: var(--font-display);
+                font-size: 17px;
+                font-weight: 700;
+                cursor: pointer;
+                margin-top: 8px;
+                letter-spacing: -0.2px;
+                transition: transform .18s var(--ease-spring), filter .18s, opacity .18s;
+            }
+            .checkout-next-btn:disabled {
+                opacity: .45;
+                cursor: not-allowed;
+                transform: none;
+            }
+            .checkout-next-btn:not(:disabled):active { transform: scale(.97); }
+            @media (hover: hover) {
+                .checkout-next-btn:not(:disabled):hover { filter: brightness(1.08); }
+            }
+
+            /* ===== EMPTY STATE ===== */
+            .empty-state {
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 60px 20px;
+                color: var(--color-sub);
+                font-size: 15px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            .empty-state-icon { font-size: 40px; }
+
+            /* ===== STRIPE CARD ===== */
+            #stripe-card-element {
+                background: var(--color-surface);
+                border: 2px solid var(--color-border);
+                border-radius: var(--radius-md);
+                padding: 18px 16px;
+                margin-bottom: 12px;
+                transition: border-color .2s;
+            }
+            #stripe-card-element.StripeElement--focus { border-color: var(--color-primary); }
+
+            /* ===== RECAP SUMMARY ===== */
+            .recap-box {
+                background: var(--color-surface);
+                border-radius: var(--radius-lg);
+                padding: 18px;
+                margin-bottom: 18px;
+                border: 1px solid var(--color-border);
+            }
+            .recap-title {
+                font-family: var(--font-display);
+                font-size: 16px;
+                font-weight: 800;
+                color: var(--color-text);
+                margin-bottom: 12px;
+            }
+            .recap-row {
+                display: flex;
+                justify-content: space-between;
+                font-size: 14px;
+                padding: 4px 0;
+                color: var(--color-text);
+            }
+            .recap-total {
+                display: flex;
+                justify-content: space-between;
+                font-family: var(--font-display);
+                font-size: 18px;
+                font-weight: 800;
+                border-top: 1px solid var(--color-border);
+                margin-top: 10px;
+                padding-top: 12px;
+            }
+
+            /* ===== POST PAYMENT POPUP ===== */
+            .post-payment-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,.5);
+                z-index: 1100;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+            }
+            .post-payment-box {
+                background: var(--color-surface);
+                border-radius: var(--radius-xl);
+                padding: 32px 28px;
+                max-width: 360px;
+                width: 100%;
+                text-align: center;
+                animation: popIn .4s var(--ease-spring);
+            }
+            @keyframes popIn {
+                from { opacity: 0; transform: scale(.88); }
+                to   { opacity: 1; transform: scale(1); }
+            }
+            .post-payment-emoji { font-size: 52px; margin-bottom: 14px; display: block; }
+            .post-payment-title {
+                font-family: var(--font-display);
+                font-size: 24px;
+                font-weight: 800;
+                color: var(--color-text);
+                margin-bottom: 8px;
+            }
+            .post-payment-sub {
+                font-size: 15px;
+                color: var(--color-sub);
+                margin-bottom: 22px;
+                line-height: 1.5;
+            }
+
+            /* ===== SAVED ADDRESS CARDS ===== */
+            .saved-addr-card {
+                border: 2px solid;
+                border-radius: var(--radius-md);
+                padding: 14px 16px;
+                margin-bottom: 10px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                transition: border-color .2s, background .2s;
+            }
+
+            /* ===== PRESET BUTTONS ===== */
+            .preset-btn {
+                border: 2px solid;
+                border-radius: 50px;
+                padding: 7px 14px;
+                font-size: 13px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all .18s;
+            }
+
+            /* ===== GPS / MANUAL BUTTONS ===== */
+            .addr-action-btn {
+                flex: 1;
+                background: var(--color-surface);
+                border: 2px solid var(--color-border);
+                border-radius: var(--radius-md);
+                padding: 14px 12px;
+                font-family: var(--font-body);
+                font-size: 14px;
+                font-weight: 700;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                transition: border-color .2s, background .2s;
+            }
+            .addr-action-btn.active {
+                border-color: var(--color-primary);
+                background: rgba(204,0,0,.05);
+                color: var(--color-primary);
+            }
+
+            /* ===== STRIPE LOADING ===== */
+            .stripe-loading {
+                text-align: center;
+                padding: 24px;
+                color: var(--color-sub);
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            /* ===== SECTION HEADER (checkout step label) ===== */
+            .section-intro {
+                font-size: 15px;
+                color: var(--color-sub);
+                margin-bottom: 20px;
+                line-height: 1.5;
+            }
+
+            /* ===== SECURE BADGE ===== */
+            .secure-badge {
+                font-size: 12px;
+                color: #AAA;
+                text-align: center;
+                margin-top: 14px;
+            }
+
+            /* ===== TRANSITIONS ALPINE ===== */
+            .fade-enter { opacity: 0; }
+            .fade-enter-active { transition: opacity .2s; }
+            
+            
+            .bna-root { font-family:'DM Sans',sans-serif; padding:10px 0; width:100%; box-sizing:border-box; padding: 17px; }
+
+.bna-viewport {
+    padding=17px;
+  overflow:hidden; 
+  border-radius:16px; 
+  position:relative;
+  touch-action:pan-y; 
+  user-select:none; 
+  cursor:grab; }
+.bna-viewport.is-dragging { cursor:grabbing;padding=17px; }
+
+.bna-track { display:flex; will-change:transform; }
+
+.bna-slide {
+  flex:0 0 100%; position:relative;
+  display:flex; align-items:stretch; overflow:hidden; border-radius:16px;
+  /* mobile */
+  min-height:220px;
+  gap: 10px;
+}
+
+.bna-bg {
+  position:absolute; inset:0; background-size:cover; background-position:center;
+  transform:scale(1.06); transition:transform 7s ease;
+}
+.bna-slide.is-active .bna-bg { transform:scale(1); }
+
+.bna-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(110deg,rgba(0,0,0,.68) 0%,rgba(0,0,0,.32) 52%,rgba(0,0,0,.04) 100%);
+}
+
+.bna-inner {
+  position:relative; z-index:2; display:flex; align-items:center;
+  width:100%;
+  padding:20px 14px 46px 18px;
+  gap:12px;
+}
+
+.bna-text { flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; }
+
+.bna-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.28);
+  color:#fff; font-size:9px; font-weight:700; letter-spacing:.9px; text-transform:uppercase;
+  padding:4px 10px; border-radius:40px; width:fit-content;
+  opacity:0; transform:translateY(10px);
+  transition:opacity .4s ease, transform .5s cubic-bezier(0.16,1,0.3,1);
+}
+.bna-title {
+  font-size:clamp(18px,5vw,42px); font-weight:700; color:#fff; line-height:1.15; margin:0;
+  opacity:0; transform:translateY(13px);
+  transition:opacity .4s ease .06s, transform .5s cubic-bezier(0.16,1,0.3,1) .06s;
+}
+.bna-desc {
+  font-size:clamp(12px,1.8vw,15px); color:rgba(255,255,255,.82); line-height:1.5; margin:0;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+  opacity:0; transform:translateY(12px);
+  transition:opacity .4s ease .12s, transform .5s cubic-bezier(0.16,1,0.3,1) .12s;
+}
+.bna-cta {
+  display:inline-flex; align-items:center; gap:6px;
+  background:#fff; color:#111; border:none; border-radius:50px;
+  padding:8px 18px; font-family:'DM Sans',sans-serif;
+  font-size:clamp(12px,1.5vw,14px); font-weight:600;
+  cursor:pointer; width:fit-content; text-decoration:none;
+  opacity:0; transform:translateY(10px);
+  transition:opacity .4s ease .17s, transform .5s cubic-bezier(0.16,1,0.3,1) .17s, background .2s, gap .2s;
+}
+.bna-cta:hover { background:#efefef; gap:10px; }
+
+/* image droite */
+.bna-img-wrap {
+  flex-shrink:0;
+  width:100px; height:120px;
+  border-radius:12px; overflow:hidden;
+  box-shadow:0 6px 20px rgba(0,0,0,.4);
+  opacity:0; transform:translateX(14px) scale(.95);
+  transition:opacity .5s ease .08s, transform .6s cubic-bezier(0.16,1,0.3,1) .08s;
+}
+.bna-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; }
+
+/* animations entrée */
+.bna-slide.is-active .bna-badge,
+.bna-slide.is-active .bna-title,
+.bna-slide.is-active .bna-desc,
+.bna-slide.is-active .bna-cta  { opacity:1; transform:translateY(0); }
+.bna-slide.is-active .bna-img-wrap { opacity:1; transform:translateX(0) scale(1); }
+
+/* dots */
+.bna-dots {
+  position:absolute; bottom:13px; right:14px; z-index:10;
+  display:flex; align-items:center; gap:5px; pointer-events:all;
+}
+.bna-dot {
+  border:none; padding:0; cursor:pointer;
+  height:6px; border-radius:99px;
+  background:rgba(255,255,255,.35); width:6px;
+  transition:width .35s cubic-bezier(0.16,1,0.3,1), background .3s;
+}
+.bna-dot.active { width:24px; background:#fff; }
+.bna-dot:hover:not(.active) { background:rgba(255,255,255,.6); }
+
+/* ── tablet ≥ 600px ── */
+@media(min-width:600px){
+  .bna-slide { min-height:280px; }
+  .bna-inner { padding:28px 24px 52px 32px; gap:20px; }
+  .bna-img-wrap { width:140px; height:170px; border-radius:14px; }
+  .bna-badge { font-size:10px; }
+  .bna-cta { padding:10px 22px; }
+}
+
+/* ── desktop ≥ 960px ── */
+@media(min-width:960px){
+  .bna-slide { min-height:340px; }
+  .bna-inner { padding:40px 40px 60px 48px; gap:32px; }
+  .bna-img-wrap { width:190px; height:220px; border-radius:18px; }
+  .bna-text { gap:12px; }
+  .bna-desc { -webkit-line-clamp:4; }
+  .bna-dots { bottom:18px; right:22px; }
+  .bna-dot { height:7px; width:7px; }
+  .bna-dot.active { width:28px; }
+}
+
+/* ── large ≥ 1280px ── */
+@media(min-width:1280px){
+  .bna-slide { min-height:400px; }
+  .bna-inner { padding:52px 56px 72px 64px; gap:40px; }
+  .bna-img-wrap { width:240px; height:280px; }
+}
+
+        </style>
     </head>
     <body x-data="appData()" x-init="init()" x-cloak>
+
         <!-- ===== ZONE STICKY (header + bandes + promo + catégories) ===== -->
         <div class="sticky-top-bar">
+
             <!-- ===== HEADER ===== -->
-            <div
-                class="app-header"
-                :style="'background:' + settings.color_primary"
-            >
-                <!-- Marque : logo + nom -->
+            <div class="app-header" :style="'background:' + settings.color_primary">
                 <div class="app-header-brand">
                     <img
                         :src="settings.logo_url || '/assets/img/logo.png'"
                         class="app-header-logo"
                         alt=""
-                        onerror="this.style.display = 'none'"
+                        onerror="this.style.display='none'"
                     />
-                    <span
-                        class="app-header-name"
-                        x-text="settings.restaurant_name || 'P.R.T'"
-                    ></span>
+                    <span class="app-header-name" x-text="settings.restaurant_name || '...'"></span>
                 </div>
-                <!-- Centre vide -->
                 <div class="app-header-center"></div>
-                <!-- Compte -->
                 <div class="app-header-action">
-                    <a
-                        href="/account.html"
-                        class="app-header-account"
-                        aria-label="Mon compte"
-                    >
-                        <!-- Icône user SVG -->
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <circle cx="12" cy="8" r="4" />
-                            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+                    <a href="/account.html" class="app-header-account" aria-label="Mon compte">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="4"/>
+                            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
                         </svg>
-                        <span
-                            x-text="authUser ? (authUser.name || 'Compte') : 'Connexion'"
-                            style="font-size: 12px"
-                        ></span>
+                        <span x-text="authUser ? (authUser.name || 'Compte') : 'Connexion'"></span>
                     </a>
                 </div>
             </div>
@@ -91,11 +1273,7 @@
 
             <!-- ===== ONGLETS CATÉGORIES ===== -->
             <div class="category-tabs">
-                <button
-                    class="category-tab"
-                    :class="activeCategory===null ? 'active' : ''"
-                    @click="activeCategory=null"
-                >
+                <button class="category-tab" :class="activeCategory===null ? 'active' : ''" @click="activeCategory=null">
                     🍽️ Tout
                 </button>
                 <template x-for="cat in categories" :key="cat.id">
@@ -104,59 +1282,100 @@
                         :class="activeCategory===cat.id ? 'active' : ''"
                         @click="activeCategory=cat.id"
                     >
-                        <span
-                            x-text="(cat.emoji ? cat.emoji + ' ' : '') + cat.name"
-                        ></span>
+                        <span x-text="(cat.emoji ? cat.emoji + ' ' : '') + cat.name"></span>
                     </button>
                 </template>
             </div>
+        </div><!-- /sticky-top-bar -->
+        
+        <div class="bna-root">
+  <div class="bna-viewport" id="bnaVp">
+    <div class="bna-track" id="bnaT">
+
+      <div class="bna-slide is-active">
+        <div class="bna-bg" style="background-image:url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80')"></div>
+        <div class="bna-overlay"></div>
+        <div class="bna-inner">
+          <div class="bna-text">
+            <span class="bna-badge">✦ Édition limitée</span>
+            <h2 class="bna-title">Titre du banner d'annonce</h2>
+            <p class="bna-desc">Découvrez une expérience culinaire unique et inédite. Ne manquez pas cette occasion exclusive.</p>
+            <a href="#" class="bna-cta">Découvrir →</a>
+          </div>
+          <div class="bna-img-wrap">
+            <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80" alt=""/>
+          </div>
         </div>
-        <!-- /sticky-top-bar -->
+      </div>
+
+      <div class="bna-slide">
+        <div class="bna-bg" style="background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80')"></div>
+        <div class="bna-overlay"></div>
+        <div class="bna-inner">
+          <div class="bna-text">
+            <span class="bna-badge">🚀 Nouveauté</span>
+            <h2 class="bna-title">Innovation & Design</h2>
+            <p class="bna-desc">Découvrez notre nouvelle collection qui repousse les limites de la créativité et du goût.</p>
+            <a href="#" class="bna-cta">En savoir plus →</a>
+          </div>
+          <div class="bna-img-wrap">
+            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80" alt=""/>
+          </div>
+        </div>
+      </div>
+
+      <div class="bna-slide">
+        <div class="bna-bg" style="background-image:url('https://images.unsplash.com/photo-1466637574441-749b8f19452f?w=1200&q=80')"></div>
+        <div class="bna-overlay"></div>
+        <div class="bna-inner">
+          <div class="bna-text">
+            <span class="bna-badge">🎁 Offre spéciale</span>
+            <h2 class="bna-title">Jusqu'à &minus;30%</h2>
+            <p class="bna-desc">Profitez de notre promotion sur toute la gamme. Livraison offerte dès 50€ d'achat !</p>
+            <a href="#" class="bna-cta">J'en profite →</a>
+          </div>
+          <div class="bna-img-wrap">
+            <img src="https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=400&q=80" alt=""/>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="bna-dots" id="bnaDots"></div>
+  </div>
+</div>
 
         <!-- ===== LISTE PLATS ===== -->
-        <div class="products-grid" style="padding-bottom: 90px">
-            <div
-                x-show="loading"
-                style="text-align: center; color: #888; padding: 40px 0"
-            >
-                Chargement du menu…
+        <div class="products-grid">
+            <div class="loading-state" x-show="loading">
+                <div class="loading-spinner"></div>
+                <span>Chargement du menu…</span>
             </div>
+
             <template x-for="product in filteredProducts" :key="product.id">
                 <div class="product-card" @click="openProduct(product)">
                     <img
                         :src="product.image_url || '/assets/img/logo.png'"
                         :alt="product.name"
-                        onerror="this.src = '/assets/img/logo.png'"
+                        onerror="this.src='/assets/img/logo.png'"
+                        loading="lazy"
                     />
                     <div class="product-info">
                         <p class="product-name" x-text="product.name"></p>
-                        <p
-                            class="product-desc"
-                            x-text="product.description"
-                        ></p>
-                        <p
-                            class="product-price"
-                            x-text="parseFloat(product.price).toFixed(2) + ' €'"
-                        ></p>
+                        <p class="product-desc" x-text="product.description"></p>
+                        <p class="product-price" x-text="parseFloat(product.price).toFixed(2) + ' €'"></p>
                     </div>
-                    <button
-                        class="product-add-btn"
-                        @click.stop="quickAdd(product)"
-                    >
-                        +
+                    <button class="product-add-btn" @click.stop="quickAdd(product)" aria-label="Ajouter">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                        </svg>
                     </button>
                 </div>
             </template>
-            <div
-                x-show="!loading && filteredProducts.length === 0"
-                style="
-                    text-align: center;
-                    color: #888;
-                    padding: 40px 0;
-                    font-size: 14px;
-                "
-            >
-                Aucun plat dans cette catégorie.
+
+            <div class="empty-state" x-show="!loading && filteredProducts.length === 0">
+                <span class="empty-state-icon">🍽️</span>
+                <span>Aucun plat dans cette catégorie.</span>
             </div>
         </div>
 
@@ -165,19 +1384,16 @@
             class="cart-bar"
             x-show="$store.cart.count > 0"
             @click="cartOpen=true"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 translate-y-4"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-8"
             x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 translate-y-0"
+            x-transition:leave-end="opacity-0 translate-y-8"
         >
-            <span
-                class="cart-bar-count"
-                x-text="$store.cart.count + ' article' + ($store.cart.count>1 ? 's' : '')"
-            ></span>
+            <span class="cart-bar-count" x-text="$store.cart.count + ' article' + ($store.cart.count>1 ? 's' : '')"></span>
             <span class="cart-bar-label">Voir le panier</span>
-            <span
-                class="cart-bar-total"
-                x-text="$store.cart.subtotal.toFixed(2) + ' €'"
-            ></span>
+            <span class="cart-bar-total" x-text="$store.cart.subtotal.toFixed(2) + ' €'"></span>
         </div>
 
         <!-- ===== DRAWER PANIER ===== -->
@@ -186,65 +1402,42 @@
             x-show="cartOpen"
             x-cloak
             @click.self="cartOpen=false"
-            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter="transition ease-out duration-250"
             x-transition:enter-start="opacity-0"
             x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
         >
             <div
                 class="cart-drawer"
-                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="translate-y-full"
                 x-transition:enter-end="translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="translate-y-0"
+                x-transition:leave-end="translate-y-full"
             >
                 <div class="cart-drawer-handle"></div>
                 <div class="cart-drawer-header">
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <circle cx="9" cy="21" r="1" />
-                        <circle cx="20" cy="21" r="1" />
-                        <path
-                            d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.61L23 6H6"
-                        />
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 001.98 1.61h9.72a2 2 0 001.98-1.61L23 6H6"/>
                     </svg>
                     Votre panier
                 </div>
 
                 <template x-for="item in $store.cart.items" :key="item.key">
                     <div class="cart-item">
-                        <div style="flex: 1">
-                            <div
-                                class="cart-item-name"
-                                x-text="item.name"
-                            ></div>
-                            <div
-                                class="cart-item-options"
-                                x-text="item.options.map(o=>o.option_name).join(', ')"
-                            ></div>
-                            <div
-                                class="cart-item-price"
-                                x-text="(item.unitTotal * item.qty).toFixed(2) + ' €'"
-                            ></div>
+                        <div style="flex:1;min-width:0">
+                            <div class="cart-item-name" x-text="item.name"></div>
+                            <div class="cart-item-options" x-text="item.options.map(o=>o.option_name).join(', ')"></div>
+                            <div class="cart-item-price" x-text="(item.unitTotal * item.qty).toFixed(2) + ' €'"></div>
                         </div>
                         <div class="cart-item-qty">
-                            <button
-                                @click="$store.cart.updateQty(item.key, -1)"
-                            >
-                                −
-                            </button>
+                            <button @click="$store.cart.updateQty(item.key, -1)">−</button>
                             <span x-text="item.qty"></span>
-                            <button
-                                @click="$store.cart.updateQty(item.key, +1)"
-                            >
-                                +
-                            </button>
+                            <button @click="$store.cart.updateQty(item.key, +1)">+</button>
                         </div>
                     </div>
                 </template>
@@ -252,35 +1445,23 @@
                 <div class="cart-total-section">
                     <div class="cart-total-row">
                         <span>Sous-total</span>
-                        <span
-                            x-text="$store.cart.subtotal.toFixed(2) + ' €'"
-                        ></span>
+                        <span x-text="$store.cart.subtotal.toFixed(2) + ' €'"></span>
                     </div>
-                    <div
-                        class="cart-total-row"
-                        x-show="mode==='delivery' && deliveryFee > 0"
-                    >
+                    <div class="cart-total-row" x-show="mode==='delivery' && deliveryFee > 0">
                         <span>Frais de livraison</span>
                         <span x-text="deliveryFee.toFixed(2) + ' €'"></span>
                     </div>
-                    <div
-                        class="cart-total-row"
-                        x-show="mode==='delivery' && deliveryFee === 0 && settings.delivery_free_above > 0"
-                    >
+                    <div class="cart-total-row" x-show="mode==='delivery' && deliveryFee === 0 && settings.delivery_free_above > 0">
                         <span>Livraison</span>
-                        <span style="color: #1a7a1a; font-weight: 700"
-                            >Offerte 🎉</span
-                        >
+                        <span style="color:#1a7a1a;font-weight:800">Offerte 🎉</span>
                     </div>
                     <div class="cart-total-row grand">
                         <span>Total</span>
-                        <span x-text="grandTotal.toFixed(2) + ' €'"></span>
+                        <span x-text="grandTotal.toFixed(2) + ' €'" :style="'color:' + settings.color_primary"></span>
                     </div>
-                    <button
-                        class="checkout-btn"
-                        @click="cartOpen=false; openCheckout()"
-                    >
-                        Commander →
+                    <button class="checkout-btn" @click="cartOpen=false; openCheckout()">
+                        Commander
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </button>
                 </div>
             </div>
@@ -292,48 +1473,49 @@
             x-show="selectedProduct"
             x-cloak
             @click.self="selectedProduct=null"
+            x-transition:enter="transition ease-out duration-250"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
         >
-            <div class="product-modal">
+            <div
+                class="product-modal"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="translate-y-full"
+                x-transition:enter-end="translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="translate-y-0"
+                x-transition:leave-end="translate-y-full"
+            >
                 <img
                     class="product-modal-img"
                     :src="selectedProduct?.image_url || '/assets/img/logo.png'"
                     :alt="selectedProduct?.name"
-                    onerror="this.src = '/assets/img/logo.png'"
+                    onerror="this.src='/assets/img/logo.png'"
                 />
                 <div class="product-modal-body">
-                    <h2
-                        class="product-modal-name"
-                        x-text="selectedProduct?.name"
-                    ></h2>
-                    <p
-                        class="product-modal-desc"
-                        x-text="selectedProduct?.description"
-                    ></p>
+                    <h2 class="product-modal-name" x-text="selectedProduct?.name"></h2>
+                    <p class="product-modal-desc" x-text="selectedProduct?.description"></p>
 
                     <!-- Groupes d'options -->
                     <template x-for="group in optionGroups" :key="group.name">
                         <div class="option-group">
-                            <div
-                                class="option-group-title"
-                                x-text="group.name"
-                            ></div>
-                            <template
-                                x-for="opt in group.options"
-                                :key="opt.id"
-                            >
+                            <div class="option-group-title" x-text="group.name"></div>
+                            <template x-for="opt in group.options" :key="opt.id">
                                 <div
                                     class="option-item"
                                     :class="isOptionSelected(opt) ? 'selected' : ''"
                                     @click="toggleOption(group, opt)"
+                                    :style="isOptionSelected(opt) ? 'border-color:' + settings.color_primary + ';background:' + settings.color_primary + '10' : ''"
                                 >
-                                    <span
-                                        class="option-item-label"
-                                        x-text="opt.option_name"
-                                    ></span>
+                                    <span class="option-item-label" x-text="opt.option_name"></span>
                                     <span
                                         class="option-item-price"
                                         x-show="parseFloat(opt.extra_price) > 0"
                                         x-text="'+' + parseFloat(opt.extra_price).toFixed(2) + ' €'"
+                                        :style="'color:' + settings.color_primary"
                                     ></span>
                                 </div>
                             </template>
@@ -342,185 +1524,98 @@
 
                     <!-- Sélecteur quantité -->
                     <div class="qty-selector">
-                        <button
-                            class="qty-btn"
-                            @click="modalQty = Math.max(1, modalQty - 1)"
-                        >
-                            −
-                        </button>
+                        <button class="qty-btn" @click="modalQty = Math.max(1, modalQty - 1)">−</button>
                         <span class="qty-value" x-text="modalQty"></span>
                         <button class="qty-btn" @click="modalQty++">+</button>
                     </div>
 
-                    <button class="checkout-btn" @click="addToCart()">
-                        Ajouter au panier —
-                        <span x-text="modalTotal.toFixed(2) + ' €'"></span>
+                    <button class="checkout-btn" @click="addToCart()" :style="'background:' + settings.color_primary">
+                        Ajouter — <span x-text="modalTotal.toFixed(2) + ' €'"></span>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- ===== MODAL CHECKOUT ===== -->
-        <div class="checkout-modal-overlay" x-show="checkoutOpen" x-cloak>
-            <div class="checkout-modal">
-                <div
-                    class="checkout-modal-header"
-                    :style="'background:' + settings.color_primary"
-                >
-                    <button
-                        class="checkout-modal-back"
-                        @click="checkoutStep > 1 ? checkoutStep-- : checkoutOpen=false"
-                    >
-                        ←
+        <div class="checkout-modal-overlay" x-show="checkoutOpen" x-cloak
+            x-transition:enter="transition ease-out duration-250"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100">
+            <div class="checkout-modal"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="translate-y-full"
+                x-transition:enter-end="translate-y-0">
+
+                <div class="checkout-modal-header" :style="'background:' + settings.color_primary">
+                    <button class="checkout-modal-back" @click="checkoutStep > 1 ? checkoutStep-- : checkoutOpen=false">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
                     </button>
-                    <h2
-                        x-text="checkoutStep === 1 ? 'Votre commande' : (mode==='pickup' ? 'Récupérer sur place' : 'Livraison à domicile')"
-                    ></h2>
+                    <h2 x-text="checkoutStep === 1 ? 'Votre commande' : (mode==='pickup' ? 'Récupérer sur place' : 'Livraison à domicile')"></h2>
                     <div class="step-indicator">
-                        <template
-                            x-for="n in (mode==='pickup' ? 3 : 4)"
-                            :key="n"
-                        >
-                            <div
-                                class="step-dot"
-                                :class="n === checkoutStep ? 'active' : (n < checkoutStep ? 'done' : '')"
-                            ></div>
+                        <template x-for="n in (mode==='pickup' ? 3 : 4)" :key="n">
+                            <div class="step-dot" :class="n === checkoutStep ? 'active' : (n < checkoutStep ? 'done' : '')"></div>
                         </template>
                     </div>
                 </div>
 
                 <div class="checkout-steps">
+
                     <!-- Étape 1 : Choix du mode -->
                     <div x-show="checkoutStep === 1">
-                        <p
-                            style="
-                                font-size: 14px;
-                                color: #555;
-                                margin-bottom: 16px;
-                                line-height: 1.5;
-                            "
-                        >
-                            Comment souhaitez-vous recevoir votre commande ?
-                        </p>
+                        <p class="section-intro">Comment souhaitez-vous recevoir votre commande ?</p>
 
                         <!-- Récupérer sur place -->
-                        <div
-                            class="mode-choice-card"
-                            @click="mode='pickup'; checkoutStep=2"
-                        >
+                        <div class="mode-choice-card" @click="mode='pickup'; checkoutStep=2">
                             <div class="mode-choice-icon">
-                                <svg
-                                    width="28"
-                                    height="28"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                >
-                                    <path
-                                        d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
-                                    />
-                                    <line x1="3" y1="6" x2="21" y2="6" />
-                                    <path d="M16 10a4 4 0 01-8 0" />
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                                    <line x1="3" y1="6" x2="21" y2="6"/>
+                                    <path d="M16 10a4 4 0 01-8 0"/>
                                 </svg>
                             </div>
                             <div class="mode-choice-text">
-                                <div class="mode-choice-title">
-                                    Récupérer sur place
-                                </div>
-                                <div class="mode-choice-sub">
-                                    Venez chercher votre commande au restaurant
-                                </div>
+                                <div class="mode-choice-title">Récupérer sur place</div>
+                                <div class="mode-choice-sub">Venez chercher votre commande au restaurant</div>
                             </div>
                             <span class="mode-choice-badge free">Gratuit</span>
                         </div>
 
                         <!-- Livraison -->
-                        <div
-                            class="mode-choice-card"
-                            @click="mode='delivery'; checkoutStep=2"
-                        >
+                        <div class="mode-choice-card" @click="mode='delivery'; checkoutStep=2">
                             <div class="mode-choice-icon">
-                                <svg
-                                    width="28"
-                                    height="28"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                >
-                                    <circle cx="6" cy="17" r="2" />
-                                    <circle cx="18" cy="17" r="2" />
-                                    <path
-                                        d="M5 17H3v-5l2-2 4-4h6l2 3 3 3v5h-2"
-                                    />
-                                    <path d="M9 6l1 5H5" />
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="6" cy="17" r="2"/><circle cx="18" cy="17" r="2"/>
+                                    <path d="M5 17H3v-5l2-2 4-4h6l2 3 3 3v5h-2"/>
+                                    <path d="M9 6l1 5H5"/>
                                 </svg>
                             </div>
                             <div class="mode-choice-text">
-                                <div class="mode-choice-title">
-                                    Livraison à domicile
-                                </div>
-                                <div
-                                    class="mode-choice-sub"
-                                    x-text="settings.delivery_free_above > 0 ? 'Offerte dès ' + settings.delivery_free_above + ' €' : 'Frais calculés à la commande'"
-                                ></div>
+                                <div class="mode-choice-title">Livraison à domicile</div>
+                                <div class="mode-choice-sub" x-text="settings.delivery_free_above > 0 ? 'Offerte dès ' + settings.delivery_free_above + ' €' : 'Frais calculés à la commande'"></div>
                             </div>
-                            <svg
-                                class="mode-choice-arrow"
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="#ccc"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <polyline points="9 18 15 12 9 6" />
-                            </svg>
+                            <svg class="mode-choice-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
                         </div>
                     </div>
 
                     <!-- Étape 2 : Téléphone -->
                     <div x-show="checkoutStep === 2">
-                        <label class="checkout-label"
-                            >Votre numéro de téléphone</label
-                        >
+                        <label class="checkout-label">Votre numéro de téléphone</label>
                         <div class="checkout-phone-group">
-                            <select
-                                class="dial-select"
-                                x-model="checkoutDialCode"
-                            >
-                                <template
-                                    x-for="dc in DIAL_CODES"
-                                    :key="dc.code"
-                                >
-                                    <option
-                                        :value="dc.code"
-                                        x-text="dc.code"
-                                    ></option>
+                            <select class="dial-select" x-model="checkoutDialCode">
+                                <template x-for="dc in DIAL_CODES" :key="dc.code">
+                                    <option :value="dc.code" x-text="dc.code"></option>
                                 </template>
                             </select>
                             <input
                                 class="checkout-input"
+                                style="margin-bottom:0;flex:1"
                                 type="tel"
                                 placeholder="694000000"
                                 x-model="checkoutPhoneRaw"
                                 @keyup.enter="checkoutPhoneRaw.trim().length >= 5 && (checkoutStep=3, mode==='pickup' && initStripe())"
                             />
                         </div>
-                        <p
-                            style="
-                                font-size: 12px;
-                                color: var(--color-sub);
-                                margin-bottom: 16px;
-                            "
-                        >
+                        <p style="font-size:13px;color:var(--color-sub);margin-bottom:18px;line-height:1.5">
                             Vous recevrez un SMS de confirmation à ce numéro.
                         </p>
                         <button
@@ -534,109 +1629,46 @@
 
                     <!-- Étape 3 : Adresse (livraison uniquement) -->
                     <div x-show="checkoutStep === 3 && mode === 'delivery'">
-                        <label class="checkout-label"
-                            >Adresse de livraison</label
-                        >
+                        <label class="checkout-label">Adresse de livraison</label>
 
-                        <!-- Adresses sauvegardées (si connecté) -->
+                        <!-- Adresses sauvegardées -->
                         <template x-if="savedAddresses.length > 0">
-                            <div style="margin-bottom: 12px">
-                                <template
-                                    x-for="a in savedAddresses"
-                                    :key="a.id"
-                                >
+                            <div style="margin-bottom:14px">
+                                <template x-for="a in savedAddresses" :key="a.id">
                                     <div
+                                        class="saved-addr-card"
                                         @click="selectSavedAddress(a)"
                                         :style="selectedAddressId===a.id
-                       ? 'border-color:var(--color-primary);background:rgba(204,0,0,.07);'
-                       : 'border-color:#e0e0e0;'"
-                                        style="
-                                            border: 2px solid;
-                                            border-radius: 12px;
-                                            padding: 12px 14px;
-                                            margin-bottom: 8px;
-                                            cursor: pointer;
-                                            display: flex;
-                                            align-items: center;
-                                            gap: 10px;
-                                        "
+                                            ? 'border-color:var(--color-primary);background:rgba(204,0,0,.06)'
+                                            : 'border-color:var(--color-border)'"
                                     >
-                                        <span
-                                            style="font-size: 20px"
-                                            x-text="addrEmoji(a.label)"
-                                        ></span>
-                                        <div style="flex: 1; min-width: 0">
-                                            <div
-                                                style="
-                                                    font-weight: 700;
-                                                    font-size: 14px;
-                                                "
-                                                x-text="a.label"
-                                            ></div>
-                                            <div
-                                                style="
-                                                    font-size: 12px;
-                                                    color: #888;
-                                                    white-space: nowrap;
-                                                    overflow: hidden;
-                                                    text-overflow: ellipsis;
-                                                "
-                                                x-text="a.address"
-                                            ></div>
+                                        <span style="font-size:22px" x-text="addrEmoji(a.label)"></span>
+                                        <div style="flex:1;min-width:0">
+                                            <div style="font-weight:700;font-size:15px" x-text="a.label"></div>
+                                            <div style="font-size:13px;color:var(--color-sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" x-text="a.address"></div>
                                         </div>
-                                        <div
-                                            x-show="selectedAddressId===a.id"
-                                            style="
-                                                color: var(--color-primary);
-                                                font-size: 18px;
-                                            "
-                                        >
-                                            ✓
-                                        </div>
+                                        <div x-show="selectedAddressId===a.id" :style="'color:' + settings.color_primary + ';font-size:20px;font-weight:700'">✓</div>
                                     </div>
                                 </template>
                             </div>
                         </template>
 
-                        <!-- Boutons GPS + Nouvelle adresse -->
-                        <div
-                            style="display: flex; gap: 8px; margin-bottom: 12px"
-                        >
+                        <!-- Boutons GPS + Saisie -->
+                        <div style="display:flex;gap:10px;margin-bottom:14px">
                             <button
+                                class="addr-action-btn"
                                 @click="useGPS()"
                                 :disabled="gpsLoading"
-                                style="
-                                    flex: 1;
-                                    background: #f5f5f5;
-                                    border: 1.5px solid #ddd;
-                                    border-radius: 10px;
-                                    padding: 10px;
-                                    font-size: 13px;
-                                    font-weight: 700;
-                                    cursor: pointer;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    gap: 6px;
-                                "
+                                :class="addrMode==='gps' ? 'active' : ''"
                             >
                                 <span x-show="!gpsLoading">📍 Ma position</span>
-                                <span x-show="gpsLoading">Localisation...</span>
+                                <span x-show="gpsLoading">Localisation…</span>
                             </button>
                             <button
+                                class="addr-action-btn"
                                 @click="addrMode='manual'; selectedAddressId=null"
-                                :style="addrMode==='manual' && !selectedAddressId
-                      ? 'border-color:var(--color-primary);background:rgba(204,0,0,.07);'
-                      : 'border-color:#ddd;background:#f5f5f5;'"
-                                style="
-                                    flex: 1;
-                                    border: 1.5px solid;
-                                    border-radius: 10px;
-                                    padding: 10px;
-                                    font-size: 13px;
-                                    font-weight: 700;
-                                    cursor: pointer;
-                                "
+                                :class="addrMode==='manual' && !selectedAddressId ? 'active' : ''"
+                                :style="addrMode==='manual' && !selectedAddressId ? 'border-color:' + settings.color_primary + ';background:' + settings.color_primary + '10;color:' + settings.color_primary : ''"
                             >
                                 ✏️ Saisir
                             </button>
@@ -644,276 +1676,104 @@
 
                         <!-- Saisie manuelle -->
                         <div x-show="addrMode === 'manual'">
-                            <input
-                                class="checkout-input"
-                                type="text"
-                                placeholder="Numéro et nom de rue"
-                                x-model="checkoutAddress"
-                                @input="selectedAddressId=null"
-                            />
-                            <input
-                                class="checkout-input"
-                                type="text"
-                                placeholder="Ville"
-                                x-model="checkoutCity"
-                                @input="selectedAddressId=null"
-                            />
+                            <input class="checkout-input" type="text" placeholder="Numéro et nom de rue" x-model="checkoutAddress" @input="selectedAddressId=null"/>
+                            <input class="checkout-input" type="text" placeholder="Ville" x-model="checkoutCity" @input="selectedAddressId=null"/>
 
-                            <!-- Sauvegarder (si connecté) -->
                             <template x-if="authUser">
-                                <div style="margin-bottom: 14px">
-                                    <label
-                                        style="
-                                            display: flex;
-                                            align-items: center;
-                                            gap: 8px;
-                                            font-size: 13px;
-                                            cursor: pointer;
-                                        "
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            x-model="saveAddressCheck"
-                                            style="width: 16px; height: 16px"
-                                        />
+                                <div style="margin-bottom:16px">
+                                    <label style="display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;font-weight:500">
+                                        <input type="checkbox" x-model="saveAddressCheck" style="width:18px;height:18px;accent-color:var(--color-primary)"/>
                                         Sauvegarder cette adresse
                                     </label>
                                     <template x-if="saveAddressCheck">
-                                        <div style="margin-top: 8px">
-                                            <div
-                                                style="
-                                                    display: flex;
-                                                    gap: 6px;
-                                                    flex-wrap: wrap;
-                                                    margin-bottom: 6px;
-                                                "
-                                            >
-                                                <template
-                                                    x-for="preset in ['Maison','Travail','Famille','Autre']"
-                                                    :key="preset"
-                                                >
+                                        <div style="margin-top:12px">
+                                            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+                                                <template x-for="preset in ['Maison','Travail','Famille','Autre']" :key="preset">
                                                     <button
                                                         @click="saveAddressLabel=preset"
+                                                        class="preset-btn"
                                                         :style="saveAddressLabel===preset
-                                  ? 'background:var(--color-primary);color:white;border-color:var(--color-primary);'
-                                  : 'background:white;color:#333;border-color:#ddd;'"
-                                                        style="
-                                                            border: 1.5px solid;
-                                                            border-radius: 20px;
-                                                            padding: 4px 12px;
-                                                            font-size: 12px;
-                                                            font-weight: 700;
-                                                            cursor: pointer;
-                                                        "
+                                                            ? 'background:var(--color-primary);color:white;border-color:var(--color-primary);'
+                                                            : 'background:white;color:#333;border-color:var(--color-border);'"
                                                         x-text="preset"
                                                     ></button>
                                                 </template>
                                             </div>
-                                            <input
-                                                class="checkout-input"
-                                                type="text"
-                                                placeholder="Nom du lieu (ex: Chez mamie)"
-                                                x-model="saveAddressLabel"
-                                                style="margin-bottom: 0"
-                                            />
+                                            <input class="checkout-input" style="margin-bottom:0" type="text" placeholder="Nom du lieu (ex: Chez mamie)" x-model="saveAddressLabel"/>
                                         </div>
                                     </template>
                                 </div>
                             </template>
                         </div>
 
-                        <div
-                            x-show="addrError"
-                            style="
-                                color: #e55;
-                                font-size: 13px;
-                                margin-bottom: 8px;
-                            "
-                            x-text="addrError"
-                        ></div>
+                        <div x-show="addrError" style="color:#e55;font-size:13px;margin-bottom:10px;font-weight:600" x-text="addrError"></div>
 
-                        <button
-                            class="checkout-next-btn"
-                            :disabled="!canProceedAddress()"
-                            @click="proceedAddress()"
-                        >
+                        <button class="checkout-next-btn" :disabled="!canProceedAddress()" @click="proceedAddress()">
                             Continuer →
                         </button>
                     </div>
 
-                    <!-- Étape paiement (étape 3 pour pickup, 4 pour livraison) -->
+                    <!-- Étape paiement -->
                     <div x-show="checkoutStep === (mode==='pickup' ? 3 : 4)">
+
                         <!-- Récapitulatif -->
-                        <div
-                            style="
-                                background: white;
-                                border-radius: 14px;
-                                padding: 14px;
-                                margin-bottom: 16px;
-                            "
-                        >
-                            <div
-                                style="
-                                    font-weight: 800;
-                                    font-size: 15px;
-                                    margin-bottom: 10px;
-                                "
-                            >
-                                Récapitulatif
-                            </div>
-                            <template
-                                x-for="item in $store.cart.items"
-                                :key="item.key"
-                            >
-                                <div
-                                    style="
-                                        display: flex;
-                                        justify-content: space-between;
-                                        font-size: 13px;
-                                        padding: 3px 0;
-                                    "
-                                >
-                                    <span
-                                        x-text="item.qty + '× ' + item.name"
-                                    ></span>
-                                    <span
-                                        x-text="(item.unitTotal * item.qty).toFixed(2) + ' €'"
-                                    ></span>
+                        <div class="recap-box">
+                            <div class="recap-title">Récapitulatif</div>
+                            <template x-for="item in $store.cart.items" :key="item.key">
+                                <div class="recap-row">
+                                    <span x-text="item.qty + '× ' + item.name"></span>
+                                    <span x-text="(item.unitTotal * item.qty).toFixed(2) + ' €'"></span>
                                 </div>
                             </template>
-                            <div
-                                x-show="mode==='delivery' && deliveryFee > 0"
-                                style="
-                                    display: flex;
-                                    justify-content: space-between;
-                                    font-size: 13px;
-                                    color: #888;
-                                    padding-top: 6px;
-                                    border-top: 1px solid #f0f0f0;
-                                    margin-top: 6px;
-                                "
-                            >
+                            <div x-show="mode==='delivery' && deliveryFee > 0" class="recap-row" style="color:var(--color-sub);border-top:1px solid var(--color-border);margin-top:8px;padding-top:8px">
                                 <span>Livraison</span>
-                                <span
-                                    x-text="deliveryFee.toFixed(2) + ' €'"
-                                ></span>
+                                <span x-text="deliveryFee.toFixed(2) + ' €'"></span>
                             </div>
-                            <div
-                                style="
-                                    display: flex;
-                                    justify-content: space-between;
-                                    font-weight: 800;
-                                    font-size: 16px;
-                                    border-top: 1px solid #eee;
-                                    margin-top: 8px;
-                                    padding-top: 8px;
-                                "
-                            >
+                            <div x-show="mode==='delivery' && deliveryFee === 0 && settings.delivery_free_above > 0" class="recap-row" style="color:#1a7a1a;border-top:1px solid var(--color-border);margin-top:8px;padding-top:8px">
+                                <span>Livraison</span>
+                                <span style="font-weight:800">Offerte 🎉</span>
+                            </div>
+                            <div class="recap-total">
                                 <span>Total</span>
-                                <span
-                                    x-text="grandTotal.toFixed(2) + ' €'"
-                                    :style="'color:' + settings.color_primary"
-                                ></span>
+                                <span x-text="grandTotal.toFixed(2) + ' €'" :style="'color:' + settings.color_primary"></span>
                             </div>
                         </div>
 
                         <!-- Widget Stripe -->
-                        <div
-                            x-show="!stripeReady"
-                            style="
-                                text-align: center;
-                                padding: 20px;
-                                color: #888;
-                                font-size: 13px;
-                            "
-                        >
+                        <div class="stripe-loading" x-show="!stripeReady">
+                            <div class="loading-spinner" style="width:20px;height:20px;border-width:2px"></div>
                             Chargement du paiement…
                         </div>
-                        <div
-                            id="stripe-card-element"
-                            x-show="stripeReady"
-                        ></div>
-                        <div
-                            style="
-                                color: #cc0000;
-                                font-size: 13px;
-                                margin-bottom: 8px;
-                            "
-                            x-text="stripeError"
-                        ></div>
+                        <div id="stripe-card-element" x-show="stripeReady"></div>
+                        <div style="color:#cc0000;font-size:13px;margin-bottom:10px;font-weight:600;min-height:20px" x-text="stripeError"></div>
 
                         <button
                             class="checkout-next-btn"
                             :disabled="payLoading || !stripeReady"
                             @click="submitPayment()"
                         >
-                            <span x-show="!payLoading">
-                                Payer
-                                <span
-                                    x-text="grandTotal.toFixed(2) + ' €'"
-                                ></span>
+                            <span x-show="!payLoading">Payer — <span x-text="grandTotal.toFixed(2) + ' €'"></span></span>
+                            <span x-show="payLoading" style="display:flex;align-items:center;justify-content:center;gap:10px">
+                                <span style="width:18px;height:18px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .7s linear infinite"></span>
+                                Traitement en cours…
                             </span>
-                            <span x-show="payLoading"
-                                >Traitement en cours…</span
-                            >
                         </button>
 
-                        <p
-                            style="
-                                font-size: 11px;
-                                color: #aaa;
-                                text-align: center;
-                                margin-top: 12px;
-                            "
-                        >
-                            🔒 Paiement sécurisé par Stripe
-                        </p>
+                        <p class="secure-badge">🔒 Paiement sécurisé par Stripe</p>
                     </div>
+
                 </div>
             </div>
         </div>
 
         <!-- ===== POPUP POST-PAIEMENT ===== -->
-        <div
-            style="
-                position: fixed;
-                inset: 0;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 1100;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 16px;
-            "
-            x-show="postPaymentOpen"
-            x-cloak
-        >
-            <div
-                style="
-                    background: white;
-                    border-radius: 20px;
-                    padding: 28px 24px;
-                    max-width: 340px;
-                    width: 100%;
-                    text-align: center;
-                "
-            >
-                <div style="font-size: 48px; margin-bottom: 12px">🎉</div>
-                <h3 style="margin: 0 0 8px; font-size: 22px; font-weight: 800">
-                    Commande confirmée !
-                </h3>
-                <p style="color: #666; font-size: 14px; margin-bottom: 20px">
-                    Un SMS de confirmation va vous être envoyé.
-                </p>
-                <label class="checkout-label" style="text-align: left"
-                    >Votre prénom (facultatif)</label
-                >
-                <input
-                    class="checkout-input"
-                    type="text"
-                    placeholder="Ex: Marie"
-                    x-model="customerName"
-                />
+        <div class="post-payment-overlay" x-show="postPaymentOpen" x-cloak>
+            <div class="post-payment-box">
+                <span class="post-payment-emoji">🎉</span>
+                <h3 class="post-payment-title">Commande confirmée !</h3>
+                <p class="post-payment-sub">Un SMS de confirmation va vous être envoyé.</p>
+                <label class="checkout-label" style="text-align:left">Votre prénom (facultatif)</label>
+                <input class="checkout-input" type="text" placeholder="Ex: Marie" x-model="customerName" @keyup.enter="finalizeOrder()"/>
                 <button class="checkout-next-btn" @click="finalizeOrder()">
                     Suivre ma commande →
                 </button>
@@ -922,10 +1782,7 @@
 
         <script src="/assets/js/api.js"></script>
         <script src="/assets/js/app.js"></script>
-        <script
-            defer
-            src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"
-        ></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
         <script src="https://js.stripe.com/v3/"></script>
 
         <script>
@@ -939,7 +1796,7 @@
                         color_band_3: "#FFFFFF",
                         color_band_4: "#1A7A1A",
                         promo_banner: "",
-                        restaurant_name: "P.R.T",
+                        restaurant_name: "...",
                         logo_url: "",
                         stripe_pk_public: "",
                         delivery_free_above: 0,
@@ -996,10 +1853,10 @@
                         { code: "+596", label: "+596 (Martinique)" },
                         { code: "+590", label: "+590 (Guadeloupe)" },
                         { code: "+262", label: "+262 (Réunion/Mayotte)" },
-                        { code: "+33", label: "+33 (France)" },
-                        { code: "+32", label: "+32 (Belgique)" },
-                        { code: "+41", label: "+41 (Suisse)" },
-                        { code: "+1", label: "+1 (USA/Canada)" },
+                        { code: "+33",  label: "+33 (France)" },
+                        { code: "+32",  label: "+32 (Belgique)" },
+                        { code: "+41",  label: "+41 (Suisse)" },
+                        { code: "+1",   label: "+1 (USA/Canada)" },
                     ],
 
                     buildPhone(dialCode, raw) {
@@ -1011,93 +1868,56 @@
                         if (!phone) return { code: "+594", raw: "" };
                         for (const dc of this.DIAL_CODES) {
                             if (phone.startsWith(dc.code))
-                                return {
-                                    code: dc.code,
-                                    raw: phone.slice(dc.code.length),
-                                };
+                                return { code: dc.code, raw: phone.slice(dc.code.length) };
                         }
                         return { code: "+594", raw: phone };
                     },
 
                     get filteredProducts() {
-                        const list = this.products.filter(
-                            (p) => p.is_available == 1,
-                        );
+                        const list = this.products.filter(p => p.is_available == 1);
                         if (this.activeCategory === null) return list;
-                        return list.filter(
-                            (p) => p.category_id == this.activeCategory,
-                        );
+                        return list.filter(p => p.category_id == this.activeCategory);
                     },
 
                     get modalTotal() {
                         if (!this.selectedProduct) return 0;
-                        const extra = this.selectedOptions.reduce(
-                            (s, o) => s + parseFloat(o.extra_price || 0),
-                            0,
-                        );
-                        return (
-                            (parseFloat(this.selectedProduct.price) + extra) *
-                            this.modalQty
-                        );
+                        const extra = this.selectedOptions.reduce((s, o) => s + parseFloat(o.extra_price || 0), 0);
+                        return (parseFloat(this.selectedProduct.price) + extra) * this.modalQty;
                     },
 
                     get grandTotal() {
-                        return (
-                            this.$store.cart.subtotal +
-                            (this.mode === "delivery" ? this.deliveryFee : 0)
-                        );
+                        return this.$store.cart.subtotal + (this.mode === "delivery" ? this.deliveryFee : 0);
                     },
 
                     async init() {
-                        const [settingsData, categoriesData, productsData] =
-                            await Promise.all([
-                                api.getSettings().catch(() => ({})),
-                                api.getCategories().catch(() => []),
-                                api.getProducts().catch(() => []),
-                            ]);
+                        const [settingsData, categoriesData, productsData] = await Promise.all([
+                            api.getSettings().catch(() => ({})),
+                            api.getCategories().catch(() => []),
+                            api.getProducts().catch(() => []),
+                        ]);
 
                         if (settingsData.color_primary) {
                             Object.assign(this.settings, settingsData);
                             const root = document.documentElement;
-                            root.style.setProperty(
-                                "--color-primary",
-                                settingsData.color_primary,
-                            );
-                            root.style.setProperty(
-                                "--color-accent",
-                                settingsData.color_accent,
-                            );
-                            root.style.setProperty(
-                                "--color-band-1",
-                                settingsData.color_band_1,
-                            );
-                            root.style.setProperty(
-                                "--color-band-2",
-                                settingsData.color_band_2,
-                            );
-                            root.style.setProperty(
-                                "--color-band-3",
-                                settingsData.color_band_3,
-                            );
-                            root.style.setProperty(
-                                "--color-band-4",
-                                settingsData.color_band_4,
-                            );
-                            document.querySelector(
-                                "meta[name=theme-color]",
-                            ).content = settingsData.color_primary;
-                            document.title =
-                                (settingsData.restaurant_name || "P.R.T") +
-                                " — Restaurant";
+                            root.style.setProperty("--color-primary", settingsData.color_primary);
+                            root.style.setProperty("--color-accent",  settingsData.color_accent);
+                            root.style.setProperty("--color-band-1",  settingsData.color_band_1);
+                            root.style.setProperty("--color-band-2",  settingsData.color_band_2);
+                            root.style.setProperty("--color-band-3",  settingsData.color_band_3);
+                            root.style.setProperty("--color-band-4",  settingsData.color_band_4);
+                            document.querySelector("meta[name=theme-color]").content = settingsData.color_primary;
+                            document.title = (settingsData.restaurant_name || "...") + " — Restaurant";
                         }
 
-                        this.categories = categoriesData.filter(
-                            (c) => c.is_active == 1,
-                        );
+                        this.categories = categoriesData.filter(c => c.is_active == 1);
                         this.products = productsData;
                         this.loading = false;
 
-                        // Calculer frais livraison
+                        // ── CORRECTION BUG deliveryFee ──
+                        // Recalcul dès que le panier change (subtotal réactif via $watch)
+                        this.$watch("$store.cart.subtotal", () => {
+                            this.deliveryFee = this.calcDeliveryFee();
+                        });
                         this.deliveryFee = this.calcDeliveryFee();
 
                         // Charger utilisateur connecté
@@ -1105,33 +1925,22 @@
                         if (userData) {
                             this.authUser = JSON.parse(userData);
                             if (this.authUser.phone) {
-                                const p = this.detectDialCode(
-                                    this.authUser.phone,
-                                );
+                                const p = this.detectDialCode(this.authUser.phone);
                                 this.checkoutDialCode = p.code;
                                 this.checkoutPhoneRaw = p.raw;
                                 this.checkoutPhone = this.authUser.phone;
                             }
-                            // Charger adresses sauvegardées
                             const token = localStorage.getItem("auth_token");
                             if (token) {
-                                fetch("/api/auth/addresses", {
-                                    headers: {
-                                        Authorization: "Bearer " + token,
-                                    },
-                                })
-                                    .then((r) => r.json())
-                                    .then((j) => {
+                                fetch("/api/auth/addresses", { headers: { Authorization: "Bearer " + token } })
+                                    .then(r => r.json())
+                                    .then(j => {
                                         if (j.data) {
                                             this.savedAddresses = j.data;
-                                            // Pré-sélectionner l'adresse par défaut
-                                            const def = j.data.find(
-                                                (a) => a.is_default,
-                                            );
+                                            const def = j.data.find(a => a.is_default);
                                             if (def) {
                                                 this.selectedAddressId = def.id;
-                                                this.checkoutAddress =
-                                                    def.address;
+                                                this.checkoutAddress = def.address;
                                                 this.addrMode = "saved";
                                             }
                                         }
@@ -1139,47 +1948,32 @@
                                     .catch(() => {});
                             }
                         } else {
-                            // Invité : charger la dernière adresse depuis localStorage
-                            const lastAddr = localStorage.getItem(
-                                "last_delivery_address",
-                            );
+                            const lastAddr = localStorage.getItem("last_delivery_address");
                             if (lastAddr) {
                                 this.checkoutAddress = lastAddr;
-                                this.checkoutCity =
-                                    localStorage.getItem(
-                                        "last_delivery_city",
-                                    ) || "";
+                                this.checkoutCity = localStorage.getItem("last_delivery_city") || "";
                             }
                         }
 
                         // Init Stripe
-                        if (
-                            settingsData.stripe_pk_public &&
-                            typeof Stripe !== "undefined"
-                        ) {
-                            this.stripeInstance = Stripe(
-                                settingsData.stripe_pk_public,
-                            );
+                        if (settingsData.stripe_pk_public && typeof Stripe !== "undefined") {
+                            this.stripeInstance = Stripe(settingsData.stripe_pk_public);
                         }
 
                         // Service Worker
                         if ("serviceWorker" in navigator) {
-                            navigator.serviceWorker
-                                .register("/sw.js")
-                                .catch(() => {});
+                            navigator.serviceWorker.register("/sw.js").catch(() => {});
                         }
                     },
 
                     calcDeliveryFee() {
-                        const freeAbove = parseFloat(
-                            this.settings.delivery_free_above || 0,
-                        );
-                        if (
-                            freeAbove > 0 &&
-                            this.$store.cart.subtotal >= freeAbove
-                        )
-                            return 0;
-                        return 3.5; // Valeur par défaut avant chargement depuis backend
+                        const freeAbove = parseFloat(this.settings.delivery_free_above || 0);
+                        // ── FIX : on lit la valeur courante du store directement ──
+                        const subtotal = (this.$store && this.$store.cart)
+                            ? this.$store.cart.subtotal
+                            : 0;
+                        if (freeAbove > 0 && subtotal >= freeAbove) return 0;
+                        return 3.5;
                     },
 
                     // ===== FICHE PLAT =====
@@ -1193,12 +1987,8 @@
                         this.selectedOptions = [];
                         const opts = product.options || [];
                         const groups = {};
-                        opts.forEach((o) => {
-                            if (!groups[o.group_name])
-                                groups[o.group_name] = {
-                                    name: o.group_name,
-                                    options: [],
-                                };
+                        opts.forEach(o => {
+                            if (!groups[o.group_name]) groups[o.group_name] = { name: o.group_name, options: [] };
                             groups[o.group_name].options.push(o);
                             if (o.is_default == 1) this.selectedOptions.push(o);
                         });
@@ -1206,44 +1996,32 @@
                     },
 
                     isOptionSelected(opt) {
-                        return this.selectedOptions.some(
-                            (o) => o.id === opt.id,
-                        );
+                        return this.selectedOptions.some(o => o.id === opt.id);
                     },
 
                     toggleOption(group, opt) {
                         if (this.isOptionSelected(opt)) {
-                            this.selectedOptions = this.selectedOptions.filter(
-                                (o) => o.id !== opt.id,
-                            );
+                            this.selectedOptions = this.selectedOptions.filter(o => o.id !== opt.id);
                         } else {
-                            // Comportement radio si le groupe a un is_default (ex: Riz)
-                            if (group.options.some((o) => o.is_default == 1)) {
-                                this.selectedOptions =
-                                    this.selectedOptions.filter(
-                                        (o) =>
-                                            !group.options.some(
-                                                (go) => go.id === o.id,
-                                            ),
-                                    );
+                            if (group.options.some(o => o.is_default == 1)) {
+                                this.selectedOptions = this.selectedOptions.filter(
+                                    o => !group.options.some(go => go.id === o.id)
+                                );
                             }
                             this.selectedOptions.push(opt);
                         }
                     },
 
                     quickAdd(product) {
-                        const defaults = (product.options || []).filter(
-                            (o) => o.is_default == 1,
-                        );
+                        const defaults = (product.options || []).filter(o => o.is_default == 1);
                         this.$store.cart.addItem(product, defaults, 1);
+                        // Recalc delivery fee after adding
+                        this.$nextTick(() => { this.deliveryFee = this.calcDeliveryFee(); });
                     },
 
                     addToCart() {
-                        this.$store.cart.addItem(
-                            this.selectedProduct,
-                            this.selectedOptions,
-                            this.modalQty,
-                        );
+                        this.$store.cart.addItem(this.selectedProduct, this.selectedOptions, this.modalQty);
+                        this.$nextTick(() => { this.deliveryFee = this.calcDeliveryFee(); });
                         this.selectedProduct = null;
                         this.cartOpen = true;
                     },
@@ -1255,20 +2033,13 @@
                         this.stripeReady = false;
                         this.stripeError = "";
                         this.addrError = "";
-                        this.addrMode = this.selectedAddressId
-                            ? "saved"
-                            : "manual";
+                        this.addrMode = this.selectedAddressId ? "saved" : "manual";
                         this.checkoutOpen = true;
                     },
 
                     // ── Adresses ──
                     addrEmoji(label) {
-                        const map = {
-                            Maison: "🏠",
-                            Travail: "💼",
-                            Famille: "👨‍👩‍👧",
-                            Autre: "📍",
-                        };
+                        const map = { Maison: "🏠", Travail: "💼", Famille: "👨‍👩‍👧", Autre: "📍" };
                         return map[label] || "📍";
                     },
 
@@ -1286,41 +2057,24 @@
                     },
 
                     async useGPS() {
-                        if (!navigator.geolocation) {
-                            this.addrError = "Géolocalisation non disponible";
-                            return;
-                        }
+                        if (!navigator.geolocation) { this.addrError = "Géolocalisation non disponible"; return; }
                         this.gpsLoading = true;
                         this.addrError = "";
                         this.selectedAddressId = null;
                         navigator.geolocation.getCurrentPosition(
-                            async (pos) => {
+                            async pos => {
                                 try {
-                                    const { latitude: lat, longitude: lon } =
-                                        pos.coords;
+                                    const { latitude: lat, longitude: lon } = pos.coords;
                                     const r = await fetch(
                                         `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-                                        {
-                                            headers: {
-                                                "Accept-Language": "fr",
-                                            },
-                                        },
+                                        { headers: { "Accept-Language": "fr" } }
                                     );
                                     const data = await r.json();
                                     const a = data.address || {};
                                     const road = a.road || a.pedestrian || "";
                                     const number = a.house_number || "";
-                                    const city =
-                                        a.city ||
-                                        a.town ||
-                                        a.village ||
-                                        a.municipality ||
-                                        "";
-                                    this.checkoutAddress =
-                                        [number, road]
-                                            .filter(Boolean)
-                                            .join(" ") ||
-                                        data.display_name.split(",")[0];
+                                    const city = a.city || a.town || a.village || a.municipality || "";
+                                    this.checkoutAddress = [number, road].filter(Boolean).join(" ") || data.display_name.split(",")[0];
                                     this.checkoutCity = city;
                                 } catch {
                                     this.checkoutAddress = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
@@ -1329,13 +2083,12 @@
                                 this.addrMode = "manual";
                                 this.gpsLoading = false;
                             },
-                            (err) => {
-                                this.addrError =
-                                    "Position refusée. Veuillez saisir manuellement.";
+                            err => {
+                                this.addrError = "Position refusée. Veuillez saisir manuellement.";
                                 this.addrMode = "manual";
                                 this.gpsLoading = false;
                             },
-                            { timeout: 8000 },
+                            { timeout: 8000 }
                         );
                     },
 
@@ -1343,54 +2096,22 @@
                         this.addrError = "";
                         const finalAddress = this.selectedAddressId
                             ? this.checkoutAddress
-                            : [
-                                  this.checkoutAddress.trim(),
-                                  this.checkoutCity.trim(),
-                              ]
-                                  .filter(Boolean)
-                                  .join(", ");
+                            : [this.checkoutAddress.trim(), this.checkoutCity.trim()].filter(Boolean).join(", ");
 
-                        if (!finalAddress) {
-                            this.addrError = "Veuillez renseigner une adresse";
-                            return;
-                        }
+                        if (!finalAddress) { this.addrError = "Veuillez renseigner une adresse"; return; }
 
-                        // Sauvegarder en localStorage (invité ou connecté)
-                        localStorage.setItem(
-                            "last_delivery_address",
-                            this.checkoutAddress.trim(),
-                        );
-                        if (this.checkoutCity)
-                            localStorage.setItem(
-                                "last_delivery_city",
-                                this.checkoutCity.trim(),
-                            );
+                        localStorage.setItem("last_delivery_address", this.checkoutAddress.trim());
+                        if (this.checkoutCity) localStorage.setItem("last_delivery_city", this.checkoutCity.trim());
 
-                        // Sauvegarder dans le profil si demandé
-                        if (
-                            this.authUser &&
-                            this.saveAddressCheck &&
-                            this.checkoutAddress.trim() &&
-                            this.saveAddressLabel.trim()
-                        ) {
+                        if (this.authUser && this.saveAddressCheck && this.checkoutAddress.trim() && this.saveAddressLabel.trim()) {
                             const token = localStorage.getItem("auth_token");
                             fetch("/api/auth/addresses", {
                                 method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    Authorization: "Bearer " + token,
-                                },
-                                body: JSON.stringify({
-                                    label: this.saveAddressLabel.trim(),
-                                    address: finalAddress,
-                                    is_default: 0,
-                                }),
+                                headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                                body: JSON.stringify({ label: this.saveAddressLabel.trim(), address: finalAddress, is_default: 0 }),
                             })
-                                .then((r) => r.json())
-                                .then((j) => {
-                                    if (j.data)
-                                        this.savedAddresses.unshift(j.data);
-                                })
+                                .then(r => r.json())
+                                .then(j => { if (j.data) this.savedAddresses.unshift(j.data); })
                                 .catch(() => {});
                         }
 
@@ -1408,75 +2129,49 @@
                                 style: {
                                     base: {
                                         fontSize: "16px",
-                                        color: "#111",
-                                        "::placeholder": { color: "#aaa" },
+                                        fontFamily: "'DM Sans', sans-serif",
+                                        color: "#1A1A1A",
+                                        "::placeholder": { color: "#AAA" },
                                     },
                                 },
                             });
                             this.stripeCard.mount("#stripe-card-element");
-                            this.stripeCard.on("ready", () => {
-                                this.stripeReady = true;
-                            });
-                            this.stripeCard.on("change", (e) => {
-                                this.stripeError = e.error
-                                    ? e.error.message
-                                    : "";
-                            });
+                            this.stripeCard.on("ready", () => { this.stripeReady = true; });
+                            this.stripeCard.on("change", e => { this.stripeError = e.error ? e.error.message : ""; });
                         });
                     },
 
                     async submitPayment() {
-                        if (this.payLoading) return; // ← double protection
-                        if (!this.stripeInstance) {
-                            this.stripeError =
-                                "Stripe non configuré. Contactez le restaurant.";
-                            return;
-                        }
+                        if (this.payLoading) return;
+                        if (!this.stripeInstance) { this.stripeError = "Stripe non configuré. Contactez le restaurant."; return; }
                         this.payLoading = true;
                         this.stripeError = "";
 
                         try {
-                            const address =
-                                this.mode === "delivery"
-                                    ? this.checkoutAddress.trim()
-                                    : null;
+                            const address = this.mode === "delivery" ? this.checkoutAddress.trim() : null;
 
                             const result = await api.createIntent({
-                                items: this.$store.cart.items.map((i) => ({
-                                    id: i.id,
-                                    qty: i.qty,
-                                    options: i.options,
-                                })),
-                                phone:
-                                    this.buildPhone(
-                                        this.checkoutDialCode,
-                                        this.checkoutPhoneRaw,
-                                    ) || this.checkoutPhone,
-                                type:
-                                    this.mode === "pickup"
-                                        ? "pickup"
-                                        : "delivery",
+                                items: this.$store.cart.items.map(i => ({ id: i.id, qty: i.qty, options: i.options })),
+                                phone: this.buildPhone(this.checkoutDialCode, this.checkoutPhoneRaw) || this.checkoutPhone,
+                                type: this.mode === "pickup" ? "pickup" : "delivery",
                                 delivery_address: address,
                             });
 
                             this.pendingOrderToken = result.order_token;
-                            this.deliveryFee = result.delivery_fee || 0;
+                            // ── FIX : mise à jour de deliveryFee depuis la réponse backend ──
+                            if (result.delivery_fee !== undefined) {
+                                this.deliveryFee = result.delivery_fee;
+                            }
 
-                            const { error, paymentIntent } =
-                                await this.stripeInstance.confirmCardPayment(
-                                    result.client_secret,
-                                    {
-                                        payment_method: {
-                                            card: this.stripeCard,
-                                        },
-                                    },
-                                );
+                            const { error, paymentIntent } = await this.stripeInstance.confirmCardPayment(
+                                result.client_secret,
+                                { payment_method: { card: this.stripeCard } }
+                            );
 
                             if (error) {
                                 this.stripeError = error.message;
                             } else if (paymentIntent.status === "succeeded") {
                                 this.checkoutOpen = false;
-                                // Si connecté avec un nom déjà renseigné → pas de popup
                                 if (this.authUser?.name) {
                                     this.customerName = this.authUser.name;
                                     await this.finalizeOrder();
@@ -1493,66 +2188,26 @@
 
                     async finalizeOrder() {
                         if (this.pendingOrderToken) {
-                            // await fetch(
-                            //     "/api/orders/" +
-                            //         this.pendingOrderToken +
-                            //         "/confirm",
-                            //     {
-                            //         method: "PATCH",
-                            //         headers: {
-                            //             "Content-Type": "application/json",
-                            //         },
-                            //     },
-                            // ).catch(() => {});
-
                             const name = this.customerName.trim();
                             if (name) {
-                                // Sauvegarder le nom sur la commande
-                                await fetch(
-                                    "/api/orders/" +
-                                        this.pendingOrderToken +
-                                        "/name",
-                                    {
-                                        method: "PATCH",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                        },
-                                        body: JSON.stringify({
-                                            customer_name: name,
-                                        }),
-                                    },
-                                ).catch(() => {});
+                                await fetch("/api/orders/" + this.pendingOrderToken + "/name", {
+                                    method: "PATCH",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ customer_name: name }),
+                                }).catch(() => {});
 
-                                // Si connecté et pas encore de nom → sauvegarder dans le profil
                                 if (this.authUser && !this.authUser.name) {
-                                    const token =
-                                        localStorage.getItem("auth_token");
-                                    const res = await fetch(
-                                        "/api/auth/profile",
-                                        {
-                                            method: "PATCH",
-                                            headers: {
-                                                "Content-Type":
-                                                    "application/json",
-                                                Authorization:
-                                                    "Bearer " + token,
-                                            },
-                                            body: JSON.stringify({ name }),
-                                        },
-                                    ).catch(() => null);
+                                    const token = localStorage.getItem("auth_token");
+                                    const res = await fetch("/api/auth/profile", {
+                                        method: "PATCH",
+                                        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                                        body: JSON.stringify({ name }),
+                                    }).catch(() => null);
                                     if (res?.ok) {
-                                        const updated = await res
-                                            .json()
-                                            .catch(() => null);
+                                        const updated = await res.json().catch(() => null);
                                         if (updated?.data) {
-                                            this.authUser = {
-                                                ...this.authUser,
-                                                name,
-                                            };
-                                            localStorage.setItem(
-                                                "auth_user",
-                                                JSON.stringify(this.authUser),
-                                            );
+                                            this.authUser = { ...this.authUser, name };
+                                            localStorage.setItem("auth_user", JSON.stringify(this.authUser));
                                         }
                                     }
                                 }
@@ -1560,12 +2215,82 @@
                         }
                         this.$store.cart.clear();
                         this.postPaymentOpen = false;
-                        window.location.href =
-                            "/track.html?token=" + this.pendingOrderToken;
+                        window.location.href = "/track.html?token=" + this.pendingOrderToken;
                     },
                 };
             }
         </script>
         <script src="/assets/js/pwa-install.js" defer></script>
+        
+        <script>
+(function(){
+  const vp     = document.getElementById('bnaVp');
+  const track  = document.getElementById('bnaT');
+  const dotsWrap = document.getElementById('bnaDots');
+  const slides = Array.from(track.querySelectorAll('.bna-slide'));
+  const n = slides.length;
+  let cur=0, timer, dragging=false, sx=0, diff=0;
+
+  function buildDots(){
+    dotsWrap.innerHTML='';
+    slides.forEach((_,i)=>{
+      const b=document.createElement('button');
+      b.className='bna-dot'+(i===0?' active':'');
+      b.setAttribute('aria-label','Slide '+(i+1));
+      b.addEventListener('click',()=>go(i));
+      dotsWrap.appendChild(b);
+    });
+  }
+
+  function updateDots(){
+    dotsWrap.querySelectorAll('.bna-dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+  }
+
+  function snap(){
+    track.style.transition='transform .6s cubic-bezier(0.16,1,0.3,1)';
+    track.style.transform=`translateX(-${cur*100}%)`;
+  }
+
+  function go(idx){
+    slides[cur].classList.remove('is-active');
+    cur=(idx+n)%n;
+    snap();
+    slides[cur].classList.add('is-active');
+    updateDots();
+    reset();
+  }
+
+  function reset(){ clearInterval(timer); timer=setInterval(()=>go(cur+1),5000); }
+
+  vp.addEventListener('pointerdown',e=>{
+    dragging=true; sx=e.clientX; diff=0;
+    track.style.transition='none';
+    vp.classList.add('is-dragging');
+    vp.setPointerCapture(e.pointerId);
+    clearInterval(timer);
+  });
+
+  vp.addEventListener('pointermove',e=>{
+    if(!dragging)return;
+    diff=e.clientX-sx;
+    track.style.transform=`translateX(${-(cur*vp.offsetWidth)+diff}px)`;
+  });
+
+  vp.addEventListener('pointerup',()=>{
+    if(!dragging)return;
+    dragging=false;
+    vp.classList.remove('is-dragging');
+    go(Math.abs(diff)>50 ? (diff<0?cur+1:cur-1) : cur);
+  });
+
+  vp.addEventListener('pointercancel',()=>{
+    if(dragging){ dragging=false; vp.classList.remove('is-dragging'); go(cur); }
+  });
+
+  buildDots();
+  reset();
+})();
+</script>
+
     </body>
 </html>
